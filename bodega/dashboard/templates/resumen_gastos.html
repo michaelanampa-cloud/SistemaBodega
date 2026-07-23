@@ -1,0 +1,214 @@
+{% extends 'dashboard_base.html' %}
+
+{% block title %}Resumen de Gastos{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid p-0">
+  <div class="mb-4">
+    <h1><i class="fa-solid fa-chart-pie"></i> Resumen histórico de gastos</h1>
+    <p class="text-muted">Aquí se muestra el total de gastos y el historial por tipo de compra.</p>
+  </div>
+
+  <form method="get" class="row g-2 align-items-end mb-4">
+    <div class="col-md-2">
+      <label class="form-label">Desde</label>
+      <input type="date" name="start_date" class="form-control" value="{{ start_date|date:'Y-m-d' }}">
+    </div>
+    <div class="col-md-2">
+      <label class="form-label">Hasta</label>
+      <input type="date" name="end_date" class="form-control" value="{{ end_date|date:'Y-m-d' }}">
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Proveedor</label>
+      <select name="proveedor" class="form-select">
+        <option value="">Todos los Proveedores</option>
+        {% for proveedor in proveedores %}
+          <option value="{{ proveedor.pk }}" {% if proveedor_id == proveedor.pk|stringformat:'s' %}selected{% endif %}>{{ proveedor.nombre }} - {{ proveedor.telefono }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <button class="btn btn-outline-primary w-100"><i class="fas fa-filter"></i> Aplicar</button>
+    </div>
+    <div class="col-md-2">
+      <a href="{% url 'resumen_gastos' %}" class="btn btn-outline-secondary w-100 mt-2"><i class="fas fa-trash"></i> Limpiar</a>
+    </div>
+  </form>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="card shadow-sm border-primary">
+        <div class="card-body">
+          <h5 class="card-title"><i class="fa-solid fa-chart-column"></i> Total Gastos</h5>
+          <p class="display-6">S/ {{ total_gastos }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-8">
+      <div class="card shadow-sm border-success">
+        <div class="card-body">
+          <h5 class="card-title"><i class="fa-solid fa-chart-pie"></i> Gastos por tipo de compra</h5>
+          <div class="row">
+            <div class="col-md-6 d-flex align-items-center justify-content-center">
+              <canvas id="gastosChart" width="300" height="300"></canvas>
+            </div>
+            <div class="col-md-6">
+              {% if resumen_por_tipo %}
+                <ul id="listaTipos" class="list-group list-group-flush">
+                  {% for item in resumen_por_tipo %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center" data-tipo="{{ item.tipo_compra }}">
+                      <span>{{ item.tipo_compra|capfirst }}</span>
+                      <span>S/ {{ item.total }}</span>
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% else %}
+                <p class="mb-0">No hay gastos registrados aún.</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-header bg-dark text-white">
+      <h5 class="mb-0"><i class="fa-solid fa-bars-staggered"></i> Historial de Gastos</h5>
+    </div>
+    <div class="card-body p-0">
+      {% if gastos %}
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Código</th>
+                <th>Proveedor</th>
+                <th>Tipo</th>
+                <th>Total</th>
+                <th>Fecha</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for gasto in gastos %}
+                <tr data-tipo="{{ gasto.tipo_compra }}">
+                  <td>{{ gasto.codigo }}</td>
+                  <td>{{ gasto.proveedor.nombre }}</td>
+                  <td>{{ gasto.get_tipo_compra_display }}</td>
+                  <td>S/ {{ gasto.total }}</td>
+                  <td>{{ gasto.fecha|date:'d/m/Y H:i' }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="p-4">
+          <p class="mb-0">No hay gastos aún. Registra un gasto para ver el historial.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+  {{ resumen_por_tipo|json_script:"resumen-data" }}
+  {{ total_gastos|json_script:"total-gastos-data" }}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      try {
+        const resumenData = document.getElementById('resumen-data');
+        const totalGastosData = document.getElementById('total-gastos-data');
+        
+        if (!resumenData || !totalGastosData) {
+          console.warn('Datos JSON no encontrados');
+          return;
+        }
+        
+        const resumen = JSON.parse(resumenData.textContent || '[]');
+        const totalGastos = parseFloat(JSON.parse(totalGastosData.textContent || '0')) || 0;
+
+        if (!resumen || resumen.length === 0) {
+          console.log('Sin datos de resumen');
+          return;
+        }
+
+        const labels = resumen.map(r => {
+          const tipo = r.tipo_compra || r.tipo || 'Desconocido';
+          return tipo.charAt(0).toUpperCase() + tipo.slice(1);
+        });
+        const dataValues = resumen.map(r => Number(r.total) || 0);
+
+        const canvas = document.getElementById('gastosChart');
+        if (!canvas) {
+          console.warn('Canvas no encontrado');
+          return;
+        }
+        
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          console.warn('Contexto 2D no disponible');
+          return;
+        }
+
+        const colors = ['#4e73df', '#1cc88a', '#f6c23e'];
+
+        const gastosChart = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: labels,
+            datasets: [{
+              data: dataValues,
+              backgroundColor: colors.slice(0, dataValues.length),
+              hoverOffset: 8
+            }]
+          },
+          options: {
+            plugins: {
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    const value = context.parsed || 0;
+                    const percent = totalGastos ? (value / totalGastos * 100).toFixed(2) : '0.00';
+                    return `${context.label}: S/ ${value} (${percent}%)`;
+                  }
+                }
+              }
+            },
+            onClick: (evt, elements) => {
+              if (!elements.length) return;
+              const index = elements[0].index;
+              const tipo = resumen[index].tipo_compra || resumen[index].tipo;
+              toggleFilterTipo(tipo);
+            }
+          }
+        });
+
+        let currentFilter = null;
+        function toggleFilterTipo(tipo) {
+          const rows = document.querySelectorAll('table.table tbody tr');
+          if (currentFilter === tipo) {
+            rows.forEach(r => r.style.display = '');
+            currentFilter = null;
+            return;
+          }
+          currentFilter = tipo;
+          rows.forEach(r => {
+            r.style.display = r.dataset.tipo === tipo ? '' : 'none';
+          });
+        }
+
+        document.querySelectorAll('#listaTipos [data-tipo]').forEach(li => {
+          li.style.cursor = 'pointer';
+          li.addEventListener('click', () => {
+            toggleFilterTipo(li.dataset.tipo);
+          });
+        });
+      } catch (e) {
+        console.error('Error en gráfica:', e);
+      }
+    });
+  </script>
+{% endblock %}

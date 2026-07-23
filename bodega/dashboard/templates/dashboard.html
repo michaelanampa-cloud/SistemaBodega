@@ -1,0 +1,149 @@
+{% extends 'dashboard_base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid p-0">
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+    <div>
+      <h1 class="mb-1"><i class="fa-solid fa-chart-pie"></i> Resumen de balance</h1>
+      <p class="text-muted mb-0">Compras menos gastos en un rango de fechas.</p>
+    </div>
+  </div>
+
+  <form method="get" class="row g-2 align-items-end mb-4">
+    <div class="col-md-4">
+      <label class="form-label">Desde</label>
+      <input type="date" name="start_date" class="form-control" value="{{ start_date|date:'Y-m-d' }}">
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Hasta</label>
+      <input type="date" name="end_date" class="form-control" value="{{ end_date|date:'Y-m-d' }}">
+    </div>
+    <div class="col-md-2">
+      <label class="form-label">Tipo pago</label>
+      <select name="tipo" class="form-select">
+        <option value="">Todos</option>
+        <option value="yape" {% if tipo == 'yape' %}selected{% endif %}>Yape</option>
+        <option value="efectivo" {% if tipo == 'efectivo' %}selected{% endif %}>Efectivo</option>
+        <option value="fiado" {% if tipo == 'fiado' %}selected{% endif %}>Fiado</option>
+      </select>
+    </div>
+    <div class="col-md-4">
+      <button class="btn btn-outline-primary"><i class="fas fa-filter"></i> Aplicar</button>
+      <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary"><i class="fas fa-trash"></i> Limpiar</a>
+    </div>
+  </form>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="card shadow-sm border-success">
+        <div class="card-body">
+          <h5 class="card-title"><i class="fa-solid fa-chart-column"></i> Compras</h5>
+          <p class="display-6 text-success">S/ {{ total_compras|floatformat:2 }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow-sm border-danger">
+        <div class="card-body">
+          <h5 class="card-title"><i class="fa-solid fa-chart-column"></i> Gastos</h5>
+          <p class="display-6 text-danger">S/ {{ total_gastos|floatformat:2 }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow-sm {% if balance >= 0 %}border-primary{% else %}border-warning{% endif %}">
+        <div class="card-body">
+          <h5 class="card-title"><i class="fa-solid fa-chart-column"></i> Balance</h5>
+          <p class="display-6 {% if balance >= 0 %}text-primary{% else %}text-warning{% endif %}">S/ {{ balance|floatformat:2 }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title"><i class="fa-solid fa-chart-pie"></i> Gráfica de balance</h5>
+          <div class="d-flex justify-content-center">
+            <canvas id="balanceChart" width="280" height="280"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+          <h5 class="mb-0"><i class="fa-solid fa-coins"></i> Últimas compras</h5>
+        </div>
+        <div class="card-body p-0">
+          {% if compras %}
+            <ul class="list-group list-group-flush">
+              {% for compra in compras %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <span>
+                    {{ compra.codigo }}<br>
+                    <small class="text-muted">{{ compra.fecha|date:'d/m/Y' }}</small>
+                  </span>
+                  <strong>S/ {{ compra.total }}</strong>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <div class="p-4">
+              <p class="mb-0">No hay compras en el rango seleccionado.</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+  {{ chart_data|json_script:"chart-data" }}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const chartDataEl = document.getElementById('chart-data');
+      if (!chartDataEl) return;
+
+      const chartData = JSON.parse(chartDataEl.textContent || '[]');
+      const canvas = document.getElementById('balanceChart');
+      if (!canvas) return;
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      const labels = chartData.map(item => item.label);
+      const values = chartData.map(item => Number(item.total) || 0);
+
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: values,
+            backgroundColor: ['#189f04', '#dc3545']
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: 'bottom' },
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  return `${context.label}: S/ ${context.parsed.toFixed(2)}`;
+                }
+              }
+            }
+          }
+        }
+      });
+    });
+  </script>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Catálogo{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+  <form method="get">
+    <div class="row g-3 align-items-end">
+      <div class="col-md-5">
+        <label class="form-label">Buscar producto</label>
+        <input type="text" name="q" class="form-control" value="{{ query }}" placeholder="Nombre o descripción">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Filtrar por tipo</label>
+        <select name="tipo" class="form-select">
+          <option value="">Todos los tipos</option>
+          {% for tipo_item in tipos_disponibles %}
+            <option value="{{ tipo_item }}" {% if tipo_item == tipo %}selected{% endif %}>{{ tipo_item }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3 d-grid">
+        <button class="btn btn-outline-primary"><i class="fas fa-search"></i>  Buscar</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+  {% for producto in page_obj.object_list %}
+    <div class="col">
+      <div class="card h-100 shadow-sm border-0 producto-card">
+        {% if producto.imagen %}
+          <img src="{% static 'img/productos/' %}{{ producto.imagen }}" class="card-img-top detalle-img img-fluid" alt="{{ producto.nombre }}">
+        {% else %}
+          <img src="{% static 'img/logo.png' %}" class="card-img-top" alt="Sin imagen">
+        {% endif %}
+        <div class="card-body d-flex flex-column bg-img text-black">
+          <h5 class="card-title">{{ producto.nombre }}</h5>
+          <p class="card-text text-muted mb-2">{{ producto.tipoProducto }}</p>
+          <p class="card-text flex-grow-1">{{ producto.detalle|default:'Sin descripción'|truncatechars:120 }}</p>
+          <div class="d-flex justify-content-between align-items-center mt-3">
+            <span class="fw-bold">S/ {{ producto.precio }}</span>
+            <span class="text-secondary">{{ producto.stock }} {{ producto.unidadMedida }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <div class="col-12">
+      <div class="alert alert-warning">No se han encontrado productos con esos criterios.</div>
+    </div>
+  {% endfor %}
+</div>
+
+<nav aria-label="Paginación" class="mt-4">
+  <ul class="pagination justify-content-center">
+    {% if page_obj.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?q={{ query }}&tipo={{ tipo }}&page={{ page_obj.previous_page_number }}">Anterior</a>
+      </li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+      {% if num == page_obj.number %}
+        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+      {% elif num >= page_obj.number|add:'-3' and num <= page_obj.number|add:'3' %}
+        <li class="page-item"><a class="page-link" href="?q={{ query }}&tipo={{ tipo }}&page={{ num }}">{{ num }}</a></li>
+      {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?q={{ query }}&tipo={{ tipo }}&page={{ page_obj.next_page_number }}">Siguiente</a>
+      </li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endblock %}

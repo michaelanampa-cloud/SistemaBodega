@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Inicio{% endblock %}
+
+{% block content %}
+
+{% load static %}
+<div class="row bg-light p-4 mb-4 rounded-3 text-center">
+  <div class="col-md-4">
+    <img src="{% static 'img/logo.png' %}" alt="Logo Bodega" class="img-fluid">
+  </div>
+  <div class="col-md-8">
+    <span class="h3">Lorem ipsum dolor sit amet consectetur adipisicing elit. Id in enim, 
+      vero sunt illum quas possimus? Quasi corporis eos nisi aut eius itaque in laborum? Similique at tempore neque error.</span>
+  </div>
+</div>
+
+<div class="row p-4 mb-4 rounded-3 text-center bg-dark">
+  <div class="col-md-8">
+    <span class="h3 text-white">Lorem ipsum dolor sit amet consectetur adipisicing elit. Id in enim, 
+      vero sunt illum quas possimus? Quasi corporis eos nisi aut eius itaque in laborum? Similique at tempore neque error.</span>
+  </div>
+  <div class="col-md-4">
+    {% load static %}
+    <img src="{% static 'img/logo.png' %}" alt="Logo Bodega" class="img-fluid">
+  </div>
+</div>
+
+<div class="row p-4 mb-4 rounded-3 text-center bg-light">
+  <div class="col-md-4">
+    {% load static %}
+    <img src="{% static 'img/logo.png' %}" alt="Logo Bodega" class="img-fluid">
+  </div>
+  <div class="col-md-8">
+    <span class="h3">Lorem ipsum dolor sit amet consectetur adipisicing elit. Id in enim, 
+      vero sunt illum quas possimus? Quasi corporis eos nisi aut eius itaque in laborum? Similique at tempore neque error.</span>
+  </div>
+</div>
+
+
+<div class="p-5 mb-4 bg-light rounded-3 text-center">
+  <div class="container-fluid py-5">
+    {% load static %}
+    <img src="{% static 'img/logo.png' %}" alt="Logo Bodega" class="welcome-logo rounded-circle shadow-sm">
+    <h1 class="display-5 fw-bold">{{ mensaje }}</h1>
+    {% if not user.is_authenticated %}
+      <p class="col-md-8 mx-auto fs-4">Accede para ver el catálogo completo, productos, carrito y más.</p>
+      <a class="btn btn-primary btn-lg" href="{% url 'login' %}">Iniciar sesión</a>
+    {% else %}
+      <p class="col-md-8 mx-auto fs-4">Explora el sitio usando el menú superior.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

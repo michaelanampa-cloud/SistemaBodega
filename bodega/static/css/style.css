@@ -1,0 +1,43 @@
+.brand-logo {
+  max-height: 40px;
+  width: auto;
+  margin-right: 10px;
+}
+
+.welcome-logo {
+  max-width: 120px;
+  width: auto;
+  margin-bottom: 1rem;
+}
+
+body {
+  min-height: 100vh;
+}
+
+footer {
+  margin-top: auto;
+}
+
+/* Efecto hover para crecer la tarjeta */
+.producto-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.producto-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Efecto hover solo para la imagen de detalle */
+.detalle-img {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.detalle-img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.25);
+}
+
+.bg-img {
+    background-color: rgba(126, 125, 125, 0.12); /* Fondo semitransparente */
+}

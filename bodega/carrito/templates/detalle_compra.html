@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalle de Compra{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h1 class="mb-4">Detalle de Compra</h1>
+
+  <div class="card mb-4">
+    <div class="card-header bg-dark text-white">
+      <h5 class="mb-0 text-white"><i class="fa-solid fa-circle-info"></i> Información de la Compra</h5>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <p><strong>Código:</strong> {{ compra.codigo }}</p>
+          <p><strong>Fecha:</strong> {{ compra.fecha|date:'d/m/Y H:i' }}</p>
+          <p><strong>Usuario:</strong>
+            {% if compra.user %}
+              {{ compra.user.username }}
+            {% else %}
+              Anónimo
+            {% endif %}
+          </p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>Cliente:</strong>
+            {% if compra.cliente %}
+              {{ compra.cliente.nombre }} - {{ compra.cliente.telefono }}
+            {% else %}
+              Sin cliente asignado
+            {% endif %}
+          </p>
+          <p><strong>Tipo de Compra:</strong> {{ compra.get_tipo_compra_display }}</p>
+          <p><strong>Total:</strong> S/ {{ compra.total }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header bg-success text-white">
+      <h5 class="mb-0"><i class="fa-solid fa-industry"></i> Productos</h5>
+    </div>
+    <div class="card-body p-0">
+      <table class="table table-bordered mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Producto</th>
+            <th>Precio</th>
+            <th>Cantidad</th>
+            <th>Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in compra.items.all %}
+            <tr>
+              <td>{{ item.producto.nombre }}</td>
+              <td>S/ {{ item.precio }}</td>
+              <td>{{ item.cantidad }}</td>
+              <td>S/ {{ item.subtotal }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    
+    <div class="card-footer">
+      <div class="row text-end" style="max-width: 400px; margin-left: auto;">
+        <div class="col-12 mb-2">
+          <p class="mb-0"><strong>Subtotal:</strong> S/ {{ compra.subtotal }}</p>
+        </div>
+        {% if compra.descuento %}
+          <div class="col-12 mb-2 text-danger">
+            <p class="mb-0"><strong>Descuento:</strong> -S/ {{ compra.descuento }}</p>
+          </div>
+        {% endif %}
+        {% if compra.adicional %}
+          <div class="col-12 mb-2 text-warning">
+            <p class="mb-0"><strong>Adicional:</strong> +S/ {{ compra.adicional }}</p>
+          </div>
+        {% endif %}
+        <div class="col-12 border-top pt-2">
+          <h5 class="text-primary"><strong>Total:</strong> S/ {{ compra.total }}</h5>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-between mt-4">
+    <a href="{% url 'lista_compras' %}" class="btn btn-secondary"><i class="fas fa-arrow-rotate-left"></i> Volver a lista</a>
+    <a class="btn btn-success" href="{% url 'exportar_pdf' compra.pk %}"><i class="fas fa-file-pdf"></i> Exportar PDF</a>
+  </div>
+</div>
+{% endblock %}

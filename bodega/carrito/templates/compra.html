@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  {% if es_formulario %}
+    Registrar Compra
+  {% else %}
+    Detalle de Compra
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  {% if es_formulario %}
+    <!-- Formulario para registrar compra -->
+    <h1 class="mb-4"><i class="fas fa-cart-plus"></i> Registrar Compra</h1>
+    
+    <div class="card mb-4">
+      <div class="card-header bg-success text-white">
+        <h5 class="mb-0"><i class="fas fa-list"></i> Resumen del Carrito</h5>
+      </div>
+      <div class="card-body">
+        <table class="table table-bordered">
+          <thead class="table-dark">
+            <tr>
+              <th>Producto</th>
+              <th>Precio</th>
+              <th>Cantidad</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in items %}
+            <tr>
+              <td>{{ item.producto.nombre }}</td>
+              <td>S/ {{ item.precio }}</td>
+              <td>{{ item.cantidad }}</td>
+              <td>S/ {{ item.subtotal }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        <div class="text-end border-top pt-3">
+          <form method="post">
+            <div class="row g-3 mb-3" style="max-width: 350px; margin-left: auto;">
+              <div class="col-6">
+                <label for="descuento" class="form-label mb-1">Descuento (S/)</label>
+                <input type="number" id="descuento" name="descuento" class="form-control" step="0.01" min="0" value="0" placeholder="0.00">
+              </div>
+              <div class="col-6">
+                <label for="adicional" class="form-label mb-1">Adicional (S/)</label>
+                <input type="number" id="adicional" name="adicional" class="form-control" step="0.01" min="0" value="0" placeholder="0.00">
+              </div>
+            </div>
+            <br>
+            <div class="card-header bg-primary text-white">
+              <h5 class="mb-0"><i class="fas fa-info-circle"></i> Información de la Compra</h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="cliente" class="form-label">Seleccionar Cliente (opcional):</label>
+                  <select name="cliente" id="cliente" class="form-select">
+                    <option value="">-- Seleccionar Cliente --</option>
+                    {% for cliente in clientes %}
+                      <option value="{{ cliente.id }}">{{ cliente.nombre }} - {{ cliente.telefono }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="tipo_compra" class="form-label">Tipo de Compra:</label>
+                  <select name="tipo_compra" id="tipo_compra" class="form-select" required>
+                    <option value="">-- Seleccionar Tipo de Compra --</option>
+                    <option value="yape">Yape</option>
+                    <option value="efectivo">Efectivo</option>
+                    <option value="fiado">Fiado</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="row g-3 mb-3" style="max-width: 350px; margin-left: auto;">
+              <div class="col-12">
+                <div class="col-12">
+                <button type="submit" class="btn btn-outline-success"><i class="fas fa-save"></i> Registrar Compra con Totales Actualizados</button>
+              </div>
+            </div>
+          <div class="border-top pt-2">
+            <h5 class="mb-2">Subtotal: S/ <span id="subtotal-display">{{ total }}</span></h5>
+            <h4 class="text-primary">Total: S/ <span id="total-display">{{ total }}</span></h4>
+          </div>
+          <a href="{% url 'carrito' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver al Carrito</a>
+            {% csrf_token %}
+          </form>
+          
+        </div>
+      </div>
+    </div>
+<!-- 1 primera forma de registro 
+    <form method="post" class="card">
+      {% csrf_token %}
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="fas fa-info-circle"></i> Información de la Compra</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="cliente" class="form-label">Seleccionar Cliente (opcional):</label>
+            <select name="cliente" id="cliente" class="form-select">
+              <option value="">-- Seleccionar Cliente --</option>
+              {% for cliente in clientes %}
+                <option value="{{ cliente.id }}">{{ cliente.nombre }} - {{ cliente.telefono }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="tipo_compra" class="form-label">Tipo de Compra:</label>
+            <select name="tipo_compra" id="tipo_compra" class="form-select" required>
+              <option value="">-- Seleccionar Tipo de Compra --</option>
+              <option value="yape">Yape</option>
+              <option value="efectivo">Efectivo</option>
+              <option value="fiado">Fiado</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-footer d-flex gap-2">
+        <button type="submit" class="btn btn-success"><i class="fas fa-cart-plus"></i> Registrar Compra</button>
+        <a href="{% url 'carrito' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver al Carrito</a>
+      </div>
+    </form>
+-->
+  {% else %}
+    <!-- Detalle de compra registrada -->
+    <h1 class="mb-4">Detalle de Compra</h1>
+
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Información de la Compra</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <p><strong>Código:</strong> {{ compra.codigo }}</p>
+            <p><strong>Fecha:</strong> {{ compra.fecha|date:'d/m/Y H:i' }}</p>
+            <p><strong>Usuario:</strong>
+              {% if compra.user %}
+                {{ compra.user.username }}
+              {% else %}
+                Anónimo
+              {% endif %}
+            </p>
+          </div>
+          <div class="col-md-6">
+            <p><strong>Cliente:</strong>
+              {% if compra.cliente %}
+                {{ compra.cliente.nombre }} - {{ compra.cliente.telefono }}
+              {% else %}
+                Sin cliente asignado
+              {% endif %}
+            </p>
+            <p><strong>Tipo de Compra:</strong> 
+              {% if compra.tipo_compra == 'yape' %}
+                <span class="badge bg-primary">Yape</span>
+              {% elif compra.tipo_compra == 'efectivo' %}
+                <span class="badge bg-success">Efectivo</span>
+              {% elif compra.tipo_compra == 'fiado' %}
+                <span class="badge bg-warning text-dark">Fiado</span>
+              {% endif %}
+            </p>
+            <p><strong>Total:</strong> S/ {{ compra.total }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-header bg-info text-white">
+        <h5 class="mb-0">Productos</h5>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-bordered mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Producto</th>
+              <th>Precio</th>
+              <th>Cantidad</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in compra.items.all %}
+            <tr>
+              <td>{{ item.producto.nombre }}</td>
+              <td>S/ {{ item.precio }}</td>
+              <td>{{ item.cantidad }}</td>
+              <td>S/ {{ item.subtotal }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-between mt-4">
+      <button class="btn btn-secondary" onclick="window.print()">Imprimir</button>
+      <a class="btn btn-success" href="{% url 'exportar_pdf' compra.pk %}">Exportar PDF</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const descuentoInput = document.getElementById('descuento');
+    const adicionalInput = document.getElementById('adicional');
+    const subtotalDisplay = document.getElementById('subtotal-display');
+    const totalDisplay = document.getElementById('total-display');
+
+    function actualizarTotales() {
+        let rowTotal = "{{ total }}".toString().replace(',', '.');
+        let subtotal = parseFloat(rowTotal) || 0;
+        let descuento = parseFloat(descuentoInput.value.replace(',', '.')) || 0;
+        let adicional = parseFloat(adicionalInput.value.replace(',', '.')) || 0;
+
+        let total = subtotal - descuento + adicional;
+
+        subtotalDisplay.textContent = subtotal.toFixed(2);
+        totalDisplay.textContent = total.toFixed(2);
+    }
+
+    descuentoInput.addEventListener('input', actualizarTotales);
+    adicionalInput.addEventListener('input', actualizarTotales);
+
+  });
+  
+</script>
+{% endblock %}

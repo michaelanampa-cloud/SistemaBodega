@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Proveedores{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Proveedores</h1>
+    <a href="{% url 'nuevo_proveedor' %}" class="btn btn-dark"><i class="fa-regular fa-square-plus"></i> Nuevo Proveedor</a>
+  </div>
+
+  {% if proveedores %}
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Correo</th>
+            <th>Teléfono</th>
+            <th>Dirección</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for proveedor in proveedores %}
+            <tr>
+              <td>{{ proveedor.id }}</td>
+              <td>{{ proveedor.nombre }}</td>
+              <td>{{ proveedor.email }}</td>
+              <td>{{ proveedor.telefono }}</td>
+              <td>{{ proveedor.direccion|default:'-' }}</td>
+              <td>
+                <a href="{% url 'editar_proveedor' proveedor.pk %}" class="btn btn-sm btn-warning me-2"><i class="fa-solid fa-edit"></i> Editar</a>
+                <form method="post" action="{% url 'eliminar_proveedor' proveedor.pk %}" class="d-inline">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Deseas eliminar este proveedor?')"><i class="fa-solid fa-trash"></i> Eliminar</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="alert alert-info">
+      No hay proveedores registrados. <a href="{% url 'nuevo_proveedor' %}">Registra uno ahora</a>.
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

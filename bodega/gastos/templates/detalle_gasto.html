@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalle de Gasto{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h1 class="mb-4">Detalle de Gasto</h1>
+
+  <div class="card mb-4">
+    <div class="card-header bg-danger text-white">
+      <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Información del Gasto</h5>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <p><strong>Código:</strong> {{ gasto.codigo }}</p>
+          <p><strong>Fecha:</strong> {{ gasto.fecha|date:'d/m/Y H:i' }}</p>
+          <p><strong>Proveedor:</strong> {{ gasto.proveedor.nombre }}</p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>Tipo de Pago:</strong> {{ gasto.get_tipo_compra_display }}</p>
+          <p><strong>Total:</strong> S/ {{ gasto.total }}</p>
+          <p><strong>Percepción:</strong> S/ {{ gasto.percepcion }}</p>
+          <p><strong>Usuario:</strong>
+            {% if gasto.user %}
+              {{ gasto.user.username }}
+            {% else %}
+              Anónimo
+            {% endif %}
+          </p>
+        </div>
+      </div>
+      {% if gasto.descripcion %}
+        <div class="mt-3">
+          <p><strong>Descripción:</strong></p>
+          <p>{{ gasto.descripcion }}</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if gasto.bonificaciones.exists %}
+    <div class="card mb-4">
+      <div class="card-header bg-warning text-dark">
+        <h5 class="mb-0"><i class="fas fa-gift"></i> Bonificaciones</h5>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-bordered mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Producto</th>
+              <th>Cantidad</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for bono in gasto.bonificaciones.all %}
+              <tr>
+                <td>{% if bono.producto %}{{ bono.producto.nombre }}{% else %}<em>Producto eliminado</em>{% endif %}</td>
+                <td>{{ bono.cantidad }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="card mb-4">
+    <div class="card-header bg-success text-white">
+      <h5 class="mb-0"><i class="fas fa-box-open"></i> Productos</h5>
+    </div>
+    <div class="card-body p-0">
+      <table class="table table-bordered mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Producto</th>
+            <th>Costo</th>
+            <th>Cantidad</th>
+            <th>Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in gasto.items.all %}
+            <tr>
+              <td>{% if item.producto %}{{ item.producto.nombre }}{% else %}<em>Producto eliminado</em>{% endif %}</td>
+              <td>S/ {{ item.costo }}</td>
+              <td>{{ item.cantidad }}</td>
+              <td>S/ {{ item.subtotal }}</td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="4" class="text-center">No hay productos registrados para este gasto.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <a href="{% url 'lista_gastos' %}" class="btn btn-secondary"><i class="fas fa-arrow-rotate-left"></i> Volver a lista de gastos</a>
+</div>
+{% endblock %}

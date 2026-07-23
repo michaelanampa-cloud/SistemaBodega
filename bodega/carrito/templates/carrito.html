@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}Carrito{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h1 class="mb-4"><i class="fas fa-shopping-cart"></i> Carrito de compras</h1>
+
+  {% if items %}
+    <form method="post" action="{% url 'actualizar_carrito' %}">
+      {% csrf_token %}
+      <table class="table table-striped table-hover table-bordered align-middle">
+        <thead class="table-dark">
+          <tr>
+            <th>Producto</th>
+            <th>Precio</th>
+            <th>Cantidad</th>
+            <th>Subtotal</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in items %}
+          <tr>
+            <td>{{ item.producto.nombre }}
+              {% if item.producto.unidadMedida %}<br><small class="text-muted">({{ item.producto.unidadMedida }})</small>{% endif %}
+            </td>
+            <td>S/ {{ item.producto.precio }}</td>
+            <td>
+              {% if item.producto.unidadMedida|lower == "kilo" or item.producto.unidadMedida|lower == "kg" %}
+                <input type="number" step="0.01" min="0.01" max="{{ item.producto.stock }}" name="cantidad_{{ item.producto.pk }}" value="{{ item.cantidad }}" class="form-control" style="width: 100px;" required>
+              {% else %}
+                <input type="number" min="1" max="{{ item.producto.stock }}" name="cantidad_{{ item.producto.pk }}" value="{{ item.cantidad }}" class="form-control" style="width: 100px;" required>
+              {% endif %}
+              <div class="small text-muted">Stock: 
+                {% if item.producto.unidadMedida|lower == "kilo" or item.producto.unidadMedida|lower == "kg" %}
+                  {{ item.producto.stock|floatformat:2 }}
+                {% else %}
+                  {{ item.producto.stock }}
+                {% endif %}
+              </div>
+            </td>
+            <td>S/ {{ item.subtotal }}</td>
+            <td>
+              <button type="button" class="btn btn-sm btn-danger btn-eliminar" data-url="{% url 'eliminar_carrito' item.producto.pk %}" data-nombre="{{ item.producto.nombre }}">Eliminar</button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <button type="submit" class="btn btn-primary"><i class="fas fa-sync-alt"></i> Actualizar total</button>
+          <a class="btn btn-outline-dark" href="{% url 'lista_productos' %}"><i class="fas fa-shopping-cart"></i> Seguir comprando</a>
+        </div>
+        <div class="text-end">
+          <h4>Total: S/ {{ total }}</h4>
+        </div>
+      </div>
+    </form>
+
+    <div class="text-end">
+      <a href="{% url 'registrar_compra' %}" class="btn btn-primary btn-lg"><i class="fas fa-check-circle"></i> Registrar compra</a>
+    </div>
+  {% else %}
+    <div class="alert alert-info">No hay productos en el carrito. Agrega alguno desde el catálogo o la página de producto.</div>
+    <a class="btn btn-primary" href="{% url 'lista_productos' %}"><i class="fas fa-list"></i> Ver productos</a>
+  {% endif %}
+</div>
+
+<!-- Modal de confirmación para eliminar del carrito -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar eliminación</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <p id="confirmDeleteText">¿Deseas eliminar este producto del carrito?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <form id="deleteForm" method="post" action="#" class="d-inline">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">Eliminar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var deleteButtons = document.querySelectorAll('.btn-eliminar');
+  var deleteForm = document.getElementById('deleteForm');
+  var confirmText = document.getElementById('confirmDeleteText');
+
+  deleteButtons.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var url = this.getAttribute('data-url');
+      var nombre = this.getAttribute('data-nombre') || '';
+      if (deleteForm) {
+        deleteForm.action = url;
+      }
+      if (confirmText) {
+        confirmText.textContent = '¿Deseas eliminar "' + nombre + '" del carrito?';
+      }
+      var modalEl = document.getElementById('confirmDeleteModal');
+      if (modalEl) {
+        var modal = new bootstrap.Modal(modalEl);
+        modal.show();
+      }
+    });
+  });
+});
+</script>
+{% endblock %}
+{% endblock %}
