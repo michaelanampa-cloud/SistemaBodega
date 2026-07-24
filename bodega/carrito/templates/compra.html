@@ -41,7 +41,7 @@
         </table>
 
         <div class="text-end border-top pt-3">
-          <form method="post">
+          <form method="post" id="compraForm">
             <div class="row g-3 mb-3" style="max-width: 350px; margin-left: auto;">
               <div class="col-6">
                 <label for="descuento" class="form-label mb-1">Descuento (S/)</label>
@@ -207,6 +207,7 @@
     <div class="d-flex justify-content-between mt-4">
       <button class="btn btn-secondary" onclick="window.print()">Imprimir</button>
       <a class="btn btn-success" href="{% url 'exportar_pdf' compra.pk %}">Exportar PDF</a>
+      <br>
     </div>
   {% endif %}
 </div>
@@ -236,6 +237,33 @@
     adicionalInput.addEventListener('input', actualizarTotales);
 
   });
-  
+
+  document.addEventListener('DOMContentLoaded', function () {
+  const form = document.getElementById('compraForm');
+
+  form.addEventListener('submit', function (event) {
+    // Evitamos que el formulario se envíe inmediatamente
+    event.preventDefault();
+
+    // Capturamos el total actual para mostrarlo en la alerta
+    const total = document.getElementById('total-display').innerText;
+
+    Swal.fire({
+      title: '¿Confirmar registro de compra?',
+      text: `El monto total a procesar es S/ ${total}`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#198754', // Verde Bootstrap
+      cancelButtonColor: '#6c757d',  // Gris Bootstrap
+      confirmButtonText: 'Sí, registrar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Si el usuario confirma, enviamos el formulario
+        form.submit();
+          }
+        });
+      });
+    });
 </script>
 {% endblock %}
