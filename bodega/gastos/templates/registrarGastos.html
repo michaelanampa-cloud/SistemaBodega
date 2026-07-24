@@ -60,7 +60,8 @@
                     <th>Producto</th>
                     <th>Stock actual</th>
                     <th>Cantidad a ingresar</th>
-                    <th>Costo por unidad</th>
+                    <th>Costo Unitario</th>
+                    <th>Total Unitario</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
@@ -163,11 +164,13 @@
             const tr = document.createElement('tr');
             tr.id = `row_prod_${p.id}`;
 
+            const totalCalculado = (1 * parseFloat(p.costo)).toFixed(2);
             tr.innerHTML = `
               <td>${p.nombre}<input type="hidden" name="producto_id_${p.id}" value="${p.id}"></td>
               <td>${p.stock}</td>
               <td><input type="number" name="cantidad_${p.id}" min="1" value="1" class="form-control" style="width:110px"></td>
               <td><input type="number" step="0.01" name="costo_${p.id}" value="${p.costo}" class="form-control" style="width:130px"></td>
+              <td class="totalCalculado" id="total_unitario_${p.id}"></td>
               <td><button type="button" class="btn btn-sm btn-danger btn-eliminar"><i class="fas fa-trash"></i> Eliminar</button></td>
             `;
 
@@ -178,6 +181,17 @@
             itemsTableBody.appendChild(tr);
             bindInputsToTotal(tr);
             updateTotal();
+            const totalUnitario = tr.querySelector('.totalCalculado');
+            const cantidadInput = tr.querySelector(`input[name="cantidad_${p.id}"]`);
+            const costoInput = tr.querySelector(`input[name="costo_${p.id}"]`);
+            function calcularTotalUnitario() {
+              const cantidad = parseFloat(cantidadInput.value) || 0;
+              const costo = parseFloat(costoInput.value) || 0;
+              totalUnitario.textContent = (cantidad * costo).toFixed(2);
+            }
+            cantidadInput.addEventListener('input', calcularTotalUnitario);
+            costoInput.addEventListener('input', calcularTotalUnitario);
+            calcularTotalUnitario();
             buscarInput.value = '';
             sugerenciasBox.innerHTML = '';
           };
