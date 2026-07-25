@@ -6,6 +6,12 @@
 <div class="container">
   <h1 class="mb-4"><i class="fas fa-shopping-cart"></i> Carrito de compras</h1>
 
+  <div class="mb-3">
+    <label for="buscar_producto" class="form-label">Buscar producto</label>
+    <input id="buscar_producto" type="search" class="form-control is-valid" placeholder="Escribe el nombre del producto..." autocomplete="off">
+    <div id="sugerencias" class="list-group mt-1" style="position:relative; z-index:1050;"></div>
+  </div>
+
   {% if items %}
     <form method="post" action="{% url 'actualizar_carrito' %}">
       {% csrf_token %}
@@ -116,6 +122,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 });
+
 </script>
-{% endblock %}
 {% endblock %}

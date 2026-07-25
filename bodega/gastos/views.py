@@ -1,4 +1,5 @@
 import uuid
+from django.core.paginator import Paginator
 from decimal import Decimal
 
 from django.contrib import messages
@@ -176,7 +177,11 @@ def registrar_gastos(request):
 @login_required
 def lista_gastos(request):
     gastos = Gasto.objects.order_by('-fecha')
-    return render(request, 'listaGastos.html', {'gastos': gastos})
+
+    paginator = Paginator(gastos, 14)  # Mostrar 14 gastos por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, 'listaGastos.html', {'page_obj': page_obj, 'gastos': page_obj})
 
 
 @login_required
