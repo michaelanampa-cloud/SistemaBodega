@@ -12,6 +12,7 @@ from django.utils import timezone
 from productos.models import Producto
 from clientes.models import Cliente
 from .models import Compra, CompraItem
+from django.http import JsonResponse
 
 
 @login_required
@@ -305,3 +306,21 @@ def actualizar_totales(request):
         })
 
     return redirect('carrito')
+
+@login_required
+def buscar_producto(request):
+    q = request.GET.get('q', '').strip()
+    if not q:
+        return JsonResponse([], safe=False)
+
+    productos = Producto.objects.filter(nombre__icontains=q)[:12]
+    results = []
+    for p in productos:
+        results.append({
+            'id': p.pk,
+            'nombre': p.nombre,
+            'stock': p.stock,
+            'precio': str(p.precio),
+        })
+
+    return JsonResponse(results, safe=False)

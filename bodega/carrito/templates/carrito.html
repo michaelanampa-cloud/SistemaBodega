@@ -123,5 +123,93 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 
+//buscar productos
+const buscarInput = document.getElementById('buscar_producto');
+const sugerenciasBox = document.getElementById('sugerencias');
+let debounceTimer = null;
+
+function debounce(fn, delay) {
+  return (...args) => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => fn(...args), delay);
+    };
+}
+
+buscarInput.addEventListener('input', debounce((e) => {
+    const q = e.target.value.trim();
+    fetchProductos(q, false);
+}, 300));
+
+async function fetchProductos(q, forBono=false) {
+    if (!q) {
+        renderSugerencias([]);
+        return;
+    }
+
+    const res = await fetch(`{% url 'buscar_producto' %}?q=${encodeURIComponent(q)}`);
+    const data = await res.json();
+
+    renderSugerencias(data);
+}
+
+function renderSugerencias(items) {
+    sugerenciasBox.innerHTML = '';
+
+    items.forEach(p => {
+        const el = document.createElement('button');
+
+        el.textContent = `${p.nombre} (Stock: ${p.stock}) - S/ ${p.precio}`;
+
+        el.addEventListener('click', () => addItemFromSuggestion(p));
+
+        sugerenciasBox.appendChild(el);
+    });
+}
+
+// funcion para addItemFromSuggestion
+window.addItemFromSuggestion = function(p) {
+    const formData = new FormData();
+    formData.append('cantidad', 1);
+
+    fetch(`{% url 'agregar_carrito' 0 %}`.replace('0', p.id), {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            window.location.reload();
+        } else {
+            alert('Error al agregar el producto al carrito.');
+        }
+    });
+};
+
+function renderSugerencias(items) {
+  sugerenciasBox.innerHTML = '';
+  if (!items.length) return;
+  items.forEach(p => {
+    const el = document.createElement('button');
+    el.type = 'button';
+    el.className = 'list-group-item list-group-item-action';
+    el.textContent = `${p.nombre} (Stock: ${p.stock}) - S/ ${p.precio}`;
+    el.dataset.id = p.id;
+    el.dataset.nombre = p.nombre;
+    el.dataset.stock = p.stock;
+    el.dataset.precio = p.precio;
+    el.addEventListener('click', () => addItemFromSuggestion(p));
+    sugerenciasBox.appendChild(el);
+    });
+  }
+  // cerrar sugerencias al hacer click fuera
+  document.addEventListener('click', (e) => {
+  if (!sugerenciasBox.contains(e.target) && e.target !== buscarInput) {
+    sugerenciasBox.innerHTML = '';
+    }
+  });
+
 </script>
+{% endblock %}
 {% endblock %}
