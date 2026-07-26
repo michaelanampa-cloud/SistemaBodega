@@ -1,6 +1,7 @@
 import uuid
 from decimal import Decimal
 from io import BytesIO
+from django.core.paginator import Paginator
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -216,7 +217,10 @@ def registrar_compra(request):
 @login_required
 def lista_compras(request):
     compras = Compra.objects.order_by('-fecha')
-    return render(request, 'lista_compras.html', {'compras': compras})
+    paginator = Paginator(compras, 14)  # Mostrar 14 productos por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, 'lista_compras.html', {'compras': page_obj, 'page_obj': page_obj})
 
 
 @login_required

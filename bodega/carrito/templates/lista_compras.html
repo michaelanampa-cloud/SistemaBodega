@@ -5,8 +5,8 @@
 {% block content %}
 <div class="container">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Compras registradas</h1>
-    <a href="{% url 'carrito' %}" class="btn btn-secondary"><i class="fas fa-arrow-rotate-left"></i> Volver al carrito</a>
+    <h1><i class="fas fa-shopping-cart"></i> Compras registradas</h1>
+    <a href="{% url 'carrito' %}" class="btn btn-outline-secondary"><i class="fas fa-arrow-rotate-left"></i> Volver al carrito</a>
   </div>
 
   {% if compras %}
@@ -42,4 +42,35 @@
     <div class="alert alert-info">No hay compras registradas aún.</div>
   {% endif %}
 </div>
+
+{% if page_obj.paginator.num_pages > 1 %}
+<nav aria-label="Paginación" class="mt-4">
+  <ul class="pagination justify-content-center">
+    {% if page_obj.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?q={{ query }}&tipo={{ tipo }}&page={{ page_obj.previous_page_number }}">Anterior</a>
+      </li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+      {% if num == page_obj.number %}
+        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+      {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+        <li class="page-item"><a class="page-link" href="?q={{ query }}&tipo={{ tipo }}&page={{ num }}">{{ num }}</a></li>
+      {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?q={{ query }}&tipo={{ tipo }}&page={{ page_obj.next_page_number }}">Siguiente</a>
+      </li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+
 {% endblock %}

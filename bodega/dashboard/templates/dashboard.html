@@ -14,11 +14,11 @@
   <form method="get" class="row g-2 align-items-end mb-4">
     <div class="col-md-4">
       <label class="form-label">Desde</label>
-      <input type="date" name="start_date" class="form-control" value="{{ start_date|date:'Y-m-d' }}">
+      <input type="date" name="start_date" class="form-control" value="{% if start_date %}{{ start_date|date:'Y-m-d' }}{% else %}{% now 'Y-m-d' %}{% endif %}">
     </div>
     <div class="col-md-4">
       <label class="form-label">Hasta</label>
-      <input type="date" name="end_date" class="form-control" value="{{ end_date|date:'Y-m-d' }}">
+      <input type="date" name="end_date" class="form-control" value="{% if end_date %}{{ end_date|date:'Y-m-d' }}{% else %}{% now 'Y-m-d' %}{% endif %}">
     </div>
     <div class="col-md-2">
       <label class="form-label">Tipo pago</label>
@@ -145,5 +145,6 @@
         }
       });
     });
+
   </script>
 {% endblock %}
