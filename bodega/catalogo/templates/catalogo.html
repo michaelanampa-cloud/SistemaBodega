@@ -32,7 +32,7 @@
     <div class="col">
       <div class="card h-100 shadow-sm border-0 producto-card">
         {% if producto.imagen %}
-          <img src="{% static 'img/productos/' %}{{ producto.imagen }}" class="card-img-top detalle-img img-fluid" alt="{{ producto.nombre }}">
+          <img src="https://raw.githubusercontent.com/michaelanampa-cloud/SistemaBodega/cfe45e0c513db308e0109ada4758edd76db5cf43/bodega/static/img/productos/{{ producto.imagen }}" class="card-img-top detalle-img img-fluid" alt="{{ producto.nombre }}">
         {% else %}
           <img src="{% static 'img/logo.png' %}" class="card-img-top" alt="Sin imagen">
         {% endif %}

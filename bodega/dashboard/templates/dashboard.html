@@ -38,25 +38,58 @@
   <div class="row g-3 mb-4">
     <div class="col-md-4">
       <div class="card shadow-sm border-success">
-        <div class="card-body">
-          <h5 class="card-title"><i class="fa-solid fa-chart-column"></i> Compras</h5>
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title"><i class="fa-solid fa-coins"></i> Compras</h5>
           <p class="display-6 text-success">S/ {{ total_compras|floatformat:2 }}</p>
+          <a href="{% url 'resumen_compras' %}" class="btn-outline-success btn btn-lg mt-auto ms-auto border-0 shadow-none"><i class="fas fa-eye"></i></a>
         </div>
       </div>
     </div>
     <div class="col-md-4">
       <div class="card shadow-sm border-danger">
-        <div class="card-body">
-          <h5 class="card-title"><i class="fa-solid fa-chart-column"></i> Gastos</h5>
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title"><i class="fa-solid fa-wallet"></i> Gastos</h5>
           <p class="display-6 text-danger">S/ {{ total_gastos|floatformat:2 }}</p>
+          <a href="{% url 'resumen_gastos' %}" class="btn-outline-danger btn btn-lg mt-auto ms-auto border-0 shadow-none"><i class="fas fa-eye"></i></a>
         </div>
       </div>
     </div>
     <div class="col-md-4">
       <div class="card shadow-sm {% if balance >= 0 %}border-primary{% else %}border-warning{% endif %}">
-        <div class="card-body">
-          <h5 class="card-title"><i class="fa-solid fa-chart-column"></i> Balance</h5>
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title"><i class="fa-brands fa-sellsy"></i> Balance</h5>
           <p class="display-6 {% if balance >= 0 %}text-primary{% else %}text-warning{% endif %}">S/ {{ balance|floatformat:2 }}</p>
+          <a href="#" class="{% if balance >= 0 %}btn-outline-primary{% else %}btn-outline-warning{% endif %} btn btn-lg mt-auto ms-auto border-0 shadow-none"><i class="fas fa-eye"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="card shadow-sm border-info">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title"><i class="fa-solid fa-user-group"></i> Clientes</h5>
+          <p class="display-6 text-info">{{ total_clientes }}</p>
+          <a href="{% url 'lista_clientes' %}" class="btn-outline-info btn btn-lg mt-auto ms-auto border-0 shadow-none"><i class="fas fa-eye"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow-sm border-warning">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title"><i class="fa-solid fa-truck-moving"></i> Proveedores</h5>
+          <p class="display-6 text-warning">S/ {{ total_proveedores|floatformat:2 }}</p>
+          <a href="{% url 'lista_proveedores' %}" class="btn-outline-warning btn btn-lg mt-auto ms-auto border-0 shadow-none"><i class="fas fa-eye"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow-sm border-dark">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title"><i class="fa-solid fa-box-open"></i> Productos</h5>
+          <p class="display-6 text-dark">S/ {{ total_productos|floatformat:2 }}</p>
+          <a href="{% url 'lista_productos' %}" class="btn-outline-dark btn btn-lg mt-auto ms-auto border-0 shadow-none"><i class="fas fa-eye"></i></a>
         </div>
       </div>
     </div>

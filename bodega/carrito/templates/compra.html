@@ -42,14 +42,21 @@
 
         <div class="text-end border-top pt-3">
           <form method="post" id="compraForm">
-            <div class="row g-3 mb-3" style="max-width: 350px; margin-left: auto;">
-              <div class="col-6">
+            <div class="row g-3 mb-3" style="max-width: 550px; margin-left: auto;">
+              <div class="col-4">
                 <label for="descuento" class="form-label mb-1">Descuento (S/)</label>
                 <input type="number" id="descuento" name="descuento" class="form-control" step="0.01" min="0" value="0" placeholder="0.00">
               </div>
-              <div class="col-6">
+              <div class="col-4">
                 <label for="adicional" class="form-label mb-1">Adicional (S/)</label>
                 <input type="number" id="adicional" name="adicional" class="form-control" step="0.01" min="0" value="0" placeholder="0.00">
+              </div>
+              <div class="col-4">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="" id="checkDefault">
+                  <label class="form-check-label" for="checkDefault">Sencillo</label>
+                  <input class="form-control" type="number" id="dineroInput" name="dinero" step="0.01" min="0" value="0" placeholder="0.00" disabled>
+                </div>
               </div>
             </div>
             <br>
@@ -86,6 +93,7 @@
               </div>
             </div>
           <div class="border-top pt-2">
+            <h5 class="mb-2 text-danger">Vuelto: S/ <span id="vuelto">0.00</span></h5>
             <h5 class="mb-2">Subtotal: S/ <span id="subtotal-display">{{ total }}</span></h5>
             <h4 class="text-primary">Total: S/ <span id="total-display">{{ total }}</span></h4>
           </div>
@@ -221,23 +229,54 @@
     const subtotalDisplay = document.getElementById('subtotal-display');
     const totalDisplay = document.getElementById('total-display');
 
+    const checkDefault = document.getElementById('checkDefault');
+    const dineroInput = document.getElementById('dineroInput');
+
     function actualizarTotales() {
         let rowTotal = "{{ total }}".toString().replace(',', '.');
         let subtotal = parseFloat(rowTotal) || 0;
         let descuento = parseFloat(descuentoInput.value.replace(',', '.')) || 0;
         let adicional = parseFloat(adicionalInput.value.replace(',', '.')) || 0;
 
+        let vuelto = 0;
+        if (checkDefault.checked) {
+            let dinero = parseFloat(dineroInput.value.replace(',', '.')) || 0;
+            vuelto = dinero - (subtotal - descuento + adicional);
+            if (vuelto < 0) {
+                vuelto = 0; // Evita mostrar un vuelto negativo
+            }
+        }
+
         let total = subtotal - descuento + adicional;
 
         subtotalDisplay.textContent = subtotal.toFixed(2);
         totalDisplay.textContent = total.toFixed(2);
+
+        document.getElementById('vuelto').textContent = vuelto.toFixed(2);
     }
 
+    checkDefault.addEventListener('change', actualizarTotales);
+    dineroInput.addEventListener('input', actualizarTotales);
     descuentoInput.addEventListener('input', actualizarTotales);
     adicionalInput.addEventListener('input', actualizarTotales);
 
+    checkDefault.addEventListener('change', actualizarEstadoDinero);
+    actualizarEstadoDinero();
+
   });
 
+  //para el checkbox de dinero sencillo
+  function actualizarEstadoDinero() {
+    dineroInput.disabled = !checkDefault.checked;
+
+    if (!checkDefault.checked) {
+        dineroInput.value = "";
+        document.getElementById('vuelto').textContent = "0.00";
+    }
+
+    actualizarTotales();
+  }
+  
   document.addEventListener('DOMContentLoaded', function () {
   const form = document.getElementById('compraForm');
 

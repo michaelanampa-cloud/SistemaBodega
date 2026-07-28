@@ -46,4 +46,48 @@
     </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      const modal = new bootstrap.Modal(document.getElementById('confirmarGastoModal'));
+      modal.show();
+    });
+
+    const btnConfirmarRegistro = document.getElementById('btnConfirmarRegistro');
+    btnConfirmarRegistro.addEventListener('click', function () {
+      form.submit();
+    });
+  });
+</script>
+
+<!-- Modal de confirmación -->
+<div class="modal fade" id="confirmarGastoModal" tabindex="-1" aria-labelledby="confirmarGastoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+              <h5 class="modal-title" id="confirmarGastoLabel">
+                Confirmar registro
+              </h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                ¿Estás seguro de registrar este proveedor?
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-success" id="btnConfirmarRegistro">
+              Sí, registrar
+              </button>
+              <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+                Cancelar
+              </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 {% endblock %}

@@ -6,7 +6,7 @@ from django.shortcuts import render
 
 from carrito.models import Compra
 from clientes.models import Cliente
-from gastos.models import Gasto, Proveedor
+from gastos.models import Gasto, Proveedor, Producto
 
 
 def _parse_date(value):
@@ -39,6 +39,10 @@ def dashboard_view(request):
 
     total_compras = compras.aggregate(total=Sum('total'))['total'] or 0
     total_gastos = gastos.aggregate(total=Sum('total'))['total'] or 0
+    total_clientes = Cliente.objects.count()
+    total_proveedores = Proveedor.objects.count()
+    total_productos = Producto.objects.count()  # Assuming you have a Producto model
+
     balance = total_compras - total_gastos
 
     chart_data = [
@@ -51,6 +55,9 @@ def dashboard_view(request):
         'gastos': gastos[:10],
         'total_compras': total_compras,
         'total_gastos': total_gastos,
+        'total_clientes': total_clientes,
+        'total_proveedores': total_proveedores,
+        'total_productos': total_productos,
         'balance': balance,
         'chart_data': chart_data,
         'start_date': start_date,
@@ -77,6 +84,7 @@ def resumen_gastos(request):
     total_gastos = gastos.aggregate(total=Sum('total'))['total'] or 0
     resumen_por_tipo = list(gastos.values('tipo_compra').annotate(cantidad=Count('id'), total=Sum('total')).order_by('-total'))
     proveedores = Proveedor.objects.filter(activo=True)
+
 
     return render(request, 'resumen_gastos.html', {
         'gastos': gastos[:10],
@@ -127,3 +135,4 @@ def resumen_compras(request):
         'end_date': end_date,
         'cliente_id': cliente_id,
     })
+

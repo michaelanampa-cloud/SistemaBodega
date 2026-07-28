@@ -276,6 +276,7 @@
           const percepEl = document.getElementById('percepcion');
           if (percepEl) percepEl.addEventListener('input', updateTotal);
 
+          /*
           function initGastosPage() {
             document.querySelectorAll('#itemsSeleccionados tbody tr').forEach(bindInputsToTotal);
             updateTotal();
@@ -288,6 +289,30 @@
                 }
               });
             }
+          }*/
+
+          //Funcion con modal para confirmar el registro de gasto
+         function initGastosPage() {
+          document.querySelectorAll('#itemsSeleccionados tbody tr').forEach(bindInputsToTotal);
+          updateTotal();
+          const gastosForm = document.getElementById('gastosForm');
+          const modal = new bootstrap.Modal(
+              document.getElementById('confirmarGastoModal')
+          );
+          const btnConfirmar = document.getElementById('btnConfirmarRegistro');
+          let enviando = false;
+
+          gastosForm.addEventListener('submit', function(e) {
+            if (enviando) return;
+              e.preventDefault();
+              modal.show();
+          });
+
+          btnConfirmar.addEventListener('click', function(){
+            enviando = true;
+            modal.hide();
+            gastosForm.submit();
+            });
           }
 
           if (document.readyState === 'loading') {
@@ -322,5 +347,35 @@
       </form>
     </div>
   </div>
+</div>
+
+<!-- Modal de confirmación -->
+<div class="modal fade" id="confirmarGastoModal" tabindex="-1" aria-labelledby="confirmarGastoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="confirmarGastoLabel">
+                    Confirmar registro
+                </h5>
+                <button type="button" class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                ¿Estás seguro de registrar este gasto?
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn-success" id="btnConfirmarRegistro">
+                Sí, registrar
+              </button>
+              <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+                Cancelar
+              </button>
+            </div>
+
+        </div>
+    </div>
 </div>
 {% endblock %}
