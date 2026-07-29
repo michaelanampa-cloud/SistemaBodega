@@ -30,7 +30,10 @@ def nuevo_proveedor(request):
 @login_required
 def lista_proveedores(request):
     proveedores = Proveedor.objects.filter(activo=True)
-    return render(request, 'listaProveedor.html', {'proveedores': proveedores})
+    paginator = Paginator(proveedores, 10)  # Mostrar 14 proveedores por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, 'listaProveedor.html', {'proveedores': page_obj, 'page_obj': page_obj})
 
 
 @login_required

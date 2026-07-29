@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Proveedores</h1>
+    <h1><i class="fa-solid fa-truck"></i> Proveedores</h1>
     <a href="{% url 'nuevo_proveedor' %}" class="btn btn-dark"><i class="fa-regular fa-square-plus"></i> Nuevo Proveedor</a>
   </div>
 
@@ -30,7 +30,7 @@
               <td>{{ proveedor.email }}</td>
               <td>{{ proveedor.telefono }}</td>
               <td>{{ proveedor.direccion|default:'-' }}</td>
-              <td>
+              <td class="text-center">
                 <a href="{% url 'editar_proveedor' proveedor.pk %}" class="btn btn-sm btn-warning me-2"><i class="fa-solid fa-edit"></i> Editar</a>
                 <form method="post" action="{% url 'eliminar_proveedor' proveedor.pk %}" class="d-inline">
                   {% csrf_token %}
@@ -48,4 +48,34 @@
     </div>
   {% endif %}
 </div>
+
+{% if page_obj.paginator.num_pages > 1 %}
+<nav aria-label="Paginación" class="mt-4">
+  <ul class="pagination justify-content-center">
+    {% if page_obj.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?q={{ query }}&tipo={{ tipo }}&page={{ page_obj.previous_page_number }}">Anterior</a>
+      </li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+      {% if num == page_obj.number %}
+        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+      {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+        <li class="page-item"><a class="page-link" href="?q={{ query }}&tipo={{ tipo }}&page={{ num }}">{{ num }}</a></li>
+      {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?q={{ query }}&tipo={{ tipo }}&page={{ page_obj.next_page_number }}">Siguiente</a>
+      </li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
 {% endblock %}
