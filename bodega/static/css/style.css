@@ -188,3 +188,57 @@ body{
 .page-content{
     padding-top:90px;
 }
+
+/*=========================
+    Para pagina catalogo */
+
+.menu-item{
+    display:flex;
+    align-items:flex-start;
+    padding:20px 0;
+}
+
+.menu-img img{
+    width:90px;
+    height:90px;
+    object-fit:cover;
+    border-radius:50%;
+    border:4px solid #f4f4f4;
+}
+
+.menu-content{
+    width:100%;
+}
+
+.menu-title{
+    font-size:20px;
+    font-weight:700;
+    color:#222;
+}
+
+.menu-price{
+    font-size:20px;
+    font-weight:700;
+    color:#d4a762;      /* color dorado parecido al template */
+}
+
+.menu-line{
+    border-bottom:2px dotted #cfcfcf;
+    margin-top:10px;
+}
+
+.menu-description{
+    margin-top:8px;
+    color:#666;
+    line-height:1.6;
+}
+
+.menu-item:hover .menu-title{
+    color:#d4a762;
+    transition:.3s;
+}
+
+.menu-item:hover img{
+    transform:scale(1.05);
+    transition:.3s;
+}
