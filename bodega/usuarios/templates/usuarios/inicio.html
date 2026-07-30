@@ -2,53 +2,106 @@
 
 {% block title %}Inicio{% endblock %}
 
+{% block main_class %}{% endblock %}
+
 {% block content %}
 
 {% load static %}
-<div class="row bg-light p-4 mb-4 rounded-3 text-center">
-  <div class="col-md-4">
-    <img src="{% static 'img/logo.png' %}" alt="Logo Bodega" class="img-fluid">
-  </div>
-  <div class="col-md-8">
-    <span class="h3">Lorem ipsum dolor sit amet consectetur adipisicing elit. Id in enim, 
-      vero sunt illum quas possimus? Quasi corporis eos nisi aut eius itaque in laborum? Similique at tempore neque error.</span>
-  </div>
-</div>
 
-<div class="row p-4 mb-4 rounded-3 text-center bg-dark">
-  <div class="col-md-8">
-    <span class="h3 text-white">Lorem ipsum dolor sit amet consectetur adipisicing elit. Id in enim, 
-      vero sunt illum quas possimus? Quasi corporis eos nisi aut eius itaque in laborum? Similique at tempore neque error.</span>
-  </div>
-  <div class="col-md-4">
-    {% load static %}
-    <img src="{% static 'img/logo.png' %}" alt="Logo Bodega" class="img-fluid">
-  </div>
-</div>
+<section class="hero container-fluid p-0 m-0">
+    <div class="hero-overlay"></div>
 
-<div class="row p-4 mb-4 rounded-3 text-center bg-light">
-  <div class="col-md-4">
-    {% load static %}
-    <img src="{% static 'img/logo.png' %}" alt="Logo Bodega" class="img-fluid">
+    <div class="hero-content">
+        <h1>Bienvenido a Bodega Doña Catita</h1>
+
+        <p>
+            Productos de calidad, atención rápida y los mejores precios.
+        </p>
+
+        {% if not user.is_authenticated %}
+            <a href="{% url 'login' %}" class="btn btn-warning btn-lg">
+                Iniciar sesión
+            </a>
+        {% endif %}
+    </div>
+</section>
+
+<div class="container">
+  <div class="row mt-5 g-4">
+
+      <div class="col-md-4">
+          <div class="card shadow h-100 text-center p-4">
+              <i class="fa-solid fa-cart-shopping fa-3x text-warning mb-3"></i>
+              <h4>Compra fácil</h4>
+              <p>Encuentra tus productos rápidamente.</p>
+          </div>
+      </div>
+
+      <div class="col-md-4">
+          <div class="card shadow h-100 text-center p-4">
+              <i class="fa-solid fa-truck fa-3x text-warning mb-3"></i>
+              <h4>Entrega rápida</h4>
+              <p>Recibe tus pedidos en el menor tiempo posible.</p>
+          </div>
+      </div>
+
+      <div class="col-md-4">
+          <div class="card shadow h-100 text-center p-4">
+              <i class="fa-solid fa-tags fa-3x text-warning mb-3"></i>
+              <h4>Mejores precios</h4>
+              <p>Ofertas y promociones todos los días.</p>
+          </div>
+      </div>
+
   </div>
-  <div class="col-md-8">
-    <span class="h3">Lorem ipsum dolor sit amet consectetur adipisicing elit. Id in enim, 
-      vero sunt illum quas possimus? Quasi corporis eos nisi aut eius itaque in laborum? Similique at tempore neque error.</span>
-  </div>
-</div>
 
 
-<div class="p-5 mb-4 bg-light rounded-3 text-center">
-  <div class="container-fluid py-5">
-    {% load static %}
-    <img src="{% static 'img/logo.png' %}" alt="Logo Bodega" class="welcome-logo rounded-circle shadow-sm">
-    <h1 class="display-5 fw-bold">{{ mensaje }}</h1>
-    {% if not user.is_authenticated %}
-      <p class="col-md-8 mx-auto fs-4">Accede para ver el catálogo completo, productos, carrito y más.</p>
-      <a class="btn btn-primary btn-lg" href="{% url 'login' %}">Iniciar sesión</a>
-    {% else %}
-      <p class="col-md-8 mx-auto fs-4">Explora el sitio usando el menú superior.</p>
-    {% endif %}
+  <div class="row bg-light p-4 mb-4 rounded-3 text-center">
+    <div class="col-md-4">
+      <img src="{% static 'img/logo.png' %}" alt="Logo Bodega" class="img-fluid">
+    </div>
+    <div class="col-md-8">
+      <span class="h3">Lorem ipsum dolor sit amet consectetur adipisicing elit. Id in enim, 
+        vero sunt illum quas possimus? Quasi corporis eos nisi aut eius itaque in laborum? Similique at tempore neque error.</span>
+    </div>
   </div>
+
+  <div class="row p-4 mb-4 rounded-3 text-center bg-dark">
+    <div class="col-md-8">
+      <span class="h3 text-white">Lorem ipsum dolor sit amet consectetur adipisicing elit. Id in enim, 
+        vero sunt illum quas possimus? Quasi corporis eos nisi aut eius itaque in laborum? Similique at tempore neque error.</span>
+    </div>
+    <div class="col-md-4">
+      {% load static %}
+      <img src="{% static 'img/logo.png' %}" alt="Logo Bodega" class="img-fluid">
+    </div>
+  </div>
+
+  <div class="row p-4 mb-4 rounded-3 text-center bg-light">
+    <div class="col-md-4">
+      {% load static %}
+      <img src="{% static 'img/logo.png' %}" alt="Logo Bodega" class="img-fluid">
+    </div>
+    <div class="col-md-8">
+      <span class="h3">Lorem ipsum dolor sit amet consectetur adipisicing elit. Id in enim, 
+        vero sunt illum quas possimus? Quasi corporis eos nisi aut eius itaque in laborum? Similique at tempore neque error.</span>
+    </div>
+  </div>
+
+
+  <div class="p-5 mb-4 bg-light rounded-3 text-center">
+    <div class="container-fluid py-5">
+      {% load static %}
+      <img src="{% static 'img/logo.png' %}" alt="Logo Bodega" class="welcome-logo rounded-circle shadow-sm">
+      <h1 class="display-5 fw-bold">{{ mensaje }}</h1>
+      {% if not user.is_authenticated %}
+        <p class="col-md-8 mx-auto fs-4">Accede para ver el catálogo completo, productos, carrito y más.</p>
+        <a class="btn btn-primary btn-lg" href="{% url 'login' %}">Iniciar sesión</a>
+      {% else %}
+        <p class="col-md-8 mx-auto fs-4">Explora el sitio usando el menú superior.</p>
+      {% endif %}
+    </div>
+  </div>
+
 </div>
 {% endblock %}
