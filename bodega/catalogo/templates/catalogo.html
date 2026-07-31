@@ -4,119 +4,192 @@
 {% block title %}Catálogo{% endblock %}
 
 {% block content %}
+
+<section class="catalog-section">
+
 <div class="container">
-  <br>
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2><i class="fa-solid fa-boxes-stacked"></i> Catálogo de Productos</h2>
-  </div>
 
-  <div class="mb-4">
-    <form method="get">
-      <div class="row g-3 align-items-end">
-        <div class="col-md-5">
-          <label class="form-label">Buscar producto</label>
-          <input type="text" name="q" class="form-control" value="{{ query }}" placeholder="Nombre o descripción">
-        </div>
-        <div class="col-md-4">
-          <label class="form-label">Filtrar por tipo</label>
-          <select name="tipo" class="form-select">
-            <option value="">Todos los tipos</option>
-            {% for tipo_item in tipos_disponibles %}
-              <option value="{{ tipo_item }}" {% if tipo_item == tipo %}selected{% endif %}>{{ tipo_item }}</option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="col-md-3 d-grid">
-          <button class="btn btn-outline-primary"><i class="fas fa-search"></i>  Buscar</button>
-        </div>
-      </div>
-    </form>
-  </div>
-
-  <div class="row">
-    {% for producto in page_obj.object_list %}
-    <div class="col-lg-6 mb-4">
-
-        <div class="menu-item d-flex">
-
-            <div class="menu-img">
-                {% if producto.imagen %}
-                    <img src="{% static 'img/productos/' %}{{ producto.imagen }}"
-                         alt="{{ producto.nombre }}">
-                {% else %}
-                    <img src="{% static 'img/logo.png' %}"
-                         alt="Sin imagen">
-                {% endif %}
-            </div>
-
-            <div class="menu-content flex-grow-1 ms-3">
-
-                <div class="d-flex align-items-center">
-
-                    <h5 class="menu-title mb-0">
-                        {{ producto.nombre }}
-                    </h5>
-
-                    <div class="menu-line flex-grow-1 mx-3"></div>
-
-                    <span class="menu-price">
-                        S/ {{ producto.precio }}
-                    </span>
-
-                </div>
-
-                <small class="text-muted d-block">
-                    {{ producto.tipoProducto }}
-                </small>
-
-                <p class="menu-description mb-1">
-                    {{ producto.detalle|default:"Sin descripción"|truncatechars:120 }}
-                </p>
-
-                <small class="text-secondary">
-                    Stock: {{ producto.stock }} {{ producto.unidadMedida }}
-                </small>
-
-            </div>
-
-        </div>
-
+<!-- Título -->
+<div class="catalog-header text-center" data-aos="fade-up">
+    <span class="catalog-subtitle">Nuestro catálogo</span>
+    <h1 class="catalog-title"> Productos disponibles</h1>
+    <div class="catalog-divider">
+        <span></span>
     </div>
-
-    {% empty %}
-        <div class="col-12">
-            <div class="alert alert-warning">
-                No se encontraron productos.
-            </div>
-        </div>
-    {% endfor %}
+    <p class="catalog-description">
+        Encuentra los mejores productos disponibles en nuestra bodega.
+    </p>
 </div>
 
-<nav aria-label="Paginación" class="mt-4">
+<!-- Buscador -->
+<div class="catalog-search" data-aos="fade-down">
+  <form method="get">
+    <div class="row g-3">
+      <div class="col-lg-7">
+        <input type="text" name="q" class="form-control" value="{{ query }}" placeholder="Buscar producto...">
+      </div>
+
+      <div class="col-lg-5">
+        <button class="btn catalog-btn w-100"><i class="fas fa-search"></i>
+          Buscar producto
+        </button>
+      </div>
+
+      <div class="category-filter">
+        <a href="?q={{ query }}" class="{% if not tipo %}active{% endif %}">
+          Todos
+        </a>
+
+        {% for tipo_item in tipos_disponibles %}
+
+        <a href="?q={{ query }}&tipo={{ tipo_item }}" class="{% if tipo_item == tipo %}active{% endif %}">
+        {{ tipo_item }}
+        </a>
+        {% endfor %}
+
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- Productos -->
+
+<div class="row catalog-grid">
+  {% for producto in page_obj.object_list %}
+    <div class="col-lg-6 catalog-product" data-aos="fade-up">
+      <article class="product-menu-item">
+        <!-- Imagen -->
+        <div class="product-image">
+          {% if producto.imagen %}
+          <button 
+            type="button"
+            class="image-button"
+            data-bs-toggle="modal"
+            data-bs-target="#imageModal"
+            data-image="{% static 'img/productos/' %}{{ producto.imagen }}"
+            data-name="{{ producto.nombre }}"
+            data-price="S/ {{ producto.precio }}">
+            <img src="{% static 'img/productos/' %}{{ producto.imagen }}" alt="{{ producto.nombre }}">
+          </button>
+          {% else %}
+          <button 
+            type="button"
+            class="image-button"
+            data-bs-toggle="modal"
+            data-bs-target="#imageModal"
+            data-image="{% static 'img/logo.png' %}"
+            data-name="{{ producto.nombre }}"
+            data-price="S/ {{ producto.precio }}">
+            <img src="{% static 'img/logo.png' %}" alt="Sin imagen">
+          </button>
+          {% endif %}
+        </div>
+
+      <!-- Información -->
+      <div class="product-info">
+        <div class="product-heading">
+          <h3>{{ producto.nombre }}</h3>
+          <div class="product-dots"></div>
+          <span class="product-price">
+            S/ {{ producto.precio }}
+          </span>
+        </div>
+      <span class="product-category">{{ producto.tipoProducto }}</span>
+      <p class="product-detail">
+        {{ producto.detalle|default:"Sin descripción"|truncatechars:120 }}
+      </p>
+      <span class="product-stock">
+      Disponible: {{ producto.stock }} {{ producto.unidadMedida }}
+      </span>
+    </div>
+    </article>
+    </div>
+      {% empty %}
+    <div class="col-12">
+      <div class="alert alert-warning">
+        No se encontraron productos.
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+<!-- Paginación -->
+<nav class="catalog-pagination">
   <ul class="pagination justify-content-center">
-    {% if page_obj.has_previous %}
-      <li class="page-item">
-        <a class="page-link" href="?q={{ query }}&tipo={{ tipo }}&page={{ page_obj.previous_page_number }}">Anterior</a>
-      </li>
-    {% else %}
-      <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+ {% if page_obj.has_previous %}
+    <li class="page-item">
+      <a class="page-link" href="?q={{ query }}&tipo={{ tipo }}&page={{ page_obj.previous_page_number }}">
+        Anterior
+      </a>
+    </li>
+      {% else %}
+    <li class="page-item disabled">
+      <span class="page-link">
+        Anterior
+      </span>
+    </li>
     {% endif %}
-
+  
     {% for num in page_obj.paginator.page_range %}
-      {% if num == page_obj.number %}
-        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-      {% elif num >= page_obj.number|add:'-3' and num <= page_obj.number|add:'3' %}
-        <li class="page-item"><a class="page-link" href="?q={{ query }}&tipo={{ tipo }}&page={{ num }}">{{ num }}</a></li>
-      {% endif %}
+    {% if num == page_obj.number %}
+    <li class="page-item active">
+     <span class="page-link"> {{ num }} </span>
+    </li>
+    {% elif num >= page_obj.number|add:'-3' and num <= page_obj.number|add:'3' %}
+    <li class="page-item">
+      <a class="page-link" href="?q={{ query }}&tipo={{ tipo }}&page={{ num }}">
+        {{ num }}
+      </a>
+    </li>
+    {% endif %}
     {% endfor %}
-
     {% if page_obj.has_next %}
-      <li class="page-item">
-        <a class="page-link" href="?q={{ query }}&tipo={{ tipo }}&page={{ page_obj.next_page_number }}">Siguiente</a>
-      </li>
+    <li class="page-item">
+      <a class="page-link" href="?q={{ query }}&tipo={{ tipo }}&page={{ page_obj.next_page_number }}">
+        Siguiente
+      </a>
+    </li>
     {% else %}
-      <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+    <li class="page-item disabled">
+      <span class="page-link">
+        Siguiente
+      </span>
+    </li>
     {% endif %}
   </ul>
-</nav>
+  </nav>
+</div>
+
+</section>
+
+<!-- Modal Imagen Producto -->
+
+<div class="modal fade" id="imageModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content product-modal">
+      <div class="modal-header text-center">
+        <h5 class="modal-title" id="modalName"> Producto</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"> </button>
+      </div>
+      <div class="modal-body text-center">
+        <img id="modalImage" class="img-fluid modal-product-image">
+        <h4 class="modal-price mt-3" id="modalPrice"></h4>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+  const images = document.querySelectorAll(".image-button");
+  images.forEach(function(img){
+    img.addEventListener("click", function(){
+      document.getElementById("modalImage").src = this.dataset.image;
+      document.getElementById("modalName").innerText = this.dataset.name;
+      document.getElementById("modalPrice").innerText = "Precio: " + this.dataset.price;
+    });
+  });
+});
+</script>
+
 {% endblock %}

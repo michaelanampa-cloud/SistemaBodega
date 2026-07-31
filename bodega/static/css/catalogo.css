@@ -1,0 +1,768 @@
+/* =====================================
+   CATALOGO - ESTILO MENU
+===================================== */
+
+body{
+
+    font-family:'Poppins', sans-serif;
+
+}
+
+
+.catalog-title,
+.product-heading h3{
+
+    font-family:'Cormorant Garamond', serif;
+
+}
+
+.catalog-section{
+
+    padding:80px 0;
+
+    background:#ffffff;
+
+}
+
+
+
+/* =====================================
+   CABECERA
+===================================== */
+
+
+.catalog-header{
+
+    margin-bottom:50px;
+
+}
+
+
+.catalog-subtitle{
+
+    color:#da1a1a;
+
+    font-size:18px;
+
+    text-transform:uppercase;
+
+    letter-spacing:3px;
+
+    font-weight:600;
+
+}
+
+
+.catalog-title{
+
+    margin-top:15px;
+
+    font-size:48px;
+
+    font-weight:700;
+
+    color:#222;
+
+}
+
+
+.catalog-description{
+
+    color:#da1a1a;
+
+    max-width:650px;
+
+    margin:auto;
+
+}
+
+
+
+.catalog-divider{
+
+    width:100px;
+
+    height:3px;
+
+    background:#da1a1a;
+
+    margin:25px auto;
+
+    position:relative;
+
+}
+
+
+.catalog-divider span{
+
+    width:15px;
+
+    height:15px;
+
+    background:#da1a1a;
+
+    border-radius:50%;
+
+    position:absolute;
+
+    left:50%;
+
+    top:50%;
+
+    transform:translate(-50%,-50%);
+
+}
+
+
+
+
+
+/* =====================================
+   BUSCADOR
+===================================== */
+
+
+.catalog-search{
+
+    background:#ddaeae;
+
+    padding:30px;
+
+    border-radius:15px;
+
+    box-shadow:0 10px 35px rgba(0,0,0,.06);
+
+    margin-bottom:60px;
+
+}
+
+
+
+.catalog-search input,
+.catalog-search select{
+
+    height:55px;
+
+    border-radius:30px;
+
+    border:1px solid #ddd;
+
+    padding-left:25px;
+
+}
+
+
+.catalog-btn{
+
+    height:55px;
+
+    border-radius:30px;
+
+    background:#da1a1a;
+
+    color:white;
+
+    font-weight:600;
+
+    transition:.3s;
+
+}
+
+
+
+.catalog-btn:hover{
+
+    background:#da1a1a;
+
+    color:white;
+
+}
+
+
+
+
+
+/* =====================================
+   PRODUCTOS
+===================================== */
+
+
+.catalog-grid{
+
+    row-gap:40px;
+
+}
+
+
+
+.product-menu-item{
+
+    display:flex;
+
+    gap:25px;
+
+    padding:20px;
+
+    background:#f8d0d0;
+
+    border-radius:20px;
+
+    transition:.35s;
+
+    height:100%;
+
+}
+
+
+
+.product-menu-item:hover{
+
+    transform:translateY(-8px);
+
+    box-shadow:0 15px 40px rgba(0,0,0,.08);
+
+}
+
+
+
+
+/* Imagen */
+
+
+.product-image{
+
+    flex-shrink:0;
+
+}
+
+
+
+.product-image img{
+
+    width:110px;
+
+    height:110px;
+
+    object-fit:cover;
+
+    border-radius:50%;
+
+    border:5px solid #e83939;
+
+    padding:4px;
+
+    background:white;
+
+    transition:.4s;
+
+}
+
+
+
+.product-menu-item:hover img{
+
+    transform:scale(1.08) rotate(5deg);
+
+}
+
+
+
+
+/* Información */
+
+
+.product-info{
+
+    flex:1;
+
+}
+
+
+
+.product-heading{
+
+    display:flex;
+
+    align-items:center;
+
+}
+
+
+
+.product-heading h3{
+
+    font-size:23px;
+
+    font-weight:700;
+
+    margin:0;
+
+    color:#222;
+
+    white-space:nowrap;
+
+}
+
+
+
+.product-dots{
+
+    flex:1;
+
+    margin:0 15px;
+
+    border-bottom:2px dotted #ccc;
+
+}
+
+
+
+.product-price{
+
+    color:#0e0e0e;
+
+    font-size:22px;
+
+    font-weight:700;
+
+    white-space:nowrap;
+
+}
+
+
+
+.product-category{
+
+    display:block;
+
+    margin-top:8px;
+
+    color:#999;
+
+    font-size:13px;
+
+    text-transform:uppercase;
+
+    letter-spacing:1px;
+
+    font-weight:600;
+
+}
+
+
+
+.product-detail{
+
+    margin-top:12px;
+
+    color:#666;
+
+    line-height:1.7;
+
+}
+
+
+
+.product-stock{
+
+    color:#555;
+
+    font-size:14px;
+
+}
+
+
+
+
+/* =====================================
+   PAGINACION
+===================================== */
+
+
+.catalog-pagination{
+
+    margin-top:60px;
+
+}
+
+
+
+.pagination .page-link{
+
+    color:#da1a1a;
+
+    border-radius:50%;
+
+    margin:0 5px;
+
+    width:40px;
+
+    height:40px;
+
+    text-align:center;
+
+    border:1px solid #eee;
+
+}
+
+
+
+.pagination .active .page-link{
+
+    background:#da1a1a;
+
+    border-color:#da1a1a;
+
+    color:white;
+
+}
+
+
+
+
+
+/* =====================================
+   RESPONSIVE
+===================================== */
+
+
+@media(max-width:768px){
+
+
+.catalog-title{
+
+    font-size:36px;
+
+}
+
+
+
+.product-menu-item{
+
+    flex-direction:column;
+
+    align-items:center;
+
+    text-align:center;
+
+}
+
+
+.product-heading{
+
+    justify-content:center;
+
+}
+
+
+
+.product-dots{
+
+    display:none;
+
+}
+
+
+
+.product-heading h3{
+
+    white-space:normal;
+
+}
+
+
+
+.product-info{
+
+    width:100%;
+
+}
+
+
+}
+.product-category{
+
+    color:#da1a1a;
+
+}
+
+
+.product-detail{
+
+    font-size:15px;
+
+}
+
+
+.product-stock strong{
+
+    color:#da1a1a;
+
+}
+
+
+.product-menu-item{
+
+    overflow:hidden;
+
+}
+
+
+.product-image{
+
+    position:relative;
+
+}
+
+
+.product-image:after{
+
+    content:"";
+
+    position:absolute;
+
+    width:110px;
+
+    height:110px;
+
+    border-radius:50%;
+
+    border:1px dashed #da1a1a;
+
+    top:0;
+
+    left:0;
+
+    opacity:0;
+
+    transition:.4s;
+    pointer-events:none; /* IMPORTANTE */
+
+}
+
+
+.product-menu-item:hover .product-image:after{
+
+    opacity:1;
+
+    transform:rotate(180deg);
+
+}
+
+/* =====================================
+   FILTRO DE CATEGORIAS
+===================================== */
+
+
+.category-filter{
+
+    display:flex;
+
+    justify-content:center;
+
+    flex-wrap:wrap;
+
+    gap:15px;
+
+    margin-bottom:35px;
+
+}
+
+
+
+.category-filter a{
+
+    text-decoration:none;
+
+    color:#555;
+
+    padding:12px 28px;
+
+    border-radius:30px;
+
+    background:white;
+
+    border:1px solid #eee;
+
+    font-weight:500;
+
+    transition:.3s;
+
+}
+
+
+
+.category-filter a:hover{
+
+    color:white;
+
+    background:#da1a1a;
+
+}
+
+
+
+.category-filter a.active{
+
+    color:white;
+
+    background:#da1a1a;
+    border-color:#da1a1a;
+    border-color:#da1a1a;
+
+}
+
+.product-category{
+
+    position:relative;
+
+    padding-left:15px;
+
+}
+
+
+.product-category:before{
+
+    content:"";
+
+    width:7px;
+
+    height:7px;
+
+    background:#da1a1a;
+
+    border-radius:50%;
+
+    position:absolute;
+
+    left:0;
+
+    top:50%;
+
+    transform:translateY(-50%);
+
+}
+
+.catalog-pagination{
+
+    padding-bottom:40px;
+
+}
+
+
+.pagination .page-item:first-child .page-link,
+.pagination .page-item:last-child .page-link{
+
+    width:auto;
+
+    padding:10px 20px;
+
+    border-radius:25px;
+
+}
+
+/* =====================================
+   MODAL PRODUCTO
+===================================== */
+
+
+.image-button{
+
+border:none;
+
+background:none;
+
+padding:0;
+
+cursor:pointer;
+
+}
+
+
+.image-button img{
+
+cursor:pointer;
+
+transition:.4s;
+
+}
+
+
+.image-button:hover img{
+
+transform:scale(1.08) rotate(5deg);
+
+}
+
+
+.zoom-product:hover{
+
+transform:scale(1.08);
+
+}
+
+
+
+.product-modal{
+
+border-radius:25px;
+
+overflow:hidden;
+
+border:none;
+
+}
+
+
+
+.product-modal .modal-header{
+
+border:none;
+
+background:#faf8f5;
+
+}
+
+
+
+.modal-product-image{
+
+max-height:500px;
+
+object-fit:contain;
+
+border-radius:20px;
+
+}
+
+
+
+.modal-price{
+
+color:#da1a1a;
+
+font-size:30px;
+
+font-weight:700;
+
+}
+
+.product-image{
+
+position:relative;
+
+z-index:5;
+
+}
+
+
+.image-button,
+.image-button img{
+
+width:110px;
+
+height:110px;
+
+display:block;
+
+}
