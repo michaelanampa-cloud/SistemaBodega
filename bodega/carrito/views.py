@@ -216,11 +216,31 @@ def registrar_compra(request):
 
 @login_required
 def lista_compras(request):
-    compras = Compra.objects.order_by('-fecha')
-    paginator = Paginator(compras, 14)  # Mostrar 14 productos por página
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    return render(request, 'lista_compras.html', {'compras': page_obj, 'page_obj': page_obj})
+    compras = Compra.objects.select_related('cliente').order_by('-fecha')
+    cliente = request.GET.get('cliente')
+    fecha_inicio = request.GET.get('fecha_inicio')
+    fecha_fin = request.GET.get('fecha_fin')
+
+    if cliente:
+        compras = compras.filter(cliente__nombre__icontains=cliente)
+
+    if fecha_inicio:
+        compras = compras.filter(fecha__date__gte=fecha_inicio)
+
+    if fecha_fin:
+        compras = compras.filter(fecha__date__lte=fecha_fin)
+
+    paginator = Paginator(compras, 14)
+    page = request.GET.get('page')
+    page_obj = paginator.get_page(page)
+
+    return render(request, 'lista_compras.html', {
+        'compras': page_obj,
+        'page_obj': page_obj,
+        'cliente': cliente,
+        'fecha_inicio': fecha_inicio,
+        'fecha_fin': fecha_fin,
+    })
 
 
 @login_required

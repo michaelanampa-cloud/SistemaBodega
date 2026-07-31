@@ -179,12 +179,31 @@ def registrar_gastos(request):
 
 @login_required
 def lista_gastos(request):
-    gastos = Gasto.objects.order_by('-fecha')
-
-    paginator = Paginator(gastos, 14)  # Mostrar 14 gastos por página
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    return render(request, 'listaGastos.html', {'page_obj': page_obj, 'gastos': page_obj})
+    gastos = Gasto.objects.select_related('proveedor').order_by('-fecha')
+    proveedor = request.GET.get('proveedor')
+    fecha_inicio = request.GET.get('fecha_inicio')
+    fecha_fin = request.GET.get('fecha_fin')
+    
+    if proveedor:
+        gastos = gastos.filter(proveedor__nombre__icontains=proveedor)
+    
+    if fecha_inicio:
+        gastos = gastos.filter(fecha__date__gte=fecha_inicio)
+    
+    if fecha_fin:
+        gastos = gastos.filter(fecha__date__lte=fecha_fin)
+    
+    paginator = Paginator(gastos, 14)
+    page = request.GET.get('page')
+    page_obj = paginator.get_page(page)
+    
+    return render(request, 'listaGastos.html', {
+        'gastos': page_obj,
+        'page_obj': page_obj,
+        'proveedor': proveedor,
+        'fecha_inicio': fecha_inicio,
+        'fecha_fin': fecha_fin,
+    })
 
 
 @login_required
