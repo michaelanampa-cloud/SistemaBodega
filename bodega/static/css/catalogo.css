@@ -8,17 +8,9 @@ body{
 
 }
 
-
-.catalog-title,
-.product-heading h3{
-
-    font-family:'Cormorant Garamond', serif;
-
-}
-
 .catalog-section{
 
-    padding:80px 0;
+    padding:20px 0;
 
     background:#ffffff;
 
@@ -124,7 +116,7 @@ body{
 
 .catalog-search{
 
-    background:#ddaeae;
+    background:#1c1b1b;
 
     padding:30px;
 
@@ -186,33 +178,12 @@ body{
    PRODUCTOS
 ===================================== */
 
-
+/*
 .catalog-grid{
 
     row-gap:40px;
 
 }
-
-
-
-.product-menu-item{
-
-    display:flex;
-
-    gap:25px;
-
-    padding:20px;
-
-    background:#f8d0d0;
-
-    border-radius:20px;
-
-    transition:.35s;
-
-    height:100%;
-
-}
-
 
 
 .product-menu-item:hover{
@@ -222,21 +193,13 @@ body{
     box-shadow:0 15px 40px rgba(0,0,0,.08);
 
 }
-
+*/
 
 
 
 /* Imagen */
 
-
-.product-image{
-
-    flex-shrink:0;
-
-}
-
-
-
+/*
 .product-image img{
 
     width:110px;
@@ -256,39 +219,9 @@ body{
     transition:.4s;
 
 }
+*/
 
-
-
-.product-menu-item:hover img{
-
-    transform:scale(1.08) rotate(5deg);
-
-}
-
-
-
-
-/* Información */
-
-
-.product-info{
-
-    flex:1;
-
-}
-
-
-
-.product-heading{
-
-    display:flex;
-
-    align-items:center;
-
-}
-
-
-
+/*
 .product-heading h3{
 
     font-size:23px;
@@ -302,34 +235,6 @@ body{
     white-space:nowrap;
 
 }
-
-
-
-.product-dots{
-
-    flex:1;
-
-    margin:0 15px;
-
-    border-bottom:2px dotted #ccc;
-
-}
-
-
-
-.product-price{
-
-    color:#0e0e0e;
-
-    font-size:22px;
-
-    font-weight:700;
-
-    white-space:nowrap;
-
-}
-
-
 
 .product-category{
 
@@ -362,18 +267,7 @@ body{
 }
 
 
-
-.product-stock{
-
-    color:#555;
-
-    font-size:14px;
-
-}
-
-
-
-
+*/
 /* =====================================
    PAGINACION
 ===================================== */
@@ -426,128 +320,12 @@ body{
 ===================================== */
 
 
-@media(max-width:768px){
-
-
-.catalog-title{
-
-    font-size:36px;
-
-}
-
-
-
-.product-menu-item{
-
-    flex-direction:column;
-
-    align-items:center;
-
-    text-align:center;
-
-}
-
-
-.product-heading{
-
-    justify-content:center;
-
-}
-
-
-
-.product-dots{
-
-    display:none;
-
-}
-
-
-
-.product-heading h3{
-
-    white-space:normal;
-
-}
-
-
-
-.product-info{
-
-    width:100%;
-
-}
-
-
-}
-.product-category{
-
-    color:#da1a1a;
-
-}
-
-
-.product-detail{
-
-    font-size:15px;
-
-}
-
-
-.product-stock strong{
-
-    color:#da1a1a;
-
-}
-
-
 .product-menu-item{
 
     overflow:hidden;
 
 }
 
-
-.product-image{
-
-    position:relative;
-
-}
-
-
-.product-image:after{
-
-    content:"";
-
-    position:absolute;
-
-    width:110px;
-
-    height:110px;
-
-    border-radius:50%;
-
-    border:1px dashed #da1a1a;
-
-    top:0;
-
-    left:0;
-
-    opacity:0;
-
-    transition:.4s;
-    pointer-events:none; /* IMPORTANTE */
-
-}
-
-
-.product-menu-item:hover .product-image:after{
-
-    opacity:1;
-
-    transform:rotate(180deg);
-
-}
 
 /* =====================================
    FILTRO DE CATEGORIAS
@@ -608,38 +386,6 @@ body{
 
     background:#da1a1a;
     border-color:#da1a1a;
-    border-color:#da1a1a;
-
-}
-
-.product-category{
-
-    position:relative;
-
-    padding-left:15px;
-
-}
-
-
-.product-category:before{
-
-    content:"";
-
-    width:7px;
-
-    height:7px;
-
-    background:#da1a1a;
-
-    border-radius:50%;
-
-    position:absolute;
-
-    left:0;
-
-    top:50%;
-
-    transform:translateY(-50%);
 
 }
 
@@ -668,40 +414,17 @@ body{
 
 .image-button{
 
-border:none;
+    border:none;
+    background:none;
 
-background:none;
+    padding:0;
 
-padding:0;
+    width:100%;
+    height:100%;
 
-cursor:pointer;
-
-}
-
-
-.image-button img{
-
-cursor:pointer;
-
-transition:.4s;
+    cursor:pointer;
 
 }
-
-
-.image-button:hover img{
-
-transform:scale(1.08) rotate(5deg);
-
-}
-
-
-.zoom-product:hover{
-
-transform:scale(1.08);
-
-}
-
-
 
 .product-modal{
 
@@ -747,22 +470,185 @@ font-weight:700;
 
 }
 
-.product-image{
+/*ultimo agregado */
 
-position:relative;
+.catalog-grid{
+    row-gap:30px;
+}
 
-z-index:5;
+.product-card{
+
+    background:#1c1b1b;
+    border-radius:22px;
+    overflow:hidden;
+    box-shadow:0 15px 35px rgba(0,0,0,.08);
+    transition:.35s;
+    height:100%;
+    display:flex;
+    flex-direction:column;
 
 }
 
+.product-card:hover{
 
-.image-button,
+    transform:translateY(-8px);
+    box-shadow:0 25px 45px rgba(0,0,0,.15);
+
+}
+
+.product-image{
+
+    position:relative;
+    height:260px;
+    overflow:hidden;
+
+}
+
+.product-card:hover img{
+
+    transform:scale(1.08);
+
+}
+
+.product-badge{
+
+    position:absolute;
+    left:15px;
+    top:15px;
+
+    background:#ff9800;
+    color:#fff;
+
+    padding:6px 14px;
+
+    border-radius:30px;
+
+    font-size:13px;
+    font-weight:600;
+
+}
+
+.product-body{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    padding:22px;
+
+}
+
+.product-body h3{
+
+    font-size:30px;
+    font-weight:700;
+    line-height:1.2;
+
+}
+
+.product-description{
+
+    color:#ffffff;
+    min-height:60px;
+
+}
+
+.product-nombre{
+    color: #e53935;
+}
+
+.product-stock{
+    color: #faf8f5;
+}
+
+.product-footer{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:25px;
+
+}
+
+.price{
+
+    display:block;
+    font-size:28px;
+    font-weight:bold;
+    color:#e53935;
+
+}
+
+.btn-add{
+
+    width:55px;
+    height:55px;
+
+    border-radius:50%;
+    background:#e53935;
+
+    color:#fff;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    font-size:22px;
+
+    text-decoration:none;
+
+    transition:.3s;
+
+}
+
+.btn-add:hover{
+
+    background:#b71c1c;
+    color:#fff;
+
+    transform:rotate(90deg);
+
+}
+
+.product-image img{
+
+    width:100%;
+    height:100%;
+    object-fit:cover;
+
+    display:block;
+
+    transition:.5s;
+
+}
+
 .image-button img{
 
-width:110px;
+    width:100%;
+    height:100%;
 
-height:110px;
+    object-fit:cover;
 
-display:block;
+}
+
+.product-footer{
+
+    margin-top:auto;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+}
+
+.product-image img{
+
+    width:100%;
+    height:100%;
+    object-fit:cover;
+
+    display:block;
+
+    transition:.5s;
 
 }

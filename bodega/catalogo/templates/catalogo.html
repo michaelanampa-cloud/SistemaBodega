@@ -12,7 +12,7 @@
 <!-- Título -->
 <div class="catalog-header text-center" data-aos="fade-up">
     <span class="catalog-subtitle">Nuestro catálogo</span>
-    <h1 class="catalog-title"> Productos disponibles</h1>
+    <h1 class="catalog-title"><i class="fa-solid fa-boxes-stacked"></i> Productos disponibles</h1>
     <div class="catalog-divider">
         <span></span>
     </div>
@@ -56,53 +56,52 @@
 
 <div class="row catalog-grid">
   {% for producto in page_obj.object_list %}
-    <div class="col-lg-6 catalog-product" data-aos="fade-up">
-      <article class="product-menu-item">
-        <!-- Imagen -->
+    <div class="col-xl-4 col-lg-4 col-md-6 mb-4" data-aos="fade-up">
+      <div class="product-card">
         <div class="product-image">
+          <button
+            type="button"
+            class="image-button"
+            data-bs-toggle="modal"
+            data-bs-target="#imageModal"
+            data-image="{% if producto.imagen %}{% static 'img/productos/' %}{{ producto.imagen }}{% else %}{% static 'img/logo.png' %}{% endif %}"
+            data-name="{{ producto.nombre }}"
+            data-price="S/ {{ producto.precio }}">
           {% if producto.imagen %}
-          <button 
-            type="button"
-            class="image-button"
-            data-bs-toggle="modal"
-            data-bs-target="#imageModal"
-            data-image="{% static 'img/productos/' %}{{ producto.imagen }}"
-            data-name="{{ producto.nombre }}"
-            data-price="S/ {{ producto.precio }}">
             <img src="{% static 'img/productos/' %}{{ producto.imagen }}" alt="{{ producto.nombre }}">
-          </button>
           {% else %}
-          <button 
-            type="button"
-            class="image-button"
-            data-bs-toggle="modal"
-            data-bs-target="#imageModal"
-            data-image="{% static 'img/logo.png' %}"
-            data-name="{{ producto.nombre }}"
-            data-price="S/ {{ producto.precio }}">
             <img src="{% static 'img/logo.png' %}" alt="Sin imagen">
-          </button>
           {% endif %}
-        </div>
-
-      <!-- Información -->
-      <div class="product-info">
-        <div class="product-heading">
-          <h3>{{ producto.nombre }}</h3>
-          <div class="product-dots"></div>
-          <span class="product-price">
-            S/ {{ producto.precio }}
+          </button>
+          <span class="product-badge"> {{ producto.tipoProducto }}
           </span>
         </div>
-      <span class="product-category">{{ producto.tipoProducto }}</span>
-      <p class="product-detail">
-        {{ producto.detalle|default:"Sin descripción"|truncatechars:120 }}
-      </p>
-      <span class="product-stock">
-      Disponible: {{ producto.stock }} {{ producto.unidadMedida }}
-      </span>
-    </div>
-    </article>
+        <div class="product-body">
+          <h3 class="product-nombre">{{ producto.nombre }}</h3>
+          <p class="product-description">
+            {{ producto.detalle|truncatechars:80 }}
+          </p>
+          <div class="product-footer">
+            <div class="col-md-6">
+              <span class="price">
+                S/ {{ producto.precio }}
+              </span>
+            </div>
+            <div class="col-md-4">
+              <small class="product-stock text-end">
+                Stock: {{ producto.stock }}
+              </small>
+            </div>
+
+            <!--Para agregar al carrito
+            <a href="{% url 'agregar_carrito' producto.id %}"
+               class="btn-add">
+
+                <i class="fas fa-plus"></i>
+            </a>-->
+          </div>
+        </div>
+      </div>
     </div>
       {% empty %}
     <div class="col-12">
