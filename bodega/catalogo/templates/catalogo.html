@@ -11,8 +11,8 @@
 
 <!-- Título -->
 <div class="catalog-header text-center" data-aos="fade-up">
-    <span class="catalog-subtitle">Nuestro catálogo</span>
-    <h1 class="catalog-title"><i class="fa-solid fa-boxes-stacked"></i> Productos disponibles</h1>
+  <!--  <span class="catalog-subtitle">Nuestro catálogo</span> -->
+    <h1 class="catalog-title"><i class="fa-solid fa-boxes-stacked"></i> Nuestro catálogo</h1>
     <div class="catalog-divider">
         <span></span>
     </div>
@@ -25,16 +25,23 @@
 <div class="catalog-search" data-aos="fade-down">
   <form method="get">
     <div class="row g-3">
-      <div class="col-lg-7">
+      <div class="col-lg-6">
         <input type="text" name="q" class="form-control" value="{{ query }}" placeholder="Buscar producto...">
       </div>
-
-      <div class="col-lg-5">
+      <div class="col-lg-3">
+        <select name="tipo" class="filtro-categoria text-center">
+          <option value="">Todos los tipos</option>
+          {% for tipo_item in tipos_disponibles %}
+            <option value="{{ tipo_item }}" {% if tipo_item == tipo %}selected{% endif %}>{{ tipo_item }}</option>
+          {% endfor %}
+          </select>
+      </div>
+      <div class="col-lg-3">
         <button class="btn catalog-btn w-100"><i class="fas fa-search"></i>
           Buscar producto
         </button>
       </div>
-
+      <!--
       <div class="category-filter">
         <a href="?q={{ query }}" class="{% if not tipo %}active{% endif %}">
           Todos
@@ -47,7 +54,7 @@
         </a>
         {% endfor %}
 
-      </div>
+      </div> -->
     </div>
   </form>
 </div>

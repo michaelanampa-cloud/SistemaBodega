@@ -283,7 +283,7 @@ body{
 
 .pagination .page-link{
 
-    color:#da1a1a;
+    color:#050505;
 
     border-radius:50%;
 
@@ -295,7 +295,7 @@ body{
 
     text-align:center;
 
-    border:1px solid #eee;
+    border:1px solid #040404;
 
 }
 
@@ -303,15 +303,25 @@ body{
 
 .pagination .active .page-link{
 
-    background:#da1a1a;
+    background:#080808;
 
-    border-color:#da1a1a;
+    border-color:#000000;
 
     color:white;
 
 }
 
+.pagination .disabled .page-link{
+    background: #ae2c2c;
+    border-color: #ae2c2c;
+    color: #ffffff;
+}
 
+.pagination .page-item .page-link:hover{
+    background: #ae2c2c;
+    border-color: #ae2c2c;
+    color: #ffffff;
+}
 
 
 
@@ -651,4 +661,54 @@ font-weight:700;
 
     transition:.5s;
 
+}
+
+/* =====================================
+   para el select
+===================================== */
+.filtro-categoria {
+    width: 260px;
+    height: 56px;
+    padding: 0 50px 0 20px;
+    border: none;
+    border-radius: 40px;
+    background: #fff;
+    color: #222;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    box-shadow: 0 4px 12px rgba(0,0,0,.12);
+    transition: all .3s ease;
+}
+
+/* Hover */
+.filtro-categoria:hover{
+    box-shadow: 0 8px 20px rgba(0,0,0,.18);
+}
+
+/* Focus */
+.filtro-categoria:focus{
+    border: 2px solid #e71d1d;
+    box-shadow: 0 0 0 4px rgba(231,29,29,.15);
+}
+
+/* Flecha personalizada */
+.select-container{
+    position: relative;
+}
+
+.select-container::after{
+    content: "⌄";
+    position: absolute;
+    right: 22px;
+    top: 50%;
+    transform: translateY(-55%);
+    font-size: 24px;
+    color: #444;
+    pointer-events: none;
 }
