@@ -71,7 +71,7 @@
                   <select name="cliente" id="cliente" class="form-select">
                     <option value="">-- Seleccionar Cliente --</option>
                     {% for cliente in clientes %}
-                      <option value="{{ cliente.id }}">{{ cliente.nombre }} - {{ cliente.telefono }}</option>
+                      <option value="{{ cliente.id }}" data-nombre="{{ cliente.nombre }}">{{ cliente.nombre }} - {{ cliente.telefono }}</option>
                     {% endfor %}
                   </select>
                 </div>
@@ -229,37 +229,51 @@
     const adicionalInput = document.getElementById('adicional');
     const subtotalDisplay = document.getElementById('subtotal-display');
     const totalDisplay = document.getElementById('total-display');
+    const clienteSelect = document.getElementById('cliente');
 
     const checkDefault = document.getElementById('checkDefault');
     const dineroInput = document.getElementById('dineroInput');
 
     function actualizarTotales() {
-        let rowTotal = "{{ total }}".toString().replace(',', '.');
-        let subtotal = parseFloat(rowTotal) || 0;
-        let descuento = parseFloat(descuentoInput.value.replace(',', '.')) || 0;
-        let adicional = parseFloat(adicionalInput.value.replace(',', '.')) || 0;
+      let rowTotal = "{{ total }}".toString().replace(',', '.');
+      let subtotal = parseFloat(rowTotal) || 0;
+      let descuento = parseFloat(descuentoInput.value.replace(',', '.')) || 0;
+      let adicional = parseFloat(adicionalInput.value.replace(',', '.')) || 0;
 
-        let vuelto = 0;
-        if (checkDefault.checked) {
-            let dinero = parseFloat(dineroInput.value.replace(',', '.')) || 0;
-            vuelto = dinero - (subtotal - descuento + adicional);
-            if (vuelto < 0) {
-                vuelto = 0; // Evita mostrar un vuelto negativo
-            }
+      let vuelto = 0;
+      if (checkDefault.checked) {
+        let dinero = parseFloat(dineroInput.value.replace(',', '.')) || 0;
+        vuelto = dinero - (subtotal - descuento + adicional);
+        if (vuelto < 0) {
+          vuelto = 0; // Evita mostrar un vuelto negativo
         }
+      }
 
-        let total = subtotal - descuento + adicional;
+      let total = subtotal - descuento + adicional;
 
-        subtotalDisplay.textContent = subtotal.toFixed(2);
-        totalDisplay.textContent = total.toFixed(2);
+      // Si el cliente seleccionado es FAMILIA, el total se muestra como 0
+      try {
+        const selectedNombre = clienteSelect && clienteSelect.selectedOptions && clienteSelect.selectedOptions[0] ? (clienteSelect.selectedOptions[0].dataset.nombre || '') : '';
+        if (selectedNombre && selectedNombre.trim().toUpperCase() === 'FAMILIA') {
+          total = 0;
+        }
+      } catch (e) {
+        // ignore
+      }
 
-        document.getElementById('vuelto').textContent = vuelto.toFixed(2);
+      subtotalDisplay.textContent = subtotal.toFixed(2);
+      totalDisplay.textContent = total.toFixed(2);
+
+      document.getElementById('vuelto').textContent = vuelto.toFixed(2);
     }
 
     checkDefault.addEventListener('change', actualizarTotales);
     dineroInput.addEventListener('input', actualizarTotales);
     descuentoInput.addEventListener('input', actualizarTotales);
     adicionalInput.addEventListener('input', actualizarTotales);
+    if (clienteSelect) {
+      clienteSelect.addEventListener('change', actualizarTotales);
+    }
 
     checkDefault.addEventListener('change', actualizarEstadoDinero);
     actualizarEstadoDinero();

@@ -114,6 +114,8 @@ def actualizar_carrito(request):
             # Allow decimals for kilo-based products
             if producto.unidadMedida and producto.unidadMedida.lower() in ('kilo', 'kg'):
                 cantidad = Decimal(str(cantidad))
+            elif producto.unidadMedida and producto.unidadMedida.lower() in ('metro', 'm'):
+                cantidad = Decimal(str(cantidad))
             else:
                 cantidad = Decimal(int(cantidad))
         except (ValueError, TypeError):
@@ -172,6 +174,15 @@ def registrar_compra(request):
         
         # Calcular total final
         total_final = total - descuento + adicional
+
+        # Si el cliente es "FAMILIA", el total se vuelve 0 pero se registra la compra y
+        # se descuenta el stock normalmente
+        try:
+            if cliente and cliente.nombre and cliente.nombre.strip().upper() == 'FAMILIA':
+                total_final = Decimal('0.00')
+        except Exception:
+            # En caso de cualquier error no interrumpimos el flujo
+            pass
         
         codigo = f"COMP-{timezone.now().strftime('%Y%m%d%H%M%S')}-{uuid.uuid4().hex[:6].upper()}"
         compra = Compra.objects.create(
