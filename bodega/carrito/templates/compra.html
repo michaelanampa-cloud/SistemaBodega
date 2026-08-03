@@ -86,6 +86,27 @@
                   </select>
                 </div>
               </div>
+              <div class="row g-3 mb-3">
+                <div class="col-md-5">
+
+                </div>
+                <div class="col-md-1 mb-3">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="bolsaCheckbox" name="bolsa_checkbox" value="1">
+                    <label class="form-check-label text-primary" for="bolsaCheckbox"><h5>Bolsa</h5></label>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="bolsa_producto" class="form-label">Seleccionar Bolsa:</label>
+                  <select name="bolsa_producto" id="bolsa_producto" class="form-select" disabled>
+                    <option value="">-- Seleccionar Bolsa --</option>
+                    {% for bolsa in bolsas %}
+                      <option value="{{ bolsa.id }}">{{ bolsa.nombre }} (Stock: {{ bolsa.stock }})</option>
+                    {% endfor %}
+                  </select>
+                  <div class="form-text">La bolsa seleccionada se descuenta del stock y no se suma al total.</div>
+                </div>
+              </div>
             </div>
             <div class="row g-3 mb-3" style="max-width: 350px; margin-left: auto;">
               <div class="col-12">
@@ -230,6 +251,8 @@
     const subtotalDisplay = document.getElementById('subtotal-display');
     const totalDisplay = document.getElementById('total-display');
     const clienteSelect = document.getElementById('cliente');
+    const bolsaCheckbox = document.getElementById('bolsaCheckbox');
+    const bolsaSelect = document.getElementById('bolsa_producto');
 
     const checkDefault = document.getElementById('checkDefault');
     const dineroInput = document.getElementById('dineroInput');
@@ -267,6 +290,15 @@
       document.getElementById('vuelto').textContent = vuelto.toFixed(2);
     }
 
+    function actualizarEstadoBolsa() {
+      if (bolsaCheckbox && bolsaSelect) {
+        bolsaSelect.disabled = !bolsaCheckbox.checked;
+        if (!bolsaCheckbox.checked) {
+          bolsaSelect.value = "";
+        }
+      }
+    }
+
     checkDefault.addEventListener('change', actualizarTotales);
     dineroInput.addEventListener('input', actualizarTotales);
     descuentoInput.addEventListener('input', actualizarTotales);
@@ -274,8 +306,12 @@
     if (clienteSelect) {
       clienteSelect.addEventListener('change', actualizarTotales);
     }
+    if (bolsaCheckbox) {
+      bolsaCheckbox.addEventListener('change', actualizarEstadoBolsa);
+    }
 
     checkDefault.addEventListener('change', actualizarEstadoDinero);
+    actualizarEstadoBolsa();
     actualizarEstadoDinero();
 
   });

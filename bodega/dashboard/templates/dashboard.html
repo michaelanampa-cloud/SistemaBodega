@@ -63,10 +63,11 @@
         </div>
       </div>
     </div>
+    
   </div>
 
   <div class="row g-3 mb-4">
-    <div class="col-md-4 producto-card">
+    <div class="col-md-3 producto-card">
       <div class="card shadow-sm border-info">
         <div class="card-body d-flex flex-column">
           <h5 class="card-title"><i class="fa-solid fa-user-group"></i> Clientes</h5>
@@ -75,7 +76,7 @@
         </div>
       </div>
     </div>
-    <div class="col-md-4 producto-card">
+    <div class="col-md-3 producto-card">
       <div class="card shadow-sm border-warning">
         <div class="card-body d-flex flex-column">
           <h5 class="card-title"><i class="fa-solid fa-truck-moving"></i> Proveedores</h5>
@@ -84,12 +85,21 @@
         </div>
       </div>
     </div>
-    <div class="col-md-4 producto-card">
+    <div class="col-md-3 producto-card">
       <div class="card shadow-sm border-dark">
         <div class="card-body d-flex flex-column">
           <h5 class="card-title"><i class="fa-solid fa-box-open"></i> Productos</h5>
           <p class="display-6 text-dark">S/ {{ total_productos|floatformat:2 }}</p>
           <a href="{% url 'lista_productos' %}" class="btn-outline-dark btn btn-lg mt-auto ms-auto border-0 shadow-none"><i class="fas fa-eye"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 producto-card">
+      <div class="card shadow-sm border-danger">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title"><i class="fa-solid fa-box-open"></i> Productos Vencidos</h5>
+          <p class="display-6 text-danger">{{ total_productos_vencidos }} Productos</p>
+          <a href="{% url 'productos_vencer' %}" class="btn-outline-danger btn btn-lg mt-auto ms-auto border-0 shadow-none"><i class="fas fa-eye"></i></a>
         </div>
       </div>
     </div>

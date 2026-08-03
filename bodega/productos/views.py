@@ -3,6 +3,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.contrib import messages
 from django.db.models import Q
+import datetime
+from django.utils import timezone
 
 from .models import Producto
 from .forms import ProductoForm
@@ -72,3 +74,35 @@ def eliminar_producto(request, pk):
 		messages.success(request, 'Producto eliminado.')
 		return redirect('lista_productos')
 	return render(request, 'productos/eliminar_producto.html', {'producto': producto})
+
+
+def productos_vencer(request):
+	"""Muestra productos con fecha de vencimiento próxima (por defecto 7 días) y permite buscar por fecha exacta."""
+	fecha_str = request.GET.get('fecha', '').strip()
+	hoy = timezone.now().date()
+	hasta = hoy + datetime.timedelta(days=7)
+
+	productos = Producto.objects.filter(fechaVencimiento__isnull=False)
+
+	if fecha_str:
+		try:
+			# Esperamos formato YYYY-MM-DD desde el input type=date
+			fecha = datetime.datetime.strptime(fecha_str, '%Y-%m-%d').date()
+			productos = productos.filter(fechaVencimiento=fecha).order_by('fechaVencimiento')
+		except ValueError:
+			messages.warning(request, 'Formato de fecha inválido. Usa YYYY-MM-DD.')
+			productos = Producto.objects.none()
+	else:
+		# Por defecto mostrar productos ya vencidos o con vencimiento hasta los próximos 7 días
+		productos = productos.filter(fechaVencimiento__lte=hasta).order_by('fechaVencimiento')
+
+	paginator = Paginator(productos, 14)
+	page_number = request.GET.get('page')
+	page_obj = paginator.get_page(page_number)
+
+	return render(request, 'productos/productos_vencer.html', {
+		'page_obj': page_obj,
+		'fecha_busqueda': fecha_str,
+		'hoy': hoy,
+		'hasta': hasta,
+	})

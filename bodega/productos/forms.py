@@ -14,6 +14,7 @@ TIPO_PRODUCTO_CHOICES = [
     ('Aguas', 'Aguas'),
     ('Verduras_Frutas', 'Verduras/Frutas'),
     ('Ropa', 'Ropa'),
+    ('Bolsas', 'Bolsas'),
 ]
 
 UNIDAD_MEDIDA_CHOICES = [

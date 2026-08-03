@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Productos por Vencer{% endblock %}
+
+{% block content %}
+<div class="container">
+	<h1 class="mb-4">Productos por Vencer</h1>
+
+	<form method="get" class="row g-2 mb-4">
+		<div class="col-auto">
+			<label for="fecha" class="form-label">Buscar por fecha de vencimiento</label>
+			<input type="date" id="fecha" name="fecha" class="form-control" value="{{ fecha_busqueda }}">
+		</div>
+		<div class="col-auto align-self-end">
+			<button type="submit" class="btn btn-primary mt-2">Buscar</button>
+			<a href="{% url 'productos_vencer' %}" class="btn btn-secondary mt-2">Ver próximos 7 días</a>
+		</div>
+	</form>
+
+	{% if page_obj and page_obj.object_list %}
+		<div class="table-responsive">
+			<table class="table table-bordered">
+				<thead class="table-light">
+					<tr>
+						<th>Nombre</th>
+						<th>Tipo</th>
+						<th>Precio</th>
+						<th>Stock</th>
+						<th>Fecha de Vencimiento</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for producto in page_obj.object_list %}
+					<tr>
+						<td>{{ producto.nombre }}</td>
+						<td>{{ producto.tipoProducto }}</td>
+						<td>S/ {{ producto.precio }}</td>
+						<td>{{ producto.stock }}</td>
+						<td>
+							{{ producto.fechaVencimiento|date:'d/m/Y' }}
+							{% if producto.fechaVencimiento < hoy %}
+								<span class="badge bg-danger text-white ms-2">Vencido</span>
+							{% elif producto.fechaVencimiento <= hasta %}
+								<span class="badge bg-warning text-dark ms-2">Próximo</span>
+							{% endif %}
+						</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+
+		<nav aria-label="Page navigation">
+			<ul class="pagination">
+				{% if page_obj.has_previous %}
+					<li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if fecha_busqueda %}&fecha={{ fecha_busqueda }}{% endif %}">Anterior</a></li>
+				{% else %}
+					<li class="page-item disabled"><span class="page-link">Anterior</span></li>
+				{% endif %}
+
+				<li class="page-item disabled"><span class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span></li>
+
+				{% if page_obj.has_next %}
+					<li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if fecha_busqueda %}&fecha={{ fecha_busqueda }}{% endif %}">Siguiente</a></li>
+				{% else %}
+					<li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+				{% endif %}
+			</ul>
+		</nav>
+
+	{% else %}
+		<div class="alert alert-info">No hay productos con fecha de vencimiento en el rango seleccionado.</div>
+	{% endif %}
+
+	<a href="{% url 'lista_productos' %}" class="btn btn-link mt-3">Volver a productos</a>
+</div>
+{% endblock %}

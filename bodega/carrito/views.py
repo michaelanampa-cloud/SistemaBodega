@@ -171,7 +171,15 @@ def registrar_compra(request):
         cliente = None
         if cliente_id:
             cliente = get_object_or_404(Cliente, pk=cliente_id)
-        
+
+        bolsa_producto_id = request.POST.get('bolsa_producto')
+        bolsa_producto = None
+        if bolsa_producto_id:
+            bolsa_producto = get_object_or_404(Producto, pk=bolsa_producto_id, tipoProducto__iexact='Bolsas')
+            if bolsa_producto.stock < Decimal('1'):
+                messages.error(request, f"No hay suficiente stock para {bolsa_producto.nombre}.")
+                return redirect('carrito')
+
         # Calcular total final
         total_final = total - descuento + adicional
 
@@ -183,7 +191,7 @@ def registrar_compra(request):
         except Exception:
             # En caso de cualquier error no interrumpimos el flujo
             pass
-        
+
         codigo = f"COMP-{timezone.now().strftime('%Y%m%d%H%M%S')}-{uuid.uuid4().hex[:6].upper()}"
         compra = Compra.objects.create(
             user=request.user, 
@@ -195,6 +203,17 @@ def registrar_compra(request):
             total=total_final,
             tipo_compra=tipo_compra
         )
+
+        if bolsa_producto:
+            CompraItem.objects.create(
+                compra=compra,
+                producto=bolsa_producto,
+                cantidad=Decimal('1'),
+                precio=Decimal('0.00'),
+                subtotal=Decimal('0.00'),
+            )
+            bolsa_producto.stock = Decimal(str(bolsa_producto.stock)) - Decimal('1')
+            bolsa_producto.save()
 
         for item in items:
             producto = item['producto']
@@ -217,10 +236,12 @@ def registrar_compra(request):
     
     # GET: Mostrar formulario para seleccionar cliente y tipo de compra
     clientes = Cliente.objects.filter(activo=True)
+    bolsas = Producto.objects.filter(tipoProducto__iexact='Bolsas')
     return render(request, 'compra.html', {
         'items': items, 
         'total': total,
         'clientes': clientes,
+        'bolsas': bolsas,
         'es_formulario': True
     })
 

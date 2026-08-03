@@ -42,6 +42,7 @@ def dashboard_view(request):
     total_clientes = Cliente.objects.count()
     total_proveedores = Proveedor.objects.count()
     total_productos = Producto.objects.count()  # Assuming you have a Producto model
+    total_productos_vencidos = Producto.objects.filter(fechaVencimiento__lt=datetime.now()).count()
 
     balance = total_compras - total_gastos
 
@@ -58,6 +59,7 @@ def dashboard_view(request):
         'total_clientes': total_clientes,
         'total_proveedores': total_proveedores,
         'total_productos': total_productos,
+        'total_productos_vencidos': total_productos_vencidos,
         'balance': balance,
         'chart_data': chart_data,
         'start_date': start_date,
