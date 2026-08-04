@@ -22,6 +22,7 @@
         <p><strong>Stock:</strong> {{ producto.stock }} {{ producto.unidadMedida }}</p>
         <p><strong>Vencimiento:</strong> {{ producto.fechaVencimiento|date:'d/m/Y' }}</p>
         <p><strong>Ganancia por unidad:</strong> <span id="ganancia_unit" class="text-primary">S/ 0.00</span></p>
+        <p><strong>Pörcentaje de Ganancia:</strong> <span id="ganancia_porcentaje" class="text-success"> 0.00 %</span></p>
         <p><strong>Ganancia total:</strong> <span id="ganancia_total" class="text-success">S/ 0.00</span></p>
         <div id="producto_data" data-precio="{{ producto.precio }}" data-costo="{{ producto.costo }}" style="display:none;"></div>
         <p><strong>Detalle:</strong></p>
@@ -68,11 +69,14 @@
 
       const gananciaUnit = precio - costo;
       const gananciaTotal = gananciaUnit * cantidad;
+      const gananciaPorcentaje = costo > 0 ? (gananciaUnit / costo) * 100 : 0;
 
+      const porcentajeEl = document.getElementById('ganancia_porcentaje');
       const unitEl = document.getElementById('ganancia_unit');
       const totalEl = document.getElementById('ganancia_total');
       if (unitEl) unitEl.textContent = `S/ ${gananciaUnit.toFixed(2)}`;
       if (totalEl) totalEl.textContent = `S/ ${gananciaTotal.toFixed(2)}`;
+      if (porcentajeEl) porcentajeEl.textContent = `${gananciaPorcentaje.toFixed(2)} %`;
     }
 
     document.addEventListener('DOMContentLoaded', function(){

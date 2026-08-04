@@ -1,7 +1,9 @@
-from datetime import datetime
+from datetime import datetime, date
+import calendar
 
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Sum
+from django.db.models.functions import TruncMonth
 from django.shortcuts import render
 
 from carrito.models import Compra
@@ -51,6 +53,43 @@ def dashboard_view(request):
         {'label': 'Gastos', 'total': float(total_gastos or 0)},
     ]
 
+    # Preparar etiquetas de meses para el gráfico mensual
+    def first_day_of_month(d):
+        return date(d.year, d.month, 1)
+
+    def next_month(d):
+        if d.month == 12:
+            return date(d.year + 1, 1, 1)
+        return date(d.year, d.month + 1, 1)
+
+    if start_date and end_date:
+        inicio_mes = first_day_of_month(start_date)
+        fin_mes = first_day_of_month(end_date)
+    else:
+        ahora = datetime.now().date()
+        fin_mes = first_day_of_month(ahora)
+        inicio_mes = first_day_of_month(date(fin_mes.year, fin_mes.month, 1))
+        for _ in range(5):
+            inicio_mes = first_day_of_month(date(inicio_mes.year, inicio_mes.month - 1, 1)) if inicio_mes.month > 1 else date(inicio_mes.year - 1, 12, 1)
+
+    meses = []
+    mes_actual = inicio_mes
+    while mes_actual <= fin_mes:
+        meses.append(mes_actual)
+        mes_actual = next_month(mes_actual)
+
+    compras_por_mes = compras.annotate(mes=TruncMonth('fecha')).values('mes').annotate(total=Sum('total')).order_by('mes')
+    gastos_por_mes = gastos.annotate(mes=TruncMonth('fecha')).values('mes').annotate(total=Sum('total')).order_by('mes')
+
+    compras_por_mes_map = {first_day_of_month(item['mes'].date() if hasattr(item['mes'], 'date') else item['mes']): float(item['total'] or 0) for item in compras_por_mes}
+    gastos_por_mes_map = {first_day_of_month(item['mes'].date() if hasattr(item['mes'], 'date') else item['mes']): float(item['total'] or 0) for item in gastos_por_mes}
+
+    monthly_chart_data = {
+        'labels': [calendar.month_name[m.month] + ' ' + str(m.year) for m in meses],
+        'compras': [compras_por_mes_map.get(m, 0) for m in meses],
+        'gastos': [gastos_por_mes_map.get(m, 0) for m in meses],
+    }
+
     return render(request, 'dashboard.html', {
         'compras': compras[:10],
         'gastos': gastos[:10],
@@ -62,6 +101,7 @@ def dashboard_view(request):
         'total_productos_vencidos': total_productos_vencidos,
         'balance': balance,
         'chart_data': chart_data,
+        'monthly_chart_data': monthly_chart_data,
         'start_date': start_date,
         'end_date': end_date,
         'tipo': tipo,

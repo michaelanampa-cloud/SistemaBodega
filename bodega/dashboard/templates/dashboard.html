@@ -12,15 +12,15 @@
   </div>
 
   <form method="get" class="row g-2 align-items-end mb-4">
-    <div class="col-md-4">
+    <div class="col-md-3">
       <label class="form-label">Desde</label>
       <input type="date" name="start_date" class="form-control" value="{% if start_date %}{{ start_date|date:'Y-m-d' }}{% else %}{% now 'Y-m-d' %}{% endif %}">
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
       <label class="form-label">Hasta</label>
       <input type="date" name="end_date" class="form-control" value="{% if end_date %}{{ end_date|date:'Y-m-d' }}{% else %}{% now 'Y-m-d' %}{% endif %}">
     </div>
-    <div class="col-md-2">
+    <div class="col-md-3">
       <label class="form-label">Tipo pago</label>
       <select name="tipo" class="form-select">
         <option value="">Todos</option>
@@ -29,7 +29,7 @@
         <option value="fiado" {% if tipo == 'fiado' %}selected{% endif %}>Fiado</option>
       </select>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
       <button class="btn btn-outline-primary"><i class="fas fa-filter"></i> Aplicar</button>
       <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary"><i class="fas fa-trash"></i> Limpiar</a>
     </div>
@@ -37,28 +37,28 @@
 
   <div class="row g-3 mb-4">
     <div class="col-md-4 producto-card">
-      <div class="card shadow-sm border-success">
+      <div class="card text-bg-success shadow-sm border-success">
         <div class="card-body d-flex flex-column">
           <h5 class="card-title"><i class="fa-solid fa-coins"></i> Compras</h5>
-          <p class="display-6 text-success">S/ {{ total_compras|floatformat:2 }}</p>
-          <a href="{% url 'resumen_compras' %}" class="btn-outline-success btn btn-lg mt-auto ms-auto border-0 shadow-none"><i class="fas fa-eye"></i></a>
+          <p class="display-6 text-center">S/ {{ total_compras|floatformat:2 }}</p>
+          <a href="{% url 'resumen_compras' %}" class="btn btn-lg mt-auto ms-auto border-0 shadow-none"><i class="fas fa-eye"></i></a>
         </div>
       </div>
     </div>
     <div class="col-md-4 producto-card">
-      <div class="card shadow-sm border-danger">
+      <div class="card text-bg-danger shadow-sm border-danger">
         <div class="card-body d-flex flex-column">
           <h5 class="card-title"><i class="fa-solid fa-wallet"></i> Gastos</h5>
-          <p class="display-6 text-danger">S/ {{ total_gastos|floatformat:2 }}</p>
+          <p class="display-6 text-center">S/ {{ total_gastos|floatformat:2 }}</p>
           <a href="{% url 'resumen_gastos' %}" class="btn-outline-danger btn btn-lg mt-auto ms-auto border-0 shadow-none"><i class="fas fa-eye"></i></a>
         </div>
       </div>
     </div>
     <div class="col-md-4 producto-card">
-      <div class="card shadow-sm {% if balance >= 0 %}border-primary{% else %}border-warning{% endif %}">
+      <div class="card shadow-sm {% if balance >= 0 %}text-bg-primary{% else %}text-bg-warning{% endif %}">
         <div class="card-body d-flex flex-column">
           <h5 class="card-title"><i class="fa-brands fa-sellsy"></i> Balance</h5>
-          <p class="display-6 {% if balance >= 0 %}text-primary{% else %}text-warning{% endif %}">S/ {{ balance|floatformat:2 }}</p>
+          <p class="display-6 text-center">S/ {{ balance|floatformat:2 }}</p>
           <a href="#" class="{% if balance >= 0 %}btn-outline-primary{% else %}btn-outline-warning{% endif %} btn btn-lg mt-auto ms-auto border-0 shadow-none"><i class="fas fa-eye"></i></a>
         </div>
       </div>
@@ -68,45 +68,45 @@
 
   <div class="row g-3 mb-4">
     <div class="col-md-3 producto-card">
-      <div class="card shadow-sm border-info">
+      <div class="card text-bg-info shadow-sm border-info">
         <div class="card-body d-flex flex-column">
           <h5 class="card-title"><i class="fa-solid fa-user-group"></i> Clientes</h5>
-          <p class="display-6 text-info">{{ total_clientes }}</p>
+          <p class="display-6 text-center">{{ total_clientes }}</p>
           <a href="{% url 'lista_clientes' %}" class="btn-outline-info btn btn-lg mt-auto ms-auto border-0 shadow-none"><i class="fas fa-eye"></i></a>
         </div>
       </div>
     </div>
     <div class="col-md-3 producto-card">
-      <div class="card shadow-sm border-warning">
+      <div class="card text-bg-warning shadow-sm border-warning">
         <div class="card-body d-flex flex-column">
           <h5 class="card-title"><i class="fa-solid fa-truck-moving"></i> Proveedores</h5>
-          <p class="display-6 text-warning">S/ {{ total_proveedores|floatformat:2 }}</p>
+          <p class="display-6 text-center"> {{ total_proveedores}}</p>
           <a href="{% url 'lista_proveedores' %}" class="btn-outline-warning btn btn-lg mt-auto ms-auto border-0 shadow-none"><i class="fas fa-eye"></i></a>
         </div>
       </div>
     </div>
     <div class="col-md-3 producto-card">
-      <div class="card shadow-sm border-dark">
+      <div class="card text-bg-primary shadow-sm border-dark">
         <div class="card-body d-flex flex-column">
           <h5 class="card-title"><i class="fa-solid fa-box-open"></i> Productos</h5>
-          <p class="display-6 text-dark">S/ {{ total_productos|floatformat:2 }}</p>
+          <p class="display-6 text-center"> {{ total_productos}}</p>
           <a href="{% url 'lista_productos' %}" class="btn-outline-dark btn btn-lg mt-auto ms-auto border-0 shadow-none"><i class="fas fa-eye"></i></a>
         </div>
       </div>
     </div>
     <div class="col-md-3 producto-card">
-      <div class="card shadow-sm border-danger">
+      <div class="card text-bg-secondary shadow-sm border-secondary">
         <div class="card-body d-flex flex-column">
           <h5 class="card-title"><i class="fa-solid fa-box-open"></i> Productos Vencidos</h5>
-          <p class="display-6 text-danger">{{ total_productos_vencidos }} Productos</p>
-          <a href="{% url 'productos_vencer' %}" class="btn-outline-danger btn btn-lg mt-auto ms-auto border-0 shadow-none"><i class="fas fa-eye"></i></a>
+          <p class="display-6 text-center">{{ total_productos_vencidos }} Vencidos</p>
+          <a href="{% url 'productos_vencer' %}" class="btn-outline-secondary btn btn-lg mt-auto ms-auto border-0 shadow-none"><i class="fas fa-eye"></i></a>
         </div>
       </div>
     </div>
   </div>
 
   <div class="row g-4">
-    <div class="col-lg-8">
+    <div class="col-lg-4">
       <div class="card shadow-sm">
         <div class="card-body">
           <h5 class="card-title"><i class="fa-solid fa-chart-pie"></i> Gráfica de balance</h5>
@@ -116,7 +116,19 @@
         </div>
       </div>
     </div>
-    <div class="col-lg-4">
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title"><i class="fa-solid fa-chart-bar"></i> Compras y Gastos por mes</h5>
+          <div class="d-flex justify-content-center">
+            <canvas id="monthlyChart" width="900" height="320"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <br>
+  <div class="col-lg-6">
       <div class="card shadow-sm">
         <div class="card-header bg-dark text-white">
           <h5 class="mb-0"><i class="fa-solid fa-coins"></i> Últimas compras</h5>
@@ -141,53 +153,106 @@
           {% endif %}
         </div>
       </div>
-    </div>
-  </div>
+
 </div>
 {% endblock %}
 
 {% block extra_js %}
   {{ chart_data|json_script:"chart-data" }}
+  {{ monthly_chart_data|json_script:"monthly-chart-data" }}
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       const chartDataEl = document.getElementById('chart-data');
-      if (!chartDataEl) return;
+      if (chartDataEl) {
+        const chartData = JSON.parse(chartDataEl.textContent || '[]');
+        const canvas = document.getElementById('balanceChart');
+        if (canvas) {
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            const labels = chartData.map(item => item.label);
+            const values = chartData.map(item => Number(item.total) || 0);
 
-      const chartData = JSON.parse(chartDataEl.textContent || '[]');
-      const canvas = document.getElementById('balanceChart');
-      if (!canvas) return;
-
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-
-      const labels = chartData.map(item => item.label);
-      const values = chartData.map(item => Number(item.total) || 0);
-
-      new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels: labels,
-          datasets: [{
-            data: values,
-            backgroundColor: ['#189f04', '#dc3545']
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: { position: 'bottom' },
-            tooltip: {
-              callbacks: {
-                label: function (context) {
-                  return `${context.label}: S/ ${context.parsed.toFixed(2)}`;
+            new Chart(ctx, {
+              type: 'doughnut',
+              data: {
+                labels: labels,
+                datasets: [{
+                  data: values,
+                  backgroundColor: ['#189f04', '#dc3545']
+                }]
+              },
+              options: {
+                responsive: true,
+                plugins: {
+                  legend: { position: 'bottom' },
+                  tooltip: {
+                    callbacks: {
+                      label: function (context) {
+                        return `${context.label}: S/ ${context.parsed.toFixed(2)}`;
+                      }
+                    }
+                  }
                 }
               }
-            }
+            });
           }
         }
-      });
-    });
+      }
 
+      const monthlyDataEl = document.getElementById('monthly-chart-data');
+      if (monthlyDataEl) {
+        const monthlyData = JSON.parse(monthlyDataEl.textContent || '{}');
+        const monthlyCanvas = document.getElementById('monthlyChart');
+        if (monthlyCanvas) {
+          const monthlyCtx = monthlyCanvas.getContext('2d');
+          if (monthlyCtx) {
+            new Chart(monthlyCtx, {
+              type: 'bar',
+              data: {
+                labels: monthlyData.labels || [],
+                datasets: [
+                  {
+                    label: 'Compras',
+                    data: monthlyData.compras || [],
+                    backgroundColor: '#189f04',
+                  },
+                  {
+                    label: 'Gastos',
+                    data: monthlyData.gastos || [],
+                    backgroundColor: '#dc3545',
+                  }
+                ]
+              },
+              options: {
+                responsive: true,
+                interaction: { mode: 'index', intersect: false },
+                scales: {
+                  x: {
+                    stacked: false,
+                    title: { display: true, text: 'Mes' }
+                  },
+                  y: {
+                    stacked: false,
+                    title: { display: true, text: 'Monto (S/)' },
+                    ticks: { precision: 0 }
+                  }
+                },
+                plugins: {
+                  legend: { position: 'bottom' },
+                  tooltip: {
+                    callbacks: {
+                      label: function (context) {
+                        return `${context.dataset.label}: S/ ${Number(context.parsed.y).toFixed(2)}`;
+                      }
+                    }
+                  }
+                }
+              }
+            });
+          }
+        }
+      }
+    });
   </script>
 {% endblock %}
