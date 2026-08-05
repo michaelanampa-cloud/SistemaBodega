@@ -1,0 +1,23 @@
+.sidebar{
+    width:270px;
+    min-height:100vh;
+    background:#212529;
+    position:fixed;
+    left:0;
+    top:0;
+}
+
+.sidebar a{
+    color:white;
+    display:block;
+    padding:14px 20px;
+    text-decoration:none;
+}
+
+.sidebar a:hover{
+    background:#0d6efd;
+}
+
+.flex-grow-1{
+    margin-left:270px;
+}

@@ -1,0 +1,51 @@
+<div class="sidebar">
+    <div class="text-center mb-4">
+        <h4>Bodega</h4>
+
+        <small>{{ user.username }}</small>
+
+    </div>
+
+    <a href="{% url 'dashboard' %}">
+        <i class="fa-solid fa-chart-line"></i>
+        Dashboard
+    </a>
+
+    <a href="{% url 'lista_productos' %}">
+        <i class="fa-solid fa-box"></i>
+        Productos
+    </a>
+
+    <a href="{% url 'lista_clientes' %}">
+        <i class="fa-solid fa-users"></i>
+        Clientes
+    </a>
+
+    <a href="{% url 'lista_compras' %}">
+        <i class="fa-solid fa-cart-shopping"></i>
+        Compras
+    </a>
+
+    <a href="{% url 'lista_gastos' %}">
+        <i class="fa-solid fa-money-bill-wave"></i>
+        Gastos
+    </a>
+
+    <a href="{% url 'lista_proveedores' %}">
+        <i class="fa-solid fa-truck"></i>
+        Proveedores
+    </a>
+
+    <a href="{% url 'perfil' %}">
+        <i class="fa-solid fa-user"></i>
+        Perfil
+    </a>
+
+    <hr>
+
+    <a href="{% url 'logout' %}" class="text-danger">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        Cerrar sesión
+    </a>
+
+</div>

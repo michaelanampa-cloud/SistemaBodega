@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  {% load static %}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="{% static 'img/logo.png' %}" type="image/png">
+  <title>{% block title %}Bodega{% endblock %}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="{% static 'css/style.css' %}" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/catalogo.css' %}">
+ 
+  <!-- Animaciones Scroll -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/6.5.0/aos.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+  {% block extra_head %}{% endblock %}
+</head>
+
+<script>
+
+window.addEventListener("scroll", function(){
+
+    let header = document.getElementById("header");
+
+    if(window.scrollY > 80){
+        header.classList.add("header-scrolled");
+    }else{
+        header.classList.remove("header-scrolled");
+    }
+
+});
+
+</script>
+
+<body class="d-flex flex-column min-vh-100 bg-overlay">
+  <nav id="header" class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="/">
+        <img src="{% static 'img/logo.png' %}" alt="Logo" class="brand-logo">
+        <span>Bodega</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse justify-content-between" id="mainNavbar">
+        <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link" href="{% url 'inicio' %}"><i class="fa-solid fa-home"></i> Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" href="/catalogo/"><i class="fa-solid fa-book"></i> Catálogo</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'contacto' %}"><i class="fa-solid fa-envelope"></i> Contacto</a></li>
+          {% if user.is_authenticated %}
+            <li class="nav-item"><a class="nav-link" href="/carrito/"><i class="fa-solid fa-shopping-cart"></i> Carrito</a></li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="panelDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fa-solid fa-user-cog"></i> Panel
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="panelDropdown">
+                <li><a class="dropdown-item" href="{% url 'dashboard' %}"><i class="fa-solid fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a class="dropdown-item" href="{% url 'resumen_compras' %}"><i class="fa-solid fa-receipt"></i> Resumen Compras</a></li>
+                <li><a class="dropdown-item" href="{% url 'resumen_gastos' %}"><i class="fa-solid fa-money-bill-wave"></i> Resumen Gastos</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{% url 'lista_productos' %}"><i class="fa-solid fa-box"></i> Productos</a></li>
+                <li><a class="dropdown-item" href="{% url 'lista_clientes' %}"><i class="fa-solid fa-users"></i> Clientes</a></li>
+                <li><a class="dropdown-item" href="{% url 'lista_compras' %}"><i class="fa-solid fa-shopping-bag"></i> Compras</a></li>
+                <li><a class="dropdown-item" href="{% url 'lista_gastos' %}"><i class="fa-solid fa-money-bill-wave"></i> Gastos</a></li>
+                <li><a class="dropdown-item" href="{% url 'lista_proveedores' %}"><i class="fa-solid fa-truck"></i> Proveedores</a></li>
+              </ul>
+            </li>
+          {% endif %}
+        </ul>
+
+        <ul class="navbar-nav ms-auto">
+          {% if user.is_authenticated %}
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fa-solid fa-user"></i> {{ user.username }}
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                <li><a class="dropdown-item" href="{% url 'perfil' %}"><i class="fa-solid fa-user"></i> Perfil</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fa-solid fa-sign-out-alt"></i> Cerrar sesión</a></li>
+              </ul>
+            </li>
+          {% else %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'login' %}"><i class="fa-solid fa-sign-in-alt"></i> Iniciar sesión</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'registro' %}"><i class="fa-solid fa-user-plus"></i> Registrarse</a></li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="flex-fill {% block main_class %}page-content{% endblock %}">
+    
+      {% if messages %}
+        {% for message in messages %}
+        
+          <div class="alert alert-info">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+      {% block content %}{% endblock %}
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  {% block extra_js %}{% endblock %}
+
+  <footer class="bg-dark text-center text-white p-4 mt-auto">
+    <div class="container">
+      <div class="row small">
+                <div class="col-md-4 mb-3">
+                    <h6 class="text-uppercase">Sobre nosotros</h6>
+                    <p class="mb-1">Doña Catita, tu bodega de confianza y con los mejores precios de la rica FM.</p>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h6 class="text-uppercase">Enlaces útiles</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'inicio' %}" class="text-white-50 text-decoration-none">Inicio</a></li>
+                        <li><a href="#" class="text-white-50 text-decoration-none">Noticias</a></li>
+                        <li><a href="#" class="text-white-50 text-decoration-none">Comunidad</a></li>
+                        <li><a href="#" class="text-white-50 text-decoration-none">Contacto</a></li>
+                        <li><a href="#" class="text-white-50 text-decoration-none">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h6 class="text-uppercase">Contacto</h6>
+                    <p class="mb-1">michaelanampa@gmail.com</p>
+                    <p class="mb-1">+51 930 233 684</p>
+                    <p class="mb-1">Calle 3 de Octubre #1598</p>
+                </div>
+            </div>
+            <hr class="bg-secondary my-2">
+            <div class="text-center small text-white-50">
+                <small>© {% now "Y" %} AMAD. Todos los derechos reservados.</small>
+            </div>
+    </div>
+  </footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+
+<script>
+    AOS.init({
+        duration: 900,
+        once: true
+    });
+</script>
+
+</body>
+</html>
