@@ -45,7 +45,7 @@ class Gasto(models.Model):
 class GastoItem(models.Model):
     gasto = models.ForeignKey(Gasto, related_name='items', on_delete=models.CASCADE)
     producto = models.ForeignKey(Producto, on_delete=models.SET_NULL, null=True, blank=True)
-    cantidad = models.PositiveIntegerField()
+    cantidad = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
     costo = models.DecimalField(max_digits=10, decimal_places=2)
     subtotal = models.DecimalField(max_digits=12, decimal_places=2)
 

@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from decimal import InvalidOperation
 
 from productos.models import Producto
 from .forms import ProveedorForm
@@ -96,9 +97,12 @@ def registrar_gastos(request):
                 continue
 
             try:
-                cantidad_val = int(cantidad)
+                if producto.unidadMedida and producto.unidadMedida.lower() in ('kilo', 'kg'):
+                    cantidad_val = Decimal(cantidad)
+                else:
+                    cantidad_val = Decimal(int(cantidad))
                 costo_val = Decimal(costo)
-            except (ValueError, TypeError):
+            except (ValueError, TypeError, InvalidOperation):
                 continue
 
             if cantidad_val <= 0:
@@ -226,6 +230,7 @@ def buscar_productos(request):
             'nombre': p.nombre,
             'stock': p.stock,
             'costo': str(p.costo),
+            'unidadMedida': p.unidadMedida,
         })
 
     return JsonResponse(results, safe=False)

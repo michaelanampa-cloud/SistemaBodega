@@ -1,51 +1,207 @@
-<div class="sidebar">
-    <div class="text-center mb-4">
-        <h4>Bodega</h4>
+<div class="sidebar" id="sidebar">
 
+    <div class="sidebar-header">
+        <h4>Bodega</h4>
         <small>{{ user.username }}</small>
+    </div>
+
+    <ul class="menu">
+
+        <li>
+            <a href="{% url 'dashboard' %}">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Dashboard</span>
+            </a>
+        </li>
+
+        <!-- Productos -->
+        <li class="submenu">
+            <a href="{% url 'lista_productos' %}" class="submenu-toggle">
+                <div>
+                    <i class="fa-solid fa-box"></i>
+                    <span>Productos</span>
+                </div>
+                <i class="fa-solid fa-chevron-down arrow"></i>
+            </a>
+
+            <ul class="submenu-items">
+
+                <li>
+                    <a href="{% url 'lista_productos' %}">
+                        Todos los productos
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{% url 'registros_productos' %}">
+                        Nuevo producto
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'productos_vencer' %}">
+                        Productos por vencer
+                    </a>
+                </li>
+
+            </ul>
+        </li>
+
+        <li class="submenu">
+            <a href="{% url 'lista_clientes' %}" class="submenu-toggle">
+                <div>
+                    <i class="fa-solid fa-users"></i>
+                    <span>Clientes</span>
+                </div>
+                <i class="fa-solid fa-chevron-down arrow"></i>
+            </a>
+            <ul class="submenu-items">
+                <li>
+                    <a href="{% url 'lista_clientes' %}">
+                        Todos los clientes
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{% url 'registro_cliente' %}">
+                        Nuevo cliente
+                    </a>
+                </li>
+
+            </ul>
+        </li>
+
+        <li class="submenu">
+            <a href="{% url 'lista_compras' %}" class="submenu-toggle">
+                <div>
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span>Compras</span>
+                </div>
+                <i class="fa-solid fa-chevron-down arrow"></i>
+            </a>
+            <ul class="submenu-items">
+                <li>
+                    <a href="{% url 'lista_compras' %}">
+                        Todas las compras
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{% url 'carrito' %}">
+                        carrito de compras
+                    </a>
+                </li>
+
+            </ul>
+        </li>
+
+        <li class="submenu">
+            <a href="{% url 'lista_gastos' %}" class="submenu-toggle">
+                <div>
+                    <i class="fa-solid fa-money-bill-wave"></i>
+                    <span>Gastos</span>
+                </div>
+                <i class="fa-solid fa-chevron-down arrow"></i>
+            </a>
+            <ul class="submenu-items">
+                <li>
+                    <a href="{% url 'lista_gastos' %}">
+                        Todas los gastos
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{% url 'registrar_gastos' %}">
+                        Nuevo gasto
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+        <li class="submenu">
+            <a href="{% url 'lista_proveedores' %}" class="submenu-toggle">
+                <div>
+                    <i class="fa-solid fa-truck"></i>
+                    <span>Proveedores</span>
+                </div>
+                <i class="fa-solid fa-chevron-down arrow"></i>
+            </a>
+            <ul class="submenu-items">
+                <li>
+                    <a href="{% url 'lista_proveedores' %}">
+                        Todos los proveedores
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{% url 'nuevo_proveedor' %}">
+                        Nuevo proveedor
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+        <li>
+            <a href="{% url 'perfil' %}">
+                <i class="fa-solid fa-user"></i>
+                <span>Perfil</span>
+            </a>
+        </li>
+    </ul>
+
+    <div class="logout">
+
+        <a href="{% url 'logout' %}">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Cerrar sesión</span>
+        </a>
 
     </div>
 
-    <a href="{% url 'dashboard' %}">
-        <i class="fa-solid fa-chart-line"></i>
-        Dashboard
-    </a>
-
-    <a href="{% url 'lista_productos' %}">
-        <i class="fa-solid fa-box"></i>
-        Productos
-    </a>
-
-    <a href="{% url 'lista_clientes' %}">
-        <i class="fa-solid fa-users"></i>
-        Clientes
-    </a>
-
-    <a href="{% url 'lista_compras' %}">
-        <i class="fa-solid fa-cart-shopping"></i>
-        Compras
-    </a>
-
-    <a href="{% url 'lista_gastos' %}">
-        <i class="fa-solid fa-money-bill-wave"></i>
-        Gastos
-    </a>
-
-    <a href="{% url 'lista_proveedores' %}">
-        <i class="fa-solid fa-truck"></i>
-        Proveedores
-    </a>
-
-    <a href="{% url 'perfil' %}">
-        <i class="fa-solid fa-user"></i>
-        Perfil
-    </a>
-
-    <hr>
-
-    <a href="{% url 'logout' %}" class="text-danger">
-        <i class="fa-solid fa-right-from-bracket"></i>
-        Cerrar sesión
-    </a>
-
 </div>
+
+<!-- Botón para móviles -->
+<button class="menu-btn" id="menuBtn">
+    <i class="fa-solid fa-bars"></i>
+</button>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<script>
+
+    const submenus = document.querySelectorAll(".submenu");
+
+    submenus.forEach(menu => {
+
+        menu.querySelector(".submenu-toggle").addEventListener("click", function (e) {
+
+            e.preventDefault();
+
+            menu.classList.toggle("active");
+
+        });
+
+    });
+
+
+    const sidebar = document.getElementById("sidebar");
+    const btn = document.getElementById("menuBtn");
+    const overlay = document.getElementById("sidebarOverlay");
+
+    btn.addEventListener("click", () => {
+        sidebar.classList.toggle("show");
+        overlay.classList.toggle("active");
+    });
+
+    overlay.addEventListener("click", () => {
+        sidebar.classList.remove("show");
+        overlay.classList.remove("active");
+    });
+
+    document.addEventListener("click", (event) => {
+        const isClickInside = sidebar.contains(event.target) || btn.contains(event.target) || overlay.contains(event.target);
+        if (!isClickInside && sidebar.classList.contains("show")) {
+            sidebar.classList.remove("show");
+            overlay.classList.remove("active");
+        }
+    });
+
+</script>
