@@ -1,7 +1,7 @@
 <div class="sidebar" id="sidebar">
-
+    {% load static %}
     <div class="sidebar-header">
-        <h4>Bodega</h4>
+        <img src="{% static 'img/logo2.png' %}" alt="Logo" class="brand-logo">
         <small>{{ user.username }}</small>
     </div>
 
