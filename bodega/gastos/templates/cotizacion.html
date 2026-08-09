@@ -1,0 +1,222 @@
+{% extends 'dashboard_base.html' %}
+
+{% block title %}Cotizar Gastos{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-3 py-3">
+  <div class="card mb-4">
+    <div class="card-body">
+      <h1 class="mb-3"><i class="fa-solid fa-file-invoice-dollar"></i> Cotizar Gastos</h1>
+      <p>Busca productos, agrega la cantidad deseada y calcula la ganancia de cada línea de producto (precio - costo).</p>
+
+      <div class="row gy-3">
+        <div class="col-12 col-lg-6">
+          <label for="buscarProducto" class="form-label">Buscar producto</label>
+          <input type="text" id="buscarProducto" class="form-control" placeholder="Escribe el nombre del producto para buscar...">
+          <div id="sugerenciasProductos" class="list-group position-relative mt-2" style="z-index: 1050;"></div>
+        </div>
+
+        <div class="col-12 col-lg-6">
+          <div class="card border-secondary h-100">
+            <div class="card-body">
+              <h5 class="card-title">Resumen</h5>
+              <div class="row gy-2">
+                <div class="col-12">
+                  <p class="mb-1"><strong>Total costo:</strong> S/ <span id="totalCosto">0.00</span></p>
+                </div>
+                <div class="col-12">
+                  <p class="mb-1"><strong>Total precio:</strong> S/ <span id="totalPrecio">0.00</span></p>
+                </div>
+                <div class="col-12">
+                  <p class="mb-0"><strong>Total ganancia:</strong> S/ <span id="totalGanancia">0.00</span></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header bg-secondary text-white">
+      <h5 class="mb-0"><i class="fa-solid fa-boxes-stacked"></i> Productos seleccionados</h5>
+    </div>
+    <div class="card-body table-responsive">
+      <table class="table table-bordered table-striped align-middle" id="tablaProductosSeleccionados">
+        <thead class="table-light">
+          <tr>
+            <th>Producto</th>
+            <th>Unidad</th>
+            <th>Costo</th>
+            <th>Precio</th>
+            <th>Cantidad</th>
+            <th>Costo total</th>
+            <th>Precio total</th>
+            <th>Ganancia</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody id="productosSeleccionadosBody">
+          <tr id="sinProductosRow">
+            <td colspan="9" class="text-center text-muted">Aún no has seleccionado ningún producto.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function debounce(fn, delay) {
+    let timeout;
+    return function (...args) {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => fn.apply(this, args), delay);
+    };
+  }
+
+  const buscarProducto = document.getElementById('buscarProducto');
+  const sugerenciasProductos = document.getElementById('sugerenciasProductos');
+  const productosSeleccionadosBody = document.getElementById('productosSeleccionadosBody');
+  const totalCostoEl = document.getElementById('totalCosto');
+  const totalPrecioEl = document.getElementById('totalPrecio');
+  const totalGananciaEl = document.getElementById('totalGanancia');
+
+  function formatNumber(value) {
+    return Number(value).toFixed(2);
+  }
+
+  async function buscarProductos(query) {
+    if (!query) {
+      sugerenciasProductos.innerHTML = '';
+      return;
+    }
+
+    try {
+      const response = await fetch(`{% url 'buscar_productos' %}?q=${encodeURIComponent(query)}`);
+      if (!response.ok) return;
+      const productos = await response.json();
+      mostrarSugerencias(productos);
+    } catch (error) {
+      console.error('Error buscando productos:', error);
+    }
+  }
+
+  function mostrarSugerencias(productos) {
+    sugerenciasProductos.innerHTML = '';
+    if (!productos.length) {
+      const item = document.createElement('div');
+      item.className = 'list-group-item text-muted';
+      item.textContent = 'No se encontraron productos.';
+      sugerenciasProductos.appendChild(item);
+      return;
+    }
+
+    productos.forEach(producto => {
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.className = 'list-group-item list-group-item-action';
+      item.innerHTML = `<strong>${producto.nombre}</strong><br><small>Costo: S/ ${formatNumber(producto.costo)} · Precio: S/ ${formatNumber(producto.precio)} · Stock: ${producto.stock}</small>`;
+      item.addEventListener('click', () => seleccionarProducto(producto));
+      sugerenciasProductos.appendChild(item);
+    });
+  }
+
+  function seleccionarProducto(producto) {
+    const existingRow = document.getElementById(`producto_row_${producto.id}`);
+    if (existingRow) {
+      const cantidadInput = existingRow.querySelector('.cantidad-input');
+      cantidadInput.value = Number(cantidadInput.value || 0) + 1;
+      updateRow(existingRow);
+      return;
+    }
+
+    if (document.getElementById('sinProductosRow')) {
+      document.getElementById('sinProductosRow').remove();
+    }
+
+    const row = document.createElement('tr');
+    row.id = `producto_row_${producto.id}`;
+    const step = (producto.unidadMedida && String(producto.unidadMedida).toLowerCase().includes('kilo')) ? '0.01' : '1';
+    row.innerHTML = `
+      <td>${producto.nombre}</td>
+      <td>${producto.unidadMedida || '-'}</td>
+      <td>S/ ${formatNumber(producto.costo)}</td>
+      <td>S/ ${formatNumber(producto.precio)}</td>
+      <td><input type="number" min="0.01" step="${step}" value="1" class="form-control cantidad-input" style="max-width:120px;"></td>
+      <td class="costo-total">S/ ${formatNumber(producto.costo)}</td>
+      <td class="precio-total">S/ ${formatNumber(producto.precio)}</td>
+      <td class="ganancia-line">S/ ${formatNumber(producto.precio - producto.costo)}</td>
+      <td><button type="button" class="btn btn-sm btn-danger btn-eliminar">Eliminar</button></td>
+    `;
+
+    const cantidadInput = row.querySelector('.cantidad-input');
+    const eliminarBtn = row.querySelector('.btn-eliminar');
+
+    cantidadInput.addEventListener('input', () => updateRow(row));
+    eliminarBtn.addEventListener('click', () => {
+      row.remove();
+      if (!productosSeleccionadosBody.querySelector('tr')) {
+        productosSeleccionadosBody.innerHTML = `<tr id="sinProductosRow"><td colspan="9" class="text-center text-muted">Aún no has seleccionado ningún producto.</td></tr>`;
+      }
+      updateTotales();
+    });
+
+    productosSeleccionadosBody.appendChild(row);
+    updateRow(row);
+    buscarProducto.value = '';
+    sugerenciasProductos.innerHTML = '';
+  }
+
+  function updateRow(row) {
+    const costo = parseFloat(row.children[2].textContent.replace(/[A-Za-z/ ]/g, '')) || 0;
+    const precio = parseFloat(row.children[3].textContent.replace(/[A-Za-z/ ]/g, '')) || 0;
+    const cantidadInput = row.querySelector('.cantidad-input');
+    const cantidad = parseFloat(cantidadInput.value) || 0;
+
+    const costoTotal = costo * cantidad;
+    const precioTotal = precio * cantidad;
+    const ganancia = (precio - costo) * cantidad;
+
+    row.querySelector('.costo-total').textContent = `S/ ${formatNumber(costoTotal)}`;
+    row.querySelector('.precio-total').textContent = `S/ ${formatNumber(precioTotal)}`;
+    row.querySelector('.ganancia-line').textContent = `S/ ${formatNumber(ganancia)}`;
+
+    updateTotales();
+  }
+
+  function updateTotales() {
+    let totalCosto = 0;
+    let totalPrecio = 0;
+    let totalGanancia = 0;
+
+    productosSeleccionadosBody.querySelectorAll('tr').forEach(row => {
+      if (row.id === 'sinProductosRow') return;
+      const costoTotal = parseFloat(row.querySelector('.costo-total').textContent.replace(/[A-Za-z/ ]/g, '')) || 0;
+      const precioTotal = parseFloat(row.querySelector('.precio-total').textContent.replace(/[A-Za-z/ ]/g, '')) || 0;
+      const gananciaLine = parseFloat(row.querySelector('.ganancia-line').textContent.replace(/[A-Za-z/ ]/g, '')) || 0;
+      totalCosto += costoTotal;
+      totalPrecio += precioTotal;
+      totalGanancia += gananciaLine;
+    });
+
+    totalCostoEl.textContent = formatNumber(totalCosto);
+    totalPrecioEl.textContent = formatNumber(totalPrecio);
+    totalGananciaEl.textContent = formatNumber(totalGanancia);
+  }
+
+  buscarProducto.addEventListener('input', debounce((event) => {
+    buscarProductos(event.target.value.trim());
+  }, 300));
+
+  document.addEventListener('click', (event) => {
+    if (!sugerenciasProductos.contains(event.target) && event.target !== buscarProducto) {
+      sugerenciasProductos.innerHTML = '';
+    }
+  });
+</script>
+{% endblock %}
+

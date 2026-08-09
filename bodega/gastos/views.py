@@ -1,12 +1,11 @@
 import uuid
 from django.core.paginator import Paginator
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
-from decimal import InvalidOperation
 
 from productos.models import Producto
 from .forms import ProveedorForm
@@ -182,6 +181,11 @@ def registrar_gastos(request):
 
 
 @login_required
+def cotizacion(request):
+    return render(request, 'cotizacion.html')
+
+
+@login_required
 def lista_gastos(request):
     gastos = Gasto.objects.select_related('proveedor').order_by('-fecha')
     proveedor = request.GET.get('proveedor')
@@ -230,6 +234,7 @@ def buscar_productos(request):
             'nombre': p.nombre,
             'stock': p.stock,
             'costo': str(p.costo),
+            'precio': str(p.precio),
             'unidadMedida': p.unidadMedida,
         })
 
