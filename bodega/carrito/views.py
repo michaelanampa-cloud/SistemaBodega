@@ -5,10 +5,12 @@ from django.core.paginator import Paginator
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.conf import settings
 
 from productos.models import Producto
 from clientes.models import Cliente
@@ -278,7 +280,70 @@ def lista_compras(request):
 @login_required
 def compra_detalle(request, pk):
     compra = get_object_or_404(Compra, pk=pk)
-    return render(request, 'detalle_compra.html', {'compra': compra})
+    clientes = Cliente.objects.filter(activo=True)
+    selected_cliente_id = None
+    email_to = ''
+
+    if request.method == 'POST':
+        selected_cliente_id = request.POST.get('cliente')
+        email_to = request.POST.get('email', '').strip()
+
+        if selected_cliente_id:
+            try:
+                cliente = get_object_or_404(Cliente, pk=selected_cliente_id)
+            except Http404:
+                cliente = None
+        else:
+            cliente = None
+
+        if cliente and cliente.email:
+            email_to = cliente.email
+
+        if not email_to:
+            messages.error(request, 'Debes seleccionar un cliente con correo o ingresar un email para enviar la boleta.')
+        else:
+            subject = f'Boleta de compra {compra.codigo}'
+            lines = [
+                'Boleta de compra',
+                'Bodega Doña Catita',
+                'RUC: 1012038912',
+                'Dirección: calle 3 de octubre 1598',
+                '',
+                f'Fecha: {compra.fecha.strftime("%d/%m/%Y %H:%M")}',
+                f'Código: {compra.codigo}',
+                f'Cliente: {compra.cliente.nombre if compra.cliente else "Sin cliente asignado"}',
+                f'Tipo de compra: {compra.get_tipo_compra_display}',
+                '',
+                'Productos:',
+            ]
+            for item in compra.items.all():
+                lines.append(
+                    f'- {item.producto.nombre} | Costo unitario: S/ {item.precio:.2f} | Cantidad: {item.cantidad} | Subtotal: S/ {item.subtotal:.2f}'
+                )
+            lines += [
+                '',
+                f'Subtotal: S/ {compra.subtotal:.2f}',
+            ]
+            if compra.descuento:
+                lines.append(f'Descuento: -S/ {compra.descuento:.2f}')
+            if compra.adicional:
+                lines.append(f'Adicional: +S/ {compra.adicional:.2f}')
+            lines.append(f'Total: S/ {compra.total:.2f}')
+            message = '\n'.join(lines)
+            from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', None) or getattr(settings, 'EMAIL_HOST_USER', None) or 'no-reply@example.com'
+
+            try:
+                send_mail(subject, message, from_email, [email_to], fail_silently=False)
+                messages.success(request, f'Boleta enviada correctamente a {email_to}.')
+            except Exception as e:
+                messages.error(request, f'Error al enviar el correo: {e}')
+
+    return render(request, 'detalle_compra.html', {
+        'compra': compra,
+        'clientes': clientes,
+        'selected_cliente_id': selected_cliente_id,
+        'email_to': email_to,
+    })
 
 
 @login_required

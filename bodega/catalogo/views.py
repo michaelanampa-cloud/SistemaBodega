@@ -18,7 +18,7 @@ def catalogo_view(request):
     if tipo:
         productos = productos.filter(tipoProducto__iexact=tipo)
 
-    paginator = Paginator(productos, 12)  # Mostrar 12 productos por página
+    paginator = Paginator(productos, 18)  # Mostrar 12 productos por página
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 

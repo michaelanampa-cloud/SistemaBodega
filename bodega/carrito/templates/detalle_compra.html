@@ -125,6 +125,36 @@
     </div>
   </div>
 
+  <div class="card my-4 no-print">
+    <div class="card-header bg-primary text-white">
+      <h5 class="mb-0"><i class="fas fa-envelope"></i> Enviar boleta por correo</h5>
+    </div>
+    <div class="card-body">
+      <form method="post" class="row g-3">
+        {% csrf_token %}
+        <div class="col-md-4">
+          <label for="clienteEmail" class="form-label">Seleccionar cliente</label>
+          <select id="clienteEmail" name="cliente" class="form-select">
+            <option value="">-- Ingresar correo manualmente --</option>
+            {% for cliente in clientes %}
+              <option value="{{ cliente.id }}" data-email="{{ cliente.email }}" {% if selected_cliente_id and cliente.id|stringformat:'s' == selected_cliente_id %}selected{% endif %}>
+                {{ cliente.nombre }}{% if cliente.email %} - {{ cliente.email }}{% endif %}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label for="emailEnviar" class="form-label">Correo electrónico</label>
+          <input type="email" id="emailEnviar" name="email" class="form-control" placeholder="ejemplo@correo.com" value="{{ email_to }}" required>
+          <div class="form-text">Si seleccionas cliente con email, este se usará automáticamente.</div>
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+          <button type="submit" class="btn btn-outline-primary w-100"><i class="fas fa-paper-plane"></i> Enviar boleta</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div class="print-only mt-4">
     <div class="border rounded p-4" style="max-width: 700px; margin: 0 auto; font-size: 14px;">
       <div class="text-center mb-4">
@@ -179,6 +209,34 @@
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const clienteEmailSelect = document.getElementById('clienteEmail');
+  const emailEnviarInput = document.getElementById('emailEnviar');
+
+  function actualizarEmailCliente() {
+    const selectedOption = clienteEmailSelect.options[clienteEmailSelect.selectedIndex];
+    const email = selectedOption.dataset.email || '';
+    if (email) {
+      emailEnviarInput.value = email;
+      emailEnviarInput.disabled = true;
+      emailEnviarInput.classList.add('bg-light');
+    } else {
+      emailEnviarInput.disabled = false;
+      if (!emailEnviarInput.value || emailEnviarInput.value === '') {
+        emailEnviarInput.value = '';
+      }
+      emailEnviarInput.classList.remove('bg-light');
+    }
+  }
+
+  if (clienteEmailSelect) {
+    clienteEmailSelect.addEventListener('change', actualizarEmailCliente);
+    actualizarEmailCliente();
+  }
+</script>
 {% endblock %}
 
 
