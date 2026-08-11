@@ -413,7 +413,7 @@ color:#c7a17a;
 
 .image-viewer {
     width: 100%;
-    height: 70vh;
+    height: 65vh;
 
     overflow: auto;
 
@@ -425,7 +425,7 @@ color:#c7a17a;
 
     border-radius: 8px;
 
-    padding: 20px;
+    padding: 10px;
 
      /* Importante para el arrastre */
     cursor: grab;
@@ -433,6 +433,7 @@ color:#c7a17a;
     user-select: none;
 
     touch-action: none;
+    position: relative;
 }
 
 /* Cuando estamos arrastrando */
@@ -445,14 +446,23 @@ color:#c7a17a;
 
 .modal-boleta-image {
 
+    display: block;
+
+    width: auto;
+
+    height: auto;
+
     max-width: 100%;
-    max-height: 65vh;
+
+    max-height: 60vh;
 
     object-fit: contain;
 
-    transition: transform 0.25s ease;
+    margin: auto;
 
     transform-origin: center center;
+
+    transition: transform 0.2s ease;
 
     user-select: none;
 
@@ -462,54 +472,109 @@ color:#c7a17a;
 }
 
 
-/* Botones */
-
-.image-controls {
-
-    display: flex;
-
-    justify-content: center;
-
-    align-items: center;
-
-    flex-wrap: wrap;
-
-    gap: 8px;
-}
-
-
-/* En celular */
+/* =========================================
+   MÓVILES
+   ========================================= */
 
 @media (max-width: 576px) {
 
+    .modal-dialog {
+        margin: 8px;
+    }
+
+
+    .modal-content {
+        width: 100%;
+
+        max-height: calc(100vh - 16px);
+
+        overflow: hidden;
+    }
+
+
+    .modal-header {
+        padding: 10px 12px;
+    }
+
+
+    .modal-title {
+        font-size: 16px;
+    }
+
+
+    .modal-body {
+
+        padding: 8px;
+
+        overflow: hidden;
+    }
+
+
+    /* Visor */
+
     .image-viewer {
 
-        height: 65vh;
+        width: 100%;
 
-        padding: 10px;
+        height: 62vh;
 
-    }
+        max-height: 62vh;
 
-    .image-controls {
+        padding: 5px;
 
-        gap: 5px;
-
-    }
-
-    .image-controls .btn {
-
-        width: 42px;
-
-        height: 42px;
-
-        padding: 0;
+        overflow: auto;
 
         display: flex;
 
         justify-content: center;
 
         align-items: center;
+    }
 
+
+    /* Imagen */
+
+    .modal-boleta-image {
+
+        max-width: 100%;
+
+        max-height: 58vh;
+
+        width: auto;
+
+        height: auto;
+
+        object-fit: contain;
+
+        pointer-events: none;
+        user-select: none;
+        -webkit-user-drag: none;
+    }
+
+
+    /* Botones */
+
+    .image-controls {
+
+        margin-bottom: 8px !important;
+
+        gap: 5px !important;
+    }
+
+
+    .image-controls .btn {
+
+        width: 38px;
+
+        height: 38px;
+
+        padding: 0;
+
+        display: inline-flex;
+
+        justify-content: center;
+
+        align-items: center;
     }
 
 }

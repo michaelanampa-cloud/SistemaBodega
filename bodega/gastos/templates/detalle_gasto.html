@@ -174,18 +174,23 @@
     const rotateImageBtn = document.getElementById("rotateImage");
 
     /* =========================================
-       VARIABLES
+       VARIABLES DE IMAGEN
        ========================================= */
-
     let imageZoom = 1;
     let flipX = 1;
     let flipY = 1;
     let rotation = 0;
 
     /* =========================================
-       VARIABLES PARA PAN
+       LIMITES DEL ZOOM
        ========================================= */
+    const MIN_ZOOM = 0.5;
+    const MAX_ZOOM = 5;
+    const ZOOM_STEP = 0.25;
 
+    /* =========================================
+       VARIABLES PARA PAN CON MOUSE
+       ========================================= */
     let isDragging = false;
     let startX = 0;
     let startY = 0;
@@ -193,11 +198,30 @@
     let scrollTop = 0;
 
     /* =========================================
+       VARIABLES PARA TOUCH
+       ========================================= */
+    let touchMode = null;
+    let lastTouchX = 0;
+    let lastTouchY = 0;
+    let pinchStartDistance = 0;
+    let pinchStartZoom = 1;
+
+    /* =========================================
+       CALCULAR DISTANCIA ENTRE DOS DEDOS
+       ========================================= */
+    function getTouchDistance(touch1, touch2) {
+      const dx = touch2.clientX - touch1.clientX;
+      const dy = touch2.clientY - touch1.clientY;
+      return Math.sqrt(
+        dx * dx + dy * dy
+      );
+    }
+
+    /* =========================================
        ACTUALIZAR TRANSFORMACIÓN
        ========================================= */
 
     function updateImageTransform() {
-
       modalImage.style.transform =
         `
             scale(${imageZoom})
@@ -205,7 +229,18 @@
             scaleY(${flipY})
             rotate(${rotation}deg)
             `;
+    }
 
+    /* =========================================
+       CAMBIAR ZOOM
+       ========================================= */
+
+    function setZoom(newZoom) {
+      imageZoom = Math.max(
+        MIN_ZOOM,
+        Math.min(MAX_ZOOM, newZoom)
+      );
+      updateImageTransform();
     }
 
     /* =========================================
@@ -213,58 +248,60 @@
        ========================================= */
 
     images.forEach(function (img) {
-
       img.addEventListener("click", function () {
-
         modalImage.src = this.dataset.image;
-
-        /* Reiniciar */
         imageZoom = 1;
         flipX = 1;
         flipY = 1;
         rotation = 0;
-
-        /* Reiniciar posición */
         imageViewer.scrollLeft = 0;
         imageViewer.scrollTop = 0;
-
-        updateImageTransform();
+        modalImage.style.transform = "none";
       });
     });
 
     /* =========================================
-       ZOOM +
+       CUANDO TERMINA DE CARGAR LA IMAGEN
        ========================================= */
 
+    modalImage.addEventListener(
+      "load",
+      function () {
+        imageZoom = 1;
+        flipX = 1;
+        flipY = 1;
+        rotation = 0;
+        imageViewer.scrollLeft = 0;
+        imageViewer.scrollTop = 0;
+        modalImage.style.transform = "none";
+      }
+    );
+
+    /* =========================================
+       BOTÓN ZOOM +
+       ========================================= */
     if (zoomInBtn) {
       zoomInBtn.addEventListener(
         "click",
         function () {
-          imageZoom += 0.25;
-          if (imageZoom > 5) {
-            imageZoom = 5;
-          }
-          updateImageTransform();
-
+          setZoom(
+            imageZoom + ZOOM_STEP
+          );
         }
       );
-
     }
 
-
     /* =========================================
-       ZOOM -
+       BOTÓN ZOOM -
        ========================================= */
 
     if (zoomOutBtn) {
       zoomOutBtn.addEventListener(
         "click",
         function () {
-          imageZoom -= 0.25;
-          if (imageZoom < 0.5) {
-            imageZoom = 0.5;
-          }
-          updateImageTransform();
+          setZoom(
+            imageZoom - ZOOM_STEP
+          );
         }
       );
     }
@@ -281,10 +318,8 @@
           flipX = 1;
           flipY = 1;
           rotation = 0;
-
           imageViewer.scrollLeft = 0;
           imageViewer.scrollTop = 0;
-
           updateImageTransform();
         }
       );
@@ -295,6 +330,7 @@
        ========================================= */
 
     if (flipHorizontalBtn) {
+
       flipHorizontalBtn.addEventListener(
         "click",
         function () {
@@ -302,7 +338,6 @@
           updateImageTransform();
         }
       );
-
     }
 
     /* =========================================
@@ -343,24 +378,36 @@
     imageViewer.addEventListener(
       "mousedown",
       function (e) {
+
+        /*
+         * Solo botón izquierdo
+         */
+        if (e.button !== 0) {
+          return;
+        }
         isDragging = true;
         imageViewer.classList.add("dragging");
-
         startX = e.pageX - imageViewer.offsetLeft;
         startY = e.pageY - imageViewer.offsetTop;
-
         scrollLeft = imageViewer.scrollLeft;
         scrollTop = imageViewer.scrollTop;
+
       }
     );
 
     imageViewer.addEventListener(
-      "mouseleave",
-      function () {
-        isDragging = false;
-        imageViewer.classList.remove(
-          "dragging"
-        );
+      "mousemove",
+      function (e) {
+        if (!isDragging) {
+          return;
+        }
+        e.preventDefault();
+        const x = e.pageX - imageViewer.offsetLeft;
+        const y = e.pageY - imageViewer.offsetTop;
+        const walkX = (x - startX) * 1.5;
+        const walkY = (y - startY) * 1.5;
+        imageViewer.scrollLeft = scrollLeft - walkX;
+        imageViewer.scrollTop = scrollTop - walkY;
       }
     );
 
@@ -375,68 +422,176 @@
     );
 
     imageViewer.addEventListener(
-      "mousemove",
+      "mouseleave",
+      function () {
+        isDragging = false;
+        imageViewer.classList.remove(
+          "dragging"
+        );
+      }
+    );
+
+
+    /* =========================================
+       ZOOM CON RUEDA DEL MOUSE
+       ========================================= */
+
+    imageViewer.addEventListener(
+      "wheel",
       function (e) {
-        if (!isDragging) {
-          return;
-        }
+        /*
+         * Evitar que la página se desplace
+         */
 
         e.preventDefault();
-        const x = e.pageX - imageViewer.offsetLeft;
-        const y = e.pageY - imageViewer.offsetTop;
-        const walkX = (x - startX) * 1.5;
-        const walkY = (y - startY) * 1.5;
 
-        imageViewer.scrollLeft = scrollLeft - walkX;
-        imageViewer.scrollTop = scrollTop - walkY;
+        /*
+         * Rueda hacia arriba = zoom +
+         *
+         * Rueda hacia abajo = zoom -
+         */
+        if (e.deltaY < 0) {
+          setZoom(imageZoom + ZOOM_STEP);
+        } else {
+          setZoom(imageZoom - ZOOM_STEP);
+        }
+      },
+      {
+        passive: false
       }
     );
 
     /* =========================================
-       PAN CON TOUCH
+       TOUCH START
        ========================================= */
 
     imageViewer.addEventListener(
       "touchstart",
       function (e) {
-        if (e.touches.length !== 1) {
+
+        /*
+         * DOS DEDOS
+         * =========================
+         * Iniciar PINCH
+         */
+        if (e.touches.length === 2) {
+          touchMode = "pinch";
+          pinchStartDistance =
+            getTouchDistance(
+              e.touches[0],
+              e.touches[1]
+            );
+          pinchStartZoom = imageZoom;
           return;
         }
 
-        isDragging = true;
-        startX = e.touches[0].pageX;
-        startY = e.touches[0].pageY;
-        scrollLeft = imageViewer.scrollLeft;
-        scrollTop = imageViewer.scrollTop;
+        /*
+         * UN DEDO
+         * =========================
+         * Iniciar PAN
+         */
+        if (e.touches.length === 1) {
+          touchMode = "pan";
+          lastTouchX = e.touches[0].clientX;
+          lastTouchY = e.touches[0].clientY;
+        }
       },
-      { passive: true }
+      {
+        passive: true
+      }
     );
+
+
+    /* =========================================
+       TOUCH MOVE
+       ========================================= */
 
     imageViewer.addEventListener(
       "touchmove",
       function (e) {
-        if (!isDragging) {
+
+        /*
+         * PINCH CON DOS DEDOS
+         */
+        if (
+          e.touches.length === 2 &&
+          touchMode === "pinch"
+        ) {
+          e.preventDefault();
+          const currentDistance =
+            getTouchDistance(
+              e.touches[0],
+              e.touches[1]
+            );
+
+          /*
+           * Relación entre la distancia
+           * inicial y la actual
+           */
+          const scale = currentDistance / pinchStartDistance;
+          const newZoom = pinchStartZoom * scale;
+          setZoom(newZoom);
           return;
         }
-
-        if (e.touches.length !== 1) {
-          return;
+        /*
+         * PAN CON UN DEDO
+         */
+        if (
+          e.touches.length === 1 &&
+          touchMode === "pan"
+        ) {
+          e.preventDefault();
+          const currentX = e.touches[0].clientX;
+          const currentY = e.touches[0].clientY;
+          const deltaX = currentX - lastTouchX;
+          const deltaY = currentY - lastTouchY;
+          imageViewer.scrollLeft -= deltaX;
+          imageViewer.scrollTop -= deltaY;
+          lastTouchX = currentX;
+          lastTouchY = currentY;
         }
-        const x = e.touches[0].pageX;
-        const y = e.touches[0].pageY;
-        const walkX = (x - startX) * 1.5;
-        const walkY = (y - startY) * 1.5;
-
-        imageViewer.scrollLeft = scrollLeft - walkX;
-        imageViewer.scrollTop = scrollTop - walkY;
       },
-      { passive: true }
+      {
+        passive: false
+      }
     );
+
+    /* =========================================
+       TOUCH END
+       ========================================= */
 
     imageViewer.addEventListener(
       "touchend",
+      function (e) {
+        /*
+         * Si queda un dedo,
+         * continuar con PAN
+         */
+
+        if (e.touches.length === 1) {
+          touchMode = "pan";
+          lastTouchX = e.touches[0].clientX;
+          lastTouchY = e.touches[0].clientY;
+          return;
+        }
+
+        /*
+         * Si ya no quedan dedos
+         */
+        if (e.touches.length === 0) {
+          touchMode = null;
+        }
+      }
+    );
+
+    /* =========================================
+       CANCELAR TOUCH
+       ========================================= */
+
+    imageViewer.addEventListener(
+      "touchcancel",
       function () {
-        isDragging = false;
+        touchMode = null;
       }
     );
   });
