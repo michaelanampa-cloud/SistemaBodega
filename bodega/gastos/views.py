@@ -1,3 +1,4 @@
+import os
 import uuid
 from django.core.paginator import Paginator
 from decimal import Decimal, InvalidOperation
@@ -6,6 +7,12 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from io import BytesIO
+from django.core.files.uploadedfile import InMemoryUploadedFile
+try:
+    from PIL import Image
+except Exception:
+    Image = None
 
 from productos.models import Producto
 from .forms import ProveedorForm
@@ -148,6 +155,41 @@ def registrar_gastos(request):
             descripcion=descripcion,
         )
 
+        # Procesar imagen adjunta: comprimir y guardar en gasto.imagen
+        image_file = request.FILES.get('image')
+
+        if image_file:
+            try:
+                # Asegurar que el directorio de boletas exista
+                os.makedirs(gasto.boletas_storage.location, exist_ok=True)
+                if Image:
+                    img = Image.open(image_file)
+                    # Convertir a RGB si es necesario
+                    if img.mode in ("RGBA", "P"):
+                        img = img.convert("RGB")
+                    # Redimensionar si es muy grande (max 1600 px)
+                    max_size = (1600, 1600)
+                    img.thumbnail(max_size, Image.Resampling.LANCZOS)
+
+                    output = BytesIO()
+                    img.save(output, format='JPEG', quality=70)
+                    output.seek(0)
+
+                    uploaded_image = InMemoryUploadedFile(
+                        file=output,
+                        field_name='image',
+                        name=f"gasto_{gasto.pk}.jpg",
+                        content_type='image/jpeg',
+                        size=output.getbuffer().nbytes,
+                        charset=None,
+                    )
+                    gasto.imagen.save(uploaded_image.name, uploaded_image, save=True)
+                else:
+                    # Pillow no disponible: guardar archivo tal cual
+                    gasto.imagen.save(image_file.name, image_file, save=True)
+            except Exception as e:
+                messages.warning(request, f"No se pudo procesar la imagen: {e}")
+
         for item in items:
             producto = item['producto']
             GastoItem.objects.create(
@@ -212,6 +254,8 @@ def lista_gastos(request):
         'fecha_inicio': fecha_inicio,
         'fecha_fin': fecha_fin,
     })
+
+                
 
 
 @login_required

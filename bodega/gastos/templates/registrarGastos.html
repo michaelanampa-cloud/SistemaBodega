@@ -9,7 +9,7 @@
 
   <div class="card mb-4 shadow-sm">
     <div class="card-body">
-      <form id="gastosForm" method="post">
+      <form id="gastosForm" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="row mb-3">
           <div class="col-md-6 mb-3 input-group">
@@ -38,6 +38,62 @@
           <textarea id="descripcion" name="descripcion" class="form-control" rows="2" placeholder="Opcional, agrega una nota sobre el gasto"></textarea>
         </div>
 
+        <!-- ==========================================
+     FOTO DE BOLETA / FACTURA
+     ========================================== -->
+
+        <div class="mb-4 input-group">
+          <label class="form-label fw-bold">
+            <i class="fa-solid fa-receipt"></i>Boleta / Factura
+          </label>
+          <div class="border rounded p-3">
+            <!-- Botones -->
+            <div class="d-flex flex-wrap gap-2 mb-3">
+              <!-- Tomar foto -->
+              <label for="image" class="btn btn-primary">
+                <i class="fa-solid fa-camera"></i>Tomar foto
+              </label>
+              <!-- Seleccionar imagen -->
+              <label for="image" class="btn btn-secondary">
+                <i class="fa-solid fa-image"></i>Elegir imagen
+              </label>
+            </div>
+
+            <!-- Input real -->
+            <input id="image" name="image" type="file" accept="image/*" capture="environment" class="d-none">
+            <!-- Vista previa -->
+            <div id="previewContainer" class="text-center" style="display: none;">
+              <div class="mb-2">
+                <img id="imagePreview" src="" alt="Vista previa de la boleta" class="img-fluid rounded border shadow-sm" style="
+                                max-width: 100%;
+                                max-height: 400px;
+                                object-fit: contain;
+                            ">
+              </div>
+              <!-- Nombre del archivo -->
+              <div id="imageName" class="small text-muted mb-3"></div>
+              <!-- Botones de acción -->
+              <div class="d-flex justify-content-center gap-2 flex-wrap">
+                <label for="image" class="btn btn-warning">
+                  <i class="fa-solid fa-rotate"></i>Cambiar foto
+                </label>
+                <button type="button" id="removeImage" class="btn btn-danger">
+                  <i class="fa-solid fa-trash"></i>Eliminar foto
+                </button>
+              </div>
+            </div>
+            <!-- Mensaje inicial -->
+            <div id="noImageMessage" class="text-center text-muted py-3">
+              <i class="fa-solid fa-camera fa-2x mb-2" style="opacity: 0.5;"></i>
+              <div>
+                No se ha seleccionado ninguna imagen
+              </div>
+              <small>
+                Puedes tomar una foto de la boleta o elegir una imagen.
+              </small>
+            </div>
+          </div>
+        </div>
         <div class="mb-3">
           <label for="buscar_producto" class="form-label">Buscar producto</label>
           <input id="buscar_producto" type="search" class="form-control is-valid" placeholder="Escribe el nombre del producto..." autocomplete="off">
@@ -351,6 +407,127 @@
   } else {
     initGastosPage();
   }
+
+  /* ==========================================
+   FOTO DE BOLETA / FACTURA
+   ========================================== */
+
+    const imageInput = document.getElementById('image');
+    const imagePreview = document.getElementById('imagePreview');
+    const previewContainer = document.getElementById('previewContainer');
+    const noImageMessage = document.getElementById('noImageMessage');
+    const imageName = document.getElementById('imageName');
+    const removeImageBtn = document.getElementById('removeImage');
+
+
+    /* ==========================================
+      CUANDO SE SELECCIONA O TOMA UNA FOTO
+      ========================================== */
+
+    if (imageInput) {
+
+      imageInput.addEventListener('change', function () {
+
+        const file = this.files[0];
+
+        if (!file) {
+          return;
+        }
+
+        // Verificar que sea una imagen
+        if (!file.type.startsWith('image/')) {
+
+          alert('Por favor selecciona una imagen válida.');
+
+          imageInput.value = '';
+
+          return;
+        }
+
+        // Mostrar nombre
+        imageName.textContent =
+          `${file.name} - ${formatFileSize(file.size)}`;
+
+        // Crear vista previa
+        const reader = new FileReader();
+
+        reader.onload = function (event) {
+
+          imagePreview.src = event.target.result;
+
+          previewContainer.style.display = 'block';
+
+          noImageMessage.style.display = 'none';
+
+        };
+
+        reader.readAsDataURL(file);
+
+      });
+
+    }
+
+
+    /* ==========================================
+      ELIMINAR FOTO
+      ========================================== */
+
+    if (removeImageBtn) {
+
+      removeImageBtn.addEventListener('click', function () {
+
+        // Limpiar input
+        imageInput.value = '';
+
+        // Limpiar imagen
+        imagePreview.src = '';
+
+        // Limpiar nombre
+        imageName.textContent = '';
+
+        // Ocultar vista previa
+        previewContainer.style.display = 'none';
+
+        // Mostrar mensaje inicial
+        noImageMessage.style.display = 'block';
+
+      });
+
+    }
+
+
+    /* ==========================================
+      FORMATEAR TAMAÑO DE ARCHIVO
+      ========================================== */
+
+    function formatFileSize(bytes) {
+
+      if (bytes === 0) {
+        return '0 Bytes';
+      }
+
+      const units = [
+        'Bytes',
+        'KB',
+        'MB',
+        'GB'
+      ];
+
+      const i = Math.floor(
+        Math.log(bytes) / Math.log(1024)
+      );
+
+      return (
+        parseFloat(
+          (bytes / Math.pow(1024, i)).toFixed(2)
+        )
+        + ' '
+        + units[i]
+      );
+
+    }
+
+
 </script>
         
 <!-- Modal de confirmación -->

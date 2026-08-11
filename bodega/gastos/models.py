@@ -1,6 +1,12 @@
 from decimal import Decimal
 
+import os
+
 from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
 from django.db import models
 
 from productos.models import Producto
@@ -37,6 +43,11 @@ class Gasto(models.Model):
     total = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
     percepcion = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
     descripcion = models.TextField(blank=True)
+    boletas_storage = FileSystemStorage(
+        location=os.path.join(settings.BASE_DIR, 'static', 'img', 'boletas'),
+        base_url='/' + os.path.join(settings.STATIC_URL.strip('/'), 'img', 'boletas') + '/',
+    )
+    imagen = models.FileField(upload_to='', storage=boletas_storage, blank=True, null=True)
 
     def __str__(self):
         return f"{self.codigo} - {self.proveedor.nombre}"
