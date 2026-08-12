@@ -2,8 +2,32 @@
     {% load static %}
     <div class="sidebar-header">
         <img src="{% static 'img/logo2.png' %}" alt="Logo" class="brand-logo">
-        <small>{{ user.username }}</small>
+    
+        <a href="{% url 'perfil' %}" class="sidebar-user">
+    
+            <div class="sidebar-avatar">
+                {{ user.username|first|upper }}
+            </div>
+    
+            <div class="sidebar-user-info">
+    
+                <strong>
+                    {{ user.username }}
+                </strong>
+    
+                <small>
+                    <i class="fa-solid fa-circle"></i>
+                    Cuenta activa
+                </small>
+    
+            </div>
+    
+            <i class="fa-solid fa-chevron-right sidebar-user-arrow"></i>
+    
+        </a>
+    
     </div>
+
 
     <ul class="menu">
 
@@ -31,12 +55,14 @@
                         Todos los productos
                     </a>
                 </li>
-
+                {% if perms.productos.add_producto %}
                 <li>
-                    <a href="{% url 'registros_productos' %}">
-                        Nuevo producto
-                    </a>
+                <a href="{% url 'registros_productos' %}">
+                    <i class="fa-solid fa-plus me-2"></i>
+                    Nuevo producto
+                </a>
                 </li>
+                {% endif %}
                 <li>
                     <a href="{% url 'productos_vencer' %}">
                         Productos por vencer
@@ -145,12 +171,50 @@
             </ul>
         </li>
 
-        <li>
-            <a href="{% url 'perfil' %}">
-                <i class="fa-solid fa-user"></i>
-                <span>Perfil</span>
+        <li class="submenu">
+            <a href="{% url 'perfil' %}" class="submenu-toggle">
+                <div>
+                    <i class="fa-solid fa-user"></i>
+                    <span>Perfil</span>
+                </div>
+                <i class="fa-solid fa-chevron-down arrow"></i>
             </a>
+            <ul class="submenu-items">
+                <li>
+                    <a href="{% url 'perfil' %}">
+                        Perfil
+                    </a>
+                </li>
+
+                <li>
+                    {% if user.is_superuser or user.groups.all|length %}
+                        <a href="{% url 'registro' %}">
+                            Registrar usuario
+                        </a>
+                    {% endif %}
+                </li>
+                {% if perms.auth.view_user %}
+                <li>
+                    <a href="{% url 'lista_usuarios' %}">
+                        <i class="fa-solid fa-users-gear"></i>
+                        <span>Usuarios</span>
+                    </a>
+
+                </li>
+                {% endif %}
+            </ul>
         </li>
+        <!-- 
+        <li class="{% if request.resolver_match.url_name == 'perfil' or request.resolver_match.url_name == 'editar_perfil' %}active{% endif %}">
+            <a href="{% url 'perfil' %}">
+        
+                <i class="fa-solid fa-user"></i>
+        
+                <span>Perfil</span>
+        
+            </a>
+        </li> -->
+
     </ul>
 
     <div class="logout">

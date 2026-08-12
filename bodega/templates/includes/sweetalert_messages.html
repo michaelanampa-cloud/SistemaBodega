@@ -1,0 +1,32 @@
+{% if messages %}
+
+{% for message in messages %}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        Swal.fire({
+
+            icon: "{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}",
+
+            title: "{% if message.tags == 'success' %}¡Operación exitosa!{% elif message.tags == 'error' %}Error{% elif message.tags == 'warning' %}Advertencia{% else %}Información{% endif %}",
+
+            text: "{{ message|escapejs }}",
+
+            confirmButtonText: "Aceptar",
+
+            confirmButtonColor: "#0d6efd",
+
+            timer: 3500,
+
+            timerProgressBar: true,
+
+            showConfirmButton: true
+
+        });
+
+    });
+</script>
+
+{% endfor %}
+{% endif %}

@@ -46,9 +46,7 @@
 
     <main class="main-content">
 
-        {% if messages %}
-            ...
-        {% endif %}
+        {% include 'includes/sweetalert_messages.html' %}
 
         {% block content %}
         {% endblock %}

@@ -259,3 +259,121 @@ body {
     transition:.3s;
     overflow-x: hidden;
 }
+
+/* =========================================
+USUARIO DEL SIDEBAR
+========================================= */
+.sidebar-user {
+
+    display: flex;
+    align-items: center;
+
+    width: 100%;
+
+    padding: 12px;
+
+    margin-top: 15px;
+
+    text-decoration: none;
+
+    border-radius: 14px;
+
+    transition: all 0.25s ease;
+
+}
+
+.sidebar-user:hover {
+    background: rgba(255, 255, 255, 0.08);
+
+}
+
+/* Avatar */
+
+.sidebar-avatar {
+
+    width: 42px;
+    height: 42px;
+
+    min-width: 42px;
+
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: linear-gradient(135deg,
+            #0d6efd,
+            #6610f2);
+
+    color: white;
+    font-size: 17px;
+    font-weight: 600;
+
+}
+
+/* Información */
+
+.sidebar-user-info {
+
+    display: flex;
+
+    flex-direction: column;
+
+    margin-left: 10px;
+
+    overflow: hidden;
+
+}
+
+.sidebar-user-info strong {
+
+    color: white;
+
+    font-size: 14px;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+.sidebar-user-info small {
+
+    color: rgba(255, 255, 255, 0.6);
+
+    font-size: 11px;
+
+    margin-top: 2px;
+
+}
+
+.sidebar-user-info small i {
+
+    color: #20c997;
+
+    font-size: 7px;
+
+    margin-right: 3px;
+
+}
+
+/* Flecha */
+
+.sidebar-user-arrow {
+
+    margin-left: auto;
+
+    color: rgba(255, 255, 255, 0.4);
+
+    font-size: 12px;
+
+    transition: transform 0.25s ease;
+
+}
+
+.sidebar-user:hover .sidebar-user-arrow {
+    transform: translateX(3px);
+
+}

@@ -9,8 +9,17 @@ from django.utils import timezone
 from .models import Producto
 from .forms import ProductoForm
 
+from django.contrib.auth.decorators import login_required
+
 
 def registros_productos(request):
+	if not request.user.has_perm('productos.add_producto'):
+		messages.error(
+			request,
+			'No tienes permisos para registrar nuevos productos.'
+		)
+		return redirect('lista_productos')
+	
 	if request.method == 'POST':
 		form = ProductoForm(request.POST)
 		if form.is_valid():
