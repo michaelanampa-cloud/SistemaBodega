@@ -5,383 +5,271 @@
 {% block content %}
 
 <div class="container-fluid py-4">
+    <!-- Título -->
+    <div class="mb-4" data-aos="fade-down">
+        <h2 class="fw-bold mb-1">
+            <i class="fa-solid fa-user-circle me-2"></i>
+            Mi Perfil
+        </h2>
+        <p class="text-muted mb-0">
+            Consulta y administra la información de tu cuenta.
+        </p>
+    </div>
 
-<!-- Título -->
-<div class="mb-4" data-aos="fade-down">
-
-    <h2 class="fw-bold mb-1">
-        <i class="fa-solid fa-user-circle me-2"></i>
-        Mi Perfil
-    </h2>
-
-    <p class="text-muted mb-0">
-        Consulta y administra la información de tu cuenta.
-    </p>
-
-</div>
-
-
-<div class="row g-4">
-
-    <!-- TARJETA PRINCIPAL -->
-    <div class="col-12 col-lg-4" data-aos="fade-right">
-
-        <div class="card border-0 shadow-sm rounded-4 h-100">
-
-            <!-- Cabecera -->
-            <div class="card-body text-center p-4">
-
-                <!-- Avatar -->
-                <div class="profile-avatar mx-auto mb-3">
-                    {{ user.username|first|upper }}
-                </div>
-
-                <h4 class="fw-bold mb-1">
-                    {{ user.username }}
-                </h4>
-
-                {% if user.email %}
+    <div class="row g-4">
+        <!-- TARJETA PRINCIPAL -->
+        <div class="col-12 col-lg-4" data-aos="fade-right">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <!-- Cabecera -->
+                <div class="card-body text-center p-4">
+                    <!-- Avatar -->
+                    <div class="profile-avatar mx-auto mb-3">
+                        {{ user.username|first|upper }}
+                    </div>
+                    <h4 class="fw-bold mb-1">
+                        {{ user.username }}
+                    </h4>
+                    {% if user.email %}
                     <p class="text-muted mb-3">
                         {{ user.email }}
                     </p>
-                {% endif %}
+                    {% endif %}
 
-                <!-- Estado -->
-                {% if user.is_active %}
-
+                    <!-- Estado -->
+                    {% if user.is_active %}
                     <span class="badge rounded-pill bg-success-subtle text-success px-3 py-2">
                         <i class="fa-solid fa-circle-check me-1"></i>
                         Cuenta activa
                     </span>
-
-                {% else %}
+                    {% else %}
 
                     <span class="badge rounded-pill bg-danger-subtle text-danger px-3 py-2">
                         <i class="fa-solid fa-circle-xmark me-1"></i>
                         Cuenta inactiva
                     </span>
+                    {% endif %}
 
-                {% endif %}
-
-                <hr class="my-4">
-
-                <div class="text-start">
-
-                    <div class="d-flex align-items-center mb-3">
-
-                        <div class="profile-icon">
-                            <i class="fa-solid fa-user"></i>
+                    <hr class="my-4">
+                    <div class="text-start">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="profile-icon">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+                            <div class="ms-3">
+                                <small class="text-muted d-block">
+                                    Usuario
+                                </small>
+                                <strong>
+                                    {{ user.username }}
+                                </strong>
+                            </div>
                         </div>
 
-                        <div class="ms-3">
-
-                            <small class="text-muted d-block">
-                                Usuario
-                            </small>
-
-                            <strong>
-                                {{ user.username }}
-                            </strong>
-
+                        <div class="d-flex align-items-center">
+                            <div class="profile-icon">
+                                <i class="fa-solid fa-calendar"></i>
+                            </div>
+                            <div class="ms-3">
+                                <small class="text-muted d-block">
+                                    Miembro desde
+                                </small>
+                                <strong>
+                                    {{ user.date_joined|date:"d/m/Y" }}
+                                </strong>
+                            </div>
                         </div>
-
                     </div>
-
-
-                    <div class="d-flex align-items-center">
-
-                        <div class="profile-icon">
-                            <i class="fa-solid fa-calendar"></i>
-                        </div>
-
-                        <div class="ms-3">
-
-                            <small class="text-muted d-block">
-                                Miembro desde
-                            </small>
-
-                            <strong>
-                                {{ user.date_joined|date:"d/m/Y" }}
-                            </strong>
-
-                        </div>
-
-                    </div>
-
                 </div>
-
             </div>
-
         </div>
 
-    </div>
-
-
-    <!-- INFORMACIÓN -->
-    <div class="col-12 col-lg-8" data-aos="fade-left">
-
-        <div class="card border-0 shadow-sm rounded-4">
-
-            <div class="card-body p-4">
-
-                <div class="d-flex justify-content-between align-items-center mb-4">
-
-                    <div>
-
-                        <h4 class="fw-bold mb-1">
-                            Información personal
-                        </h4>
-
-                        <p class="text-muted mb-0">
-                            Datos asociados a tu cuenta.
-                        </p>
-
-                    </div>
-
-                    <i class="fa-solid fa-address-card fs-2 text-primary"></i>
-
-                </div>
-
-
-                <div class="row g-3">
-
-                    <!-- Usuario -->
-                    <div class="col-12 col-md-6">
-
-                        <div class="info-box">
-
-                            <small class="text-muted">
-                                Nombre de usuario
-                            </small>
-
-                            <div class="fw-semibold mt-1">
-                                <i class="fa-solid fa-user me-2 text-primary"></i>
-                                {{ user.username }}
-                            </div>
-
+        <!-- INFORMACIÓN -->
+        <div class="col-12 col-lg-8" data-aos="fade-left">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h4 class="fw-bold mb-1">
+                                Información personal
+                            </h4>
+                            <p class="text-muted mb-0">
+                                Datos asociados a tu cuenta.
+                            </p>
                         </div>
-
+                        <i class="fa-solid fa-address-card fs-2 text-primary"></i>
                     </div>
+                    <div class="row g-3">
+                        <!-- Usuario -->
+                        <div class="col-12 col-md-6">
+                            <div class="info-box">
+                                <small class="text-muted">
+                                    Nombre de usuario
+                                </small>
+                                <div class="fw-semibold mt-1">
+                                    <i class="fa-solid fa-user me-2 text-primary"></i>
+                                    {{ user.username }}
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Email -->
+                        <div class="col-12 col-md-6">
+                            <div class="info-box">
+                                <small class="text-muted">
+                                    Correo electrónico
+                                </small>
+                                <div class="fw-semibold mt-1">
+                                    <i class="fa-solid fa-envelope me-2 text-primary"></i>
 
-
-                    <!-- Email -->
-                    <div class="col-12 col-md-6">
-
-                        <div class="info-box">
-
-                            <small class="text-muted">
-                                Correo electrónico
-                            </small>
-
-                            <div class="fw-semibold mt-1">
-
-                                <i class="fa-solid fa-envelope me-2 text-primary"></i>
-
-                                {% if user.email %}
+                                    {% if user.email %}
                                     {{ user.email }}
-                                {% else %}
+                                    {% else %}
                                     <span class="text-muted">
                                         No registrado
                                     </span>
-                                {% endif %}
-
+                                    {% endif %}
+                                </div>
                             </div>
-
                         </div>
+                        <!-- Nombre -->
+                        <div class="col-12 col-md-6">
+                            <div class="info-box">
+                                <small class="text-muted">
+                                    Nombre
+                                </small>
+                                <div class="fw-semibold mt-1">
+                                    <i class="fa-solid fa-id-card me-2 text-primary"></i>
 
-                    </div>
-
-
-                    <!-- Nombre -->
-                    <div class="col-12 col-md-6">
-
-                        <div class="info-box">
-
-                            <small class="text-muted">
-                                Nombre
-                            </small>
-
-                            <div class="fw-semibold mt-1">
-
-                                <i class="fa-solid fa-id-card me-2 text-primary"></i>
-
-                                {% if user.first_name %}
+                                    {% if user.first_name %}
                                     {{ user.first_name }}
-                                {% else %}
+                                    {% else %}
                                     <span class="text-muted">
                                         No registrado
                                     </span>
-                                {% endif %}
-
+                                    {% endif %}
+                                </div>
                             </div>
-
                         </div>
+                        <!-- Apellidos -->
+                        <div class="col-12 col-md-6">
+                            <div class="info-box">
+                                <small class="text-muted">
+                                    Apellidos
+                                </small>
+                                <div class="fw-semibold mt-1">
+                                    <i class="fa-solid fa-id-card me-2 text-primary"></i>
 
-                    </div>
-
-
-                    <!-- Apellidos -->
-                    <div class="col-12 col-md-6">
-
-                        <div class="info-box">
-
-                            <small class="text-muted">
-                                Apellidos
-                            </small>
-
-                            <div class="fw-semibold mt-1">
-
-                                <i class="fa-solid fa-id-card me-2 text-primary"></i>
-
-                                {% if user.last_name %}
+                                    {% if user.last_name %}
                                     {{ user.last_name }}
-                                {% else %}
+                                    {% else %}
                                     <span class="text-muted">
                                         No registrados
                                     </span>
-                                {% endif %}
-
+                                    {% endif %}
+                                </div>
                             </div>
-
                         </div>
-
                     </div>
-
-                </div>
-
-
-                <!-- Acciones -->
-                <div class="border-top mt-4 pt-4">
-
-                    <h6 class="fw-bold mb-3">
-                        Acciones de la cuenta
-                    </h6>
-
-                    <div class="d-flex flex-column flex-sm-row gap-2">
-
-                        <a href="{% url 'editar_perfil' %}"
-                           class="btn btn-primary">
-
-                            <i class="fa-solid fa-pen-to-square me-2"></i>
-                            Editar perfil
-
-                        </a>
-
-
-						<a href="{% url 'cambiar_password' %}" class="btn btn-outline-secondary">
-						
-							<i class="fa-solid fa-lock me-2"></i>
-							Cambiar contraseña
-						
-						</a>
-
-
-                        <a href="{% url 'logout' %}"
-                           class="btn btn-outline-danger">
-
-                            <i class="fa-solid fa-right-from-bracket me-2"></i>
-                            Cerrar sesión
-
-                        </a>
-
+                    <!-- Acciones -->
+                    <div class="border-top mt-4 pt-4">
+                        <h6 class="fw-bold mb-3">
+                            Acciones de la cuenta
+                        </h6>
+                        <div class="d-flex flex-column flex-sm-row gap-2">
+                            <a href="{% url 'editar_perfil' %}" class="btn btn-primary">
+                                <i class="fa-solid fa-pen-to-square me-2"></i>
+                                Editar perfil
+                            </a>
+                            <a href="{% url 'cambiar_password' %}" class="btn btn-outline-secondary">
+                                <i class="fa-solid fa-lock me-2"></i>
+                                Cambiar contraseña
+                            </a>
+                            <a href="{% url 'logout' %}" class="btn btn-outline-danger">
+                                <i class="fa-solid fa-right-from-bracket me-2"></i>
+                                Cerrar sesión
+                            </a>
+                        </div>
                     </div>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
-</div>
-
 </div>
 
 <style>
-
-.profile-avatar {
-
-    width: 110px;
-    height: 110px;
-
-    border-radius: 50%;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: linear-gradient(
-        135deg,
-        #0d6efd,
-        #6610f2
-    );
-
-    color: white;
-
-    font-size: 42px;
-    font-weight: 600;
-
-    box-shadow: 0 8px 25px rgba(13, 110, 253, 0.25);
-
-}
-
-
-.profile-icon {
-
-    width: 42px;
-    height: 42px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 12px;
-
-    background: rgba(13, 110, 253, 0.08);
-
-    color: #0d6efd;
-
-}
-
-
-.info-box {
-
-    padding: 18px;
-
-    border: 1px solid #eee;
-
-    border-radius: 14px;
-
-    background: #fafafa;
-
-    transition: all 0.25s ease;
-
-}
-
-
-.info-box:hover {
-
-    transform: translateY(-2px);
-
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.06);
-
-}
-
-
-@media (max-width: 576px) {
-
     .profile-avatar {
 
-        width: 90px;
-        height: 90px;
+        width: 110px;
+        height: 110px;
 
-        font-size: 34px;
+        border-radius: 50%;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        background: linear-gradient(135deg,
+                #0d6efd,
+                #6610f2);
+
+        color: white;
+
+        font-size: 42px;
+        font-weight: 600;
+
+        box-shadow: 0 8px 25px rgba(13, 110, 253, 0.25);
 
     }
 
-}
+    .profile-icon {
 
+        width: 42px;
+        height: 42px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 12px;
+
+        background: rgba(13, 110, 253, 0.08);
+
+        color: #0d6efd;
+
+    }
+
+    .info-box {
+
+        padding: 18px;
+
+        border: 1px solid #eee;
+
+        border-radius: 14px;
+
+        background: #fafafa;
+
+        transition: all 0.25s ease;
+
+    }
+
+    .info-box:hover {
+
+        transform: translateY(-2px);
+
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.06);
+
+    }
+
+    @media (max-width: 576px) {
+
+        .profile-avatar {
+
+            width: 90px;
+            height: 90px;
+
+            font-size: 34px;
+
+        }
+    }
 </style>
 
 {% endblock %}

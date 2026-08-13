@@ -2,42 +2,29 @@
     {% load static %}
     <div class="sidebar-header">
         <img src="{% static 'img/logo2.png' %}" alt="Logo" class="brand-logo">
-    
         <a href="{% url 'perfil' %}" class="sidebar-user">
-    
             <div class="sidebar-avatar">
                 {{ user.username|first|upper }}
             </div>
-    
             <div class="sidebar-user-info">
-    
                 <strong>
                     {{ user.username }}
                 </strong>
-    
                 <small>
                     <i class="fa-solid fa-circle"></i>
                     Cuenta activa
                 </small>
-    
             </div>
-    
             <i class="fa-solid fa-chevron-right sidebar-user-arrow"></i>
-    
         </a>
-    
     </div>
-
-
     <ul class="menu">
-
         <li>
             <a href="{% url 'dashboard' %}">
                 <i class="fa-solid fa-chart-line"></i>
                 <span>Dashboard</span>
             </a>
         </li>
-
         <!-- Productos -->
         <li class="submenu">
             <a href="{% url 'lista_productos' %}" class="submenu-toggle">
@@ -47,9 +34,7 @@
                 </div>
                 <i class="fa-solid fa-chevron-down arrow"></i>
             </a>
-
             <ul class="submenu-items">
-
                 <li>
                     <a href="{% url 'lista_productos' %}">
                         Todos los productos
@@ -57,10 +42,10 @@
                 </li>
                 {% if perms.productos.add_producto %}
                 <li>
-                <a href="{% url 'registros_productos' %}">
-                    <i class="fa-solid fa-plus me-2"></i>
-                    Nuevo producto
-                </a>
+                    <a href="{% url 'registros_productos' %}">
+                        <i class="fa-solid fa-plus me-2"></i>
+                        Nuevo producto
+                    </a>
                 </li>
                 {% endif %}
                 <li>
@@ -68,10 +53,8 @@
                         Productos por vencer
                     </a>
                 </li>
-
             </ul>
         </li>
-
         <li class="submenu">
             <a href="{% url 'lista_clientes' %}" class="submenu-toggle">
                 <div>
@@ -86,16 +69,13 @@
                         Todos los clientes
                     </a>
                 </li>
-
                 <li>
                     <a href="{% url 'registro_cliente' %}">
                         Nuevo cliente
                     </a>
                 </li>
-
             </ul>
         </li>
-
         <li class="submenu">
             <a href="{% url 'lista_compras' %}" class="submenu-toggle">
                 <div>
@@ -110,13 +90,11 @@
                         Todas las compras
                     </a>
                 </li>
-
                 <li>
                     <a href="{% url 'carrito' %}">
                         carrito de compras
                     </a>
                 </li>
-
             </ul>
         </li>
 
@@ -134,7 +112,6 @@
                         Todas los gastos
                     </a>
                 </li>
-
                 <li>
                     <a href="{% url 'registrar_gastos' %}">
                         Nuevo gasto
@@ -162,7 +139,6 @@
                         Todos los proveedores
                     </a>
                 </li>
-
                 <li>
                     <a href="{% url 'nuevo_proveedor' %}">
                         Nuevo proveedor
@@ -185,12 +161,11 @@
                         Perfil
                     </a>
                 </li>
-
                 <li>
                     {% if user.is_superuser or user.groups.all|length %}
-                        <a href="{% url 'registro' %}">
-                            Registrar usuario
-                        </a>
+                    <a href="{% url 'registro' %}">
+                        Registrar usuario
+                    </a>
                     {% endif %}
                 </li>
                 {% if perms.auth.view_user %}
@@ -199,7 +174,6 @@
                         <i class="fa-solid fa-users-gear"></i>
                         <span>Usuarios</span>
                     </a>
-
                 </li>
                 {% endif %}
             </ul>
@@ -216,16 +190,12 @@
         </li> -->
 
     </ul>
-
     <div class="logout">
-
         <a href="{% url 'logout' %}">
             <i class="fa-solid fa-right-from-bracket"></i>
             <span>Cerrar sesión</span>
         </a>
-
     </div>
-
 </div>
 
 <!-- Botón para móviles -->
@@ -237,15 +207,10 @@
 <script>
 
     const submenus = document.querySelectorAll(".submenu");
-
     submenus.forEach(menu => {
-
         menu.querySelector(".submenu-toggle").addEventListener("click", function (e) {
-
             e.preventDefault();
-
             menu.classList.toggle("active");
-
         });
 
     });

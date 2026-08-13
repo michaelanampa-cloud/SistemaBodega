@@ -70,7 +70,7 @@ def eliminar_proveedor(request, pk):
 
 @login_required
 def registrar_gastos(request):
-    proveedores = Proveedor.objects.filter(activo=True)
+    proveedores = Proveedor.objects.filter(activo=True).order_by('nombre')
     productos = Producto.objects.order_by('nombre')
 
     if request.method == 'POST':
@@ -270,7 +270,7 @@ def buscar_productos(request):
     if not q:
         return JsonResponse([], safe=False)
 
-    productos = Producto.objects.filter(nombre__icontains=q)[:12]
+    productos = Producto.objects.filter(nombre__icontains=q).order_by('nombre')[:12]
     results = []
     for p in productos:
         results.append({

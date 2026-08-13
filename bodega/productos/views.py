@@ -11,7 +11,6 @@ from .forms import ProductoForm
 
 from django.contrib.auth.decorators import login_required
 
-
 def registros_productos(request):
 	if not request.user.has_perm('productos.add_producto'):
 		messages.error(
@@ -29,7 +28,6 @@ def registros_productos(request):
 	else:
 		form = ProductoForm()
 	return render(request, 'productos/registros_productos.html', {'form': form})
-
 
 def lista_productos(request):
 	query = request.GET.get('q', '').strip()
@@ -57,11 +55,9 @@ def lista_productos(request):
 		'tipos_disponibles': tipos_disponibles,
 	})
 
-
 def detalle_producto(request, pk):
 	producto = get_object_or_404(Producto, pk=pk)
 	return render(request, 'productos/detalle_producto.html', {'producto': producto})
-
 
 def editar_producto(request, pk):
 	producto = get_object_or_404(Producto, pk=pk)
@@ -75,7 +71,6 @@ def editar_producto(request, pk):
 		form = ProductoForm(instance=producto)
 	return render(request, 'productos/editar_producto.html', {'form': form, 'producto': producto})
 
-
 def eliminar_producto(request, pk):
 	producto = get_object_or_404(Producto, pk=pk)
 	if request.method == 'POST':
@@ -83,7 +78,6 @@ def eliminar_producto(request, pk):
 		messages.success(request, 'Producto eliminado.')
 		return redirect('lista_productos')
 	return render(request, 'productos/eliminar_producto.html', {'producto': producto})
-
 
 def productos_vencer(request):
 	"""Muestra productos con fecha de vencimiento próxima (por defecto 7 días) y permite buscar por fecha exacta."""

@@ -183,26 +183,27 @@ body {
     border-radius: 8px;
 }
 
-@media (max-width:768px){
+@media (max-width:768px) {
 
-    body, html {
+    body,
+    html {
         overflow-x: hidden !important;
     }
 
-    .sidebar{
+    .sidebar {
         display: none !important;
         left: 0 !important;
         transform: translateX(-100vw) !important;
         width: min(260px, 80vw) !important;
         max-width: 260px !important;
-        box-shadow: 0 0 20px rgba(0,0,0,.25);
+        box-shadow: 0 0 20px rgba(0, 0, 0, .25);
         z-index: 1002;
         visibility: hidden;
         opacity: 0;
         transition: transform .3s ease, opacity .3s ease;
     }
 
-    .sidebar.show{
+    .sidebar.show {
         display: flex !important;
         transform: translateX(0) !important;
         visibility: visible !important;
@@ -212,7 +213,7 @@ body {
     .sidebar-overlay {
         position: fixed;
         inset: 0;
-        background: rgba(0,0,0,0.45);
+        background: rgba(0, 0, 0, 0.45);
         z-index: 1000;
         opacity: 0;
         visibility: hidden;
@@ -224,15 +225,15 @@ body {
         visibility: visible;
     }
 
-    .menu-btn{
-        display:block;
+    .menu-btn {
+        display: block;
         z-index: 1003;
     }
 
-    .main-content{
-        margin-left:0 !important;
-        width:100% !important;
-        padding:70px 15px 20px !important;
+    .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding: 70px 15px 20px !important;
     }
 
     .table-responsive {
@@ -244,19 +245,20 @@ body {
         min-width: 100%;
     }
 
-    .table th, .table td {
+    .table th,
+    .table td {
         white-space: normal;
         word-break: break-word;
     }
 }
 
-.main-content{
-    margin-left:260px;
-    width:calc(100% - 260px);
-    min-height:100vh;
-    padding:30px;
-    box-sizing:border-box;
-    transition:.3s;
+.main-content {
+    margin-left: 260px;
+    width: calc(100% - 260px);
+    min-height: 100vh;
+    padding: 30px;
+    box-sizing: border-box;
+    transition: .3s;
     overflow-x: hidden;
 }
 
