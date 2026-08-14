@@ -3,241 +3,674 @@
 {% block title %}Detalle de Compra{% endblock %}
 
 {% block content %}
+
 <style>
-  .no-print { display: block; }
-  .print-only { display: none; }
+  .boleta-container {
+    max-width: 950px;
+    margin: 0 auto;
+  }
+
+  .boleta-header {
+    border-bottom: 2px solid #212529;
+    padding-bottom: 15px;
+  }
+
+  .boleta-logo {
+    font-size: 28px;
+    font-weight: 700;
+  }
+
+  .boleta-subtitle {
+    color: #6c757d;
+  }
+
+  .info-label {
+    font-weight: 600;
+    color: #495057;
+  }
+
+  .total-box {
+    max-width: 400px;
+    margin-left: auto;
+  }
+
+  .total-final {
+    font-size: 25px;
+    font-weight: 700;
+  }
+
+  .vuelto-box {
+    background: #f8f9fa;
+    border-left: 4px solid #198754;
+    padding: 12px 15px;
+  }
+
+  .nota-box {
+    background: #fff8e1;
+    border-left: 4px solid #ffc107;
+    padding: 15px;
+  }
 
   @media print {
+
+    body {
+      background: white !important;
+    }
+
     body * {
       visibility: hidden;
     }
-    .print-only, .print-only * {
+
+    .print-area,
+    .print-area * {
       visibility: visible;
     }
-    .print-only {
-      display: block !important;
+
+    .print-area {
       position: absolute;
       left: 0;
       top: 0;
       width: 100%;
-      padding: 0 20px;
+      padding: 15px;
     }
+
     .no-print {
       display: none !important;
     }
-  }
-</style>
-<div class="container">
-  <br>
-  <h1 class="mb-4">Detalle de Compra</h1>
 
-  <div class="card mb-4">
-    <div class="card-header bg-dark text-white">
-      <h5 class="mb-0 text-white"><i class="fa-solid fa-circle-info"></i> Información de la Compra</h5>
-    </div>
-    <div class="card-body">
-      <div class="row">
-        <div class="col-md-6">
-          <p><strong>Código:</strong> {{ compra.codigo }}</p>
-          <p><strong>Fecha:</strong> {{ compra.fecha|date:'d/m/Y H:i' }}</p>
-          <p><strong>Usuario:</strong>
-            {% if compra.user %}
-              {{ compra.user.username }}
-            {% else %}
-              Anónimo
-            {% endif %}
-          </p>
-        </div>
-        <div class="col-md-6">
-          <p><strong>Cliente:</strong>
-            {% if compra.cliente %}
-              {{ compra.cliente.nombre }} - {{ compra.cliente.telefono }}
-            {% else %}
-              Sin cliente asignado
-            {% endif %}
-          </p>
-          <p><strong>Tipo de Compra:</strong> {{ compra.get_tipo_compra_display }}</p>
-          <p><strong>Total:</strong> S/ {{ compra.total }}</p>
-        </div>
-      </div>
-    </div>
-  </div>
+    .card {
+      border: 1px solid #ddd !important;
+      box-shadow: none !important;
+    }
 
-  <div class="card mb-4">
-    <div class="card-header bg-success text-white">
-      <h5 class="mb-0"><i class="fa-solid fa-industry"></i> Productos</h5>
-    </div>
-    <div class="card-body p-0 table-responsive">
-      <table class="table table-bordered mb-0">
-        <thead class="table-light">
-          <tr>
-            <th>Producto</th>
-            <th>Precio</th>
-            <th>Cantidad</th>
-            <th>Subtotal</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for item in compra.items.all %}
-            <tr>
-              <td>{{ item.producto.nombre }}</td>
-              <td>S/ {{ item.precio }}</td>
-              <td>{{ item.cantidad }}</td>
-              <td>S/ {{ item.subtotal }}</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-    
-    <div class="card-footer">
-      <div class="row text-end" style="max-width: 400px; margin-left: auto;">
-        <div class="col-12 mb-2">
-          <p class="mb-0"><strong>Subtotal:</strong> S/ {{ compra.subtotal }}</p>
-        </div>
-        {% if compra.descuento %}
-          <div class="col-12 mb-2 text-danger">
-            <p class="mb-0"><strong>Descuento:</strong> -S/ {{ compra.descuento }}</p>
-          </div>
-        {% endif %}
-        {% if compra.adicional %}
-          <div class="col-12 mb-2 text-warning">
-            <p class="mb-0"><strong>Adicional:</strong> +S/ {{ compra.adicional }}</p>
-          </div>
-        {% endif %}
-        <div class="col-12 border-top pt-2">
-          <h5 class="text-primary"><strong>Total:</strong> S/ {{ compra.total }}</h5>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="d-flex justify-content-between mt-4 no-print">
-    <div class="col-4 mb-2">
-      <a href="{% url 'lista_compras' %}" class="btn btn-secondary"><i class="fas fa-arrow-rotate-left"></i> Ir a lista</a>
-    </div>
-    <div class="col-4 mb-2">
-       <a href="{% url 'carrito' %}" class="btn btn-primary"><i class="fas fa-shopping-cart"></i> Carrito</a>
-    </div>
-    <div class="col-4 mb-2 text-end">
-      <button class="btn btn-outline-dark" onclick="window.print()"><i class="fas fa-print"></i> Imprimir boleta</button>
-      <a class="btn btn-success" href="{% url 'exportar_pdf' compra.pk %}"><i class="fas fa-file-pdf"></i> Exp. PDF</a>
-    </div>
-  </div>
-
-  <div class="card my-4 no-print">
-    <div class="card-header bg-primary text-white">
-      <h5 class="mb-0"><i class="fas fa-envelope"></i> Enviar boleta por correo</h5>
-    </div>
-    <div class="card-body">
-      <form method="post" class="row g-3">
-        {% csrf_token %}
-        <div class="col-md-4">
-          <label for="clienteEmail" class="form-label">Seleccionar cliente</label>
-          <select id="clienteEmail" name="cliente" class="form-select">
-            <option value="">-- Ingresar correo manualmente --</option>
-            {% for cliente in clientes %}
-              <option value="{{ cliente.id }}" data-email="{{ cliente.email }}" {% if selected_cliente_id and cliente.id|stringformat:'s' == selected_cliente_id %}selected{% endif %}>
-                {{ cliente.nombre }}{% if cliente.email %} - {{ cliente.email }}{% endif %}
-              </option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="col-md-4">
-          <label for="emailEnviar" class="form-label">Correo electrónico</label>
-          <input type="email" id="emailEnviar" name="email" class="form-control" placeholder="ejemplo@correo.com" value="{{ email_to }}" required>
-          <div class="form-text">Si seleccionas cliente con email, este se usará automáticamente.</div>
-        </div>
-        <div class="col-md-4 d-flex align-items-end">
-          <button type="submit" class="btn btn-outline-primary w-100"><i class="fas fa-paper-plane"></i> Enviar boleta</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <div class="print-only mt-4">
-    <div class="border rounded p-4" style="max-width: 700px; margin: 0 auto; font-size: 14px;">
-      <div class="text-center mb-4">
-        <h3 class="fw-bold mb-1">Boleta de compra</h3>
-        <h5 class="mb-1">Bodega Doña Catita</h5>
-        <p class="mb-1">RUC: 1012038912</p>
-        <p class="mb-0">Dirección: calle 3 de octubre 1598</p>
-      </div>
-
-      <div class="row mb-3">
-        <div class="col-6">
-          <p class="mb-1"><strong>Fecha:</strong> {{ compra.fecha|date:'d/m/Y H:i' }}</p>
-          <p class="mb-1"><strong>Código:</strong> {{ compra.codigo }}</p>
-        </div>
-        <div class="col-6">
-          <p class="mb-1"><strong>Cliente:</strong> {% if compra.cliente %}{{ compra.cliente.nombre }}{% else %}Sin cliente asignado{% endif %}</p>
-          <p class="mb-1"><strong>Tipo de compra:</strong> {{ compra.get_tipo_compra_display }}</p>
-        </div>
-      </div>
-
-      <table class="table table-bordered mb-3">
-        <thead>
-          <tr>
-            <th>Producto</th>
-            <th>Costo unitario</th>
-            <th>Cantidad</th>
-            <th>Subtotal</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for item in compra.items.all %}
-            <tr>
-              <td>{{ item.producto.nombre }}</td>
-              <td>S/ {{ item.precio }}</td>
-              <td>{{ item.cantidad }}</td>
-              <td>S/ {{ item.subtotal }}</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-
-      <div class="text-end">
-        <p class="mb-1"><strong>Subtotal:</strong> S/ {{ compra.subtotal }}</p>
-        {% if compra.descuento %}
-          <p class="mb-1 text-danger"><strong>Descuento:</strong> -S/ {{ compra.descuento }}</p>
-        {% endif %}
-        {% if compra.adicional %}
-          <p class="mb-1 text-warning"><strong>Adicional:</strong> +S/ {{ compra.adicional }}</p>
-        {% endif %}
-        <h5 class="fw-bold mt-2"><strong>Total:</strong> S/ {{ compra.total }}</h5>
-      </div>
-    </div>
-  </div>
-</div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-  const clienteEmailSelect = document.getElementById('clienteEmail');
-  const emailEnviarInput = document.getElementById('emailEnviar');
-
-  function actualizarEmailCliente() {
-    const selectedOption = clienteEmailSelect.options[clienteEmailSelect.selectedIndex];
-    const email = selectedOption.dataset.email || '';
-    if (email) {
-      emailEnviarInput.value = email;
-      emailEnviarInput.disabled = true;
-      emailEnviarInput.classList.add('bg-light');
-    } else {
-      emailEnviarInput.disabled = false;
-      if (!emailEnviarInput.value || emailEnviarInput.value === '') {
-        emailEnviarInput.value = '';
-      }
-      emailEnviarInput.classList.remove('bg-light');
+    .boleta-container {
+      max-width: 100%;
     }
   }
+</style>
 
-  if (clienteEmailSelect) {
-    clienteEmailSelect.addEventListener('change', actualizarEmailCliente);
-    actualizarEmailCliente();
-  }
-</script>
+
+<div class="container py-4">
+
+  <div class="boleta-container print-area">
+
+    <!-- ENCABEZADO -->
+    <div class="boleta-header mb-4">
+
+      <div class="row align-items-center">
+
+        <div class="col-md-7">
+
+          <div class="boleta-logo">
+            <i class="fas fa-store"></i>
+            Bodega Doña Catita
+          </div>
+
+          <div class="boleta-subtitle">
+            Venta de productos de bodega
+          </div>
+
+          <small>
+            RUC: 1012038912<br>
+            Dirección: calle 3 de octubre 1598
+          </small>
+
+        </div>
+
+        <div class="col-md-5 text-md-end mt-3 mt-md-0">
+
+          <div class="border rounded p-3">
+
+            <div class="text-muted">
+              DETALLE DE COMPRA
+            </div>
+
+            <h5 class="mb-0">
+              {{ compra.codigo }}
+            </h5>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- INFORMACIÓN DE LA COMPRA -->
+    <div class="card mb-4">
+
+      <div class="card-header bg-dark text-white">
+        <h5 class="mb-0">
+          <i class="fas fa-circle-info"></i>
+          Información de la Compra
+        </h5>
+      </div>
+
+      <div class="card-body">
+
+        <div class="row">
+
+          <div class="col-md-6">
+
+            <p class="mb-2">
+              <span class="info-label">Código:</span>
+              {{ compra.codigo }}
+            </p>
+
+            <p class="mb-2">
+              <span class="info-label">Fecha:</span>
+              {{ compra.fecha|date:'d/m/Y H:i' }}
+            </p>
+
+            <p class="mb-2">
+              <span class="info-label">Usuario:</span>
+
+              {% if compra.user %}
+              {{ compra.user.username }}
+              {% else %}
+              Anónimo
+              {% endif %}
+
+            </p>
+
+            <p class="mb-0">
+              <span class="info-label">Estado:</span>
+
+              <span class="badge bg-success">
+                {{ compra.estado }}
+              </span>
+
+            </p>
+
+          </div>
+
+
+          <div class="col-md-6">
+
+            <p class="mb-2">
+
+              <span class="info-label">
+                Cliente:
+              </span>
+
+              {% if compra.cliente %}
+
+              {{ compra.cliente.nombre }}
+
+              {% if compra.cliente.telefono %}
+              <br>
+              <small class="text-muted">
+                Teléfono: {{ compra.cliente.telefono }}
+              </small>
+              {% endif %}
+
+              {% else %}
+
+              Sin cliente asignado
+
+              {% endif %}
+
+            </p>
+
+
+            <p class="mb-0">
+
+              <span class="info-label">
+                Tipo de compra:
+              </span>
+
+              <span class="badge bg-primary">
+                {{ compra.get_tipo_compra_display }}
+              </span>
+
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- PRODUCTOS -->
+    <div class="card mb-4">
+
+      <div class="card-header bg-success text-white">
+
+        <h5 class="mb-0">
+          <i class="fas fa-shopping-basket"></i>
+          Productos de la compra
+        </h5>
+
+      </div>
+
+
+      <div class="card-body p-0">
+
+        <div class="table-responsive">
+
+          <table class="table table-bordered table-hover mb-0">
+
+            <thead class="table-light">
+
+              <tr>
+
+                <th style="width: 45%;">
+                  Producto
+                </th>
+
+                <th class="text-end">
+                  Precio
+                </th>
+
+                <th class="text-center">
+                  Cantidad
+                </th>
+
+                <th class="text-end">
+                  Subtotal
+                </th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody>
+            
+              {% for item in compra.items.all %}
+            
+              <tr>
+            
+                <td>
+                  {{ item.producto.nombre }}
+                </td>
+            
+                <td class="text-end">
+                  S/ {{ item.precio|floatformat:2 }}
+                </td>
+            
+                <td class="text-center">
+                  {{ item.cantidad }}
+                </td>
+            
+                <td class="text-end">
+                  S/ {{ item.subtotal|floatformat:2 }}
+                </td>
+            
+              </tr>
+            
+              {% empty %}
+            
+              <tr>
+                <td colspan="4" class="text-center text-muted py-4">
+                  No hay productos registrados en esta compra.
+                </td>
+              </tr>
+            
+              {% endfor %}
+            
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- NOTA -->
+    {% if compra.descripcion %}
+
+    <div class="nota-box mb-4">
+
+      <div class="fw-bold mb-1">
+
+        <i class="fas fa-note-sticky"></i>
+        Nota sobre la compra
+
+      </div>
+
+      <div>
+        {{ compra.descripcion }}
+      </div>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- TOTALES -->
+    <div class="card mb-4">
+
+      <div class="card-body">
+
+        <div class="total-box">
+
+          <div class="d-flex justify-content-between mb-2">
+
+            <span>
+              Subtotal:
+            </span>
+
+            <strong>
+              S/ {{ compra.subtotal|floatformat:2 }}
+            </strong>
+
+          </div>
+
+
+          {% if compra.descuento > 0 %}
+
+          <div class="d-flex justify-content-between mb-2 text-danger">
+
+            <span>
+              Descuento:
+            </span>
+
+            <strong>
+              - S/ {{ compra.descuento|floatformat:2 }}
+            </strong>
+
+          </div>
+
+          {% endif %}
+
+
+          {% if compra.adicional > 0 %}
+
+          <div class="d-flex justify-content-between mb-2 text-warning">
+
+            <span>
+              Adicional:
+            </span>
+
+            <strong>
+              + S/ {{ compra.adicional|floatformat:2 }}
+            </strong>
+
+          </div>
+
+          {% endif %}
+
+
+          <hr>
+
+
+          <div class="d-flex justify-content-between">
+
+            <span class="fw-bold">
+              TOTAL:
+            </span>
+
+            <span class="total-final text-primary">
+              S/ {{ compra.total|floatformat:2 }}
+            </span>
+
+          </div>
+
+
+          {% if compra.tipo_compra == 'efectivo' and compra.dinero_recibido > 0 %}
+
+          <hr>
+
+          <div class="d-flex justify-content-between mb-2">
+
+            <span>
+              Dinero recibido:
+            </span>
+
+            <strong>
+              S/ {{ compra.dinero_recibido|floatformat:2 }}
+            </strong>
+
+          </div>
+
+
+          <div class="vuelto-box">
+
+            <div class="d-flex justify-content-between">
+
+              <span class="fw-bold">
+                Vuelto:
+              </span>
+
+              <strong class="text-success">
+                S/ {{ compra.vuelto|floatformat:2 }}
+              </strong>
+
+            </div>
+
+          </div>
+
+          {% endif %}
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- PIE DE BOLETA -->
+    <div class="text-center text-muted mb-4">
+
+      <small>
+        Gracias por su compra.
+      </small>
+
+    </div>
+
+  </div>
+
+
+  <!-- BOTONES -->
+  <div class="d-flex flex-wrap justify-content-between gap-2 mt-4 no-print">
+
+    <a href="{% url 'lista_compras' %}" class="btn btn-secondary">
+
+      <i class="fas fa-arrow-left"></i>
+      Lista de compras
+
+    </a>
+
+
+    <a href="{% url 'carrito' %}" class="btn btn-primary">
+
+      <i class="fas fa-shopping-cart"></i>
+      Carrito
+
+    </a>
+
+
+    <div class="d-flex gap-2">
+
+      <button type="button" class="btn btn-outline-dark" onclick="window.print()">
+
+        <i class="fas fa-print"></i>
+        Imprimir
+
+      </button>
+
+
+      <a href="{% url 'exportar_pdf' compra.pk %}" class="btn btn-success">
+
+        <i class="fas fa-file-pdf"></i>
+        PDF
+
+      </a>
+
+    </div>
+
+  </div>
+
+
+  <!-- ENVÍO POR CORREO -->
+  <div class="card my-4 no-print">
+
+    <div class="card-header bg-primary text-white">
+
+      <h5 class="mb-0">
+
+        <i class="fas fa-envelope"></i>
+        Enviar boleta por correo
+
+      </h5>
+
+    </div>
+
+
+    <div class="card-body">
+
+      <form method="post" class="row g-3">
+
+        {% csrf_token %}
+
+
+        <div class="col-md-4">
+
+          <label for="clienteEmail" class="form-label">
+
+            Seleccionar cliente
+
+          </label>
+
+
+          <select id="clienteEmail" name="cliente" class="form-select">
+          
+            <option value="">
+              -- Ingresar correo manualmente --
+            </option>
+          
+            {% for cliente in clientes %}
+            {% with cliente_id_str=cliente.id|stringformat:'s' %}
+          
+            {% if selected_cliente_id and cliente_id_str == selected_cliente_id %}
+            <option value="{{ cliente.id }}" data-email="{{ cliente.email }}" selected>
+              {{ cliente.nombre }}{% if cliente.email %} - {{ cliente.email }}{% endif %}
+            </option>
+            {% else %}
+            <option value="{{ cliente.id }}" data-email="{{ cliente.email }}">
+              {{ cliente.nombre }}{% if cliente.email %} - {{ cliente.email }}{% endif %}
+            </option>
+            {% endif %}
+          
+            {% endwith %}
+            {% endfor %}
+          
+          </select>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+          <label for="emailEnviar" class="form-label">
+
+            Correo electrónico
+
+          </label>
+
+
+          <input type="email" id="emailEnviar" name="email" class="form-control" placeholder="ejemplo@correo.com"
+            value="{{ email_to }}" required>
+
+
+          <div class="form-text">
+
+            Si seleccionas un cliente con correo,
+            se utilizará automáticamente.
+
+          </div>
+
+        </div>
+
+
+        <div class="col-md-4 d-flex align-items-end">
+
+          <button type="submit" class="btn btn-outline-primary w-100">
+
+            <i class="fas fa-paper-plane"></i>
+            Enviar boleta
+
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+</div>
+
 {% endblock %}
 
 
+{% block extra_js %}
 
+<script>
+
+  const clienteEmailSelect =
+    document.getElementById('clienteEmail');
+
+  const emailEnviarInput =
+    document.getElementById('emailEnviar');
+
+
+  function actualizarEmailCliente() {
+
+    if (!clienteEmailSelect || !emailEnviarInput) {
+      return;
+    }
+
+    const selectedOption =
+      clienteEmailSelect.options[
+      clienteEmailSelect.selectedIndex
+      ];
+
+
+    const email =
+      selectedOption.dataset.email || '';
+
+
+    if (email) {
+
+      emailEnviarInput.value = email;
+
+      emailEnviarInput.disabled = true;
+
+      emailEnviarInput.classList.add('bg-light');
+
+    } else {
+
+      emailEnviarInput.disabled = false;
+
+      emailEnviarInput.classList.remove('bg-light');
+
+    }
+
+  }
+
+
+  if (clienteEmailSelect) {
+
+    clienteEmailSelect.addEventListener(
+      'change',
+      actualizarEmailCliente
+    );
+
+    actualizarEmailCliente();
+
+  }
+
+</script>
+
+{% endblock %}

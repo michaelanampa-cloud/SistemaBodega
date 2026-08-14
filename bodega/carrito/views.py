@@ -163,12 +163,15 @@ def registrar_compra(request):
     if request.method == 'POST':
         cliente_id = request.POST.get('cliente')
         tipo_compra = request.POST.get('tipo_compra', 'efectivo')
+        descripcion = request.POST.get('descripcion', '').strip()
         try:
             descuento = Decimal(str(request.POST.get('descuento', '0')))
             adicional = Decimal(str(request.POST.get('adicional', '0')))
+            dinero_recibido = Decimal(str(request.POST.get('dinero', '0')))
         except (ValueError, TypeError):
             descuento = Decimal('0.00')
             adicional = Decimal('0.00')
+            dinero_recibido = Decimal('0.00')
         
         cliente = None
         if cliente_id:
@@ -184,6 +187,11 @@ def registrar_compra(request):
 
         # Calcular total final
         total_final = total - descuento + adicional
+
+        vuelto = Decimal('0.00')
+
+        if tipo_compra == 'efectivo' and dinero_recibido > total_final:
+            vuelto = dinero_recibido - total_final
 
         # Si el cliente es "FAMILIA", el total se vuelve 0 pero se registra la compra y
         # se descuenta el stock normalmente
@@ -203,7 +211,10 @@ def registrar_compra(request):
             descuento=descuento,
             adicional=adicional,
             total=total_final,
-            tipo_compra=tipo_compra
+            dinero_recibido=dinero_recibido,
+            vuelto=vuelto,
+            tipo_compra=tipo_compra,
+            descripcion=descripcion,
         )
 
         if bolsa_producto:
@@ -279,7 +290,12 @@ def lista_compras(request):
 
 @login_required
 def compra_detalle(request, pk):
-    compra = get_object_or_404(Compra, pk=pk)
+    compra = get_object_or_404(
+        Compra.objects.select_related('cliente', 'user').prefetch_related(
+            'items__producto'
+        ),
+        pk=pk
+    )
     clientes = Cliente.objects.filter(activo=True)
     selected_cliente_id = None
     email_to = ''

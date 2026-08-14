@@ -24,6 +24,9 @@ class Compra(models.Model):
     total = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
     tipo_compra = models.CharField(max_length=20, choices=TIPO_COMPRA_CHOICES, default='efectivo')
     estado = models.CharField(max_length=50, default='Registrada')
+    descripcion = models.TextField(blank=True)
+    dinero_recibido = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
+    vuelto = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
 
     def __str__(self):
         return f"{self.codigo} - {self.fecha:%d/%m/%Y}"
