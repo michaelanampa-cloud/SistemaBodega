@@ -11,23 +11,339 @@ from .forms import ProductoForm
 
 from django.contrib.auth.decorators import login_required
 
+import os
+from io import BytesIO
+
+from PIL import Image, ImageOps
+
+from django.conf import settings
+from django.utils.text import slugify
+
+from django.core.files.base import ContentFile
+
 def registros_productos(request):
-	if not request.user.has_perm('productos.add_producto'):
-		messages.error(
-			request,
-			'No tienes permisos para registrar nuevos productos.'
-		)
-		return redirect('lista_productos')
-	
-	if request.method == 'POST':
-		form = ProductoForm(request.POST)
-		if form.is_valid():
-			form.save()
-			messages.success(request, 'Producto creado correctamente.')
-			return redirect('lista_productos')
-	else:
-		form = ProductoForm()
-	return render(request, 'productos/registros_productos.html', {'form': form})
+
+    if not request.user.has_perm('productos.add_producto'):
+        messages.error(
+            request,
+            'No tienes permisos para registrar nuevos productos.'
+        )
+        return redirect('lista_productos')
+
+    if request.method == 'POST':
+
+        # IMPORTANTE:
+        # request.FILES permite recibir la fotografía
+        form = ProductoForm(
+            request.POST,
+            request.FILES
+        )
+
+        if form.is_valid():
+
+            producto = form.save(commit=False)
+
+            archivo_imagen = form.cleaned_data.get(
+                'archivo_imagen'
+            )
+
+            nombre_imagen = form.cleaned_data.get(
+                'nombre_imagen',
+                ''
+            ).strip()
+
+            # ==========================================
+            # SI SE SELECCIONÓ UNA IMAGEN
+            # ==========================================
+
+            if archivo_imagen:
+
+                try:
+
+                    import os
+                    from io import BytesIO
+
+                    from PIL import Image, ImageOps
+                    from django.conf import settings
+                    from django.utils.text import slugify
+
+
+                    # ==================================
+                    # ABRIR IMAGEN
+                    # ==================================
+
+                    imagen = Image.open(
+                        archivo_imagen
+                    )
+
+
+                    # Corregir orientación de fotos
+                    # tomadas desde celular
+                    imagen = ImageOps.exif_transpose(
+                        imagen
+                    )
+
+
+                    # ==================================
+                    # DETERMINAR FORMATO
+                    # ==================================
+
+                    formato = (
+                        imagen.format or 'JPEG'
+                    ).upper()
+
+
+                    if formato == 'PNG':
+
+                        extension = '.png'
+
+                    elif formato in ['JPEG', 'JPG']:
+
+                        extension = '.jpg'
+
+                    elif formato == 'WEBP':
+
+                        extension = '.webp'
+
+                    else:
+
+                        # Otros formatos los convertimos
+                        # a JPG
+                        extension = '.jpg'
+
+
+                    # ==================================
+                    # PREPARAR IMAGEN
+                    # ==================================
+
+                    if extension == '.jpg':
+
+                        if imagen.mode != 'RGB':
+                            imagen = imagen.convert('RGB')
+
+                    elif extension == '.png':
+
+                        if imagen.mode not in [
+                            'RGB',
+                            'RGBA'
+                        ]:
+                            imagen = imagen.convert('RGBA')
+
+
+                    elif extension == '.webp':
+
+                        if imagen.mode != 'RGB':
+                            imagen = imagen.convert('RGB')
+
+
+                    # ==================================
+                    # REDUCIR DIMENSIONES
+                    # ==================================
+
+                    imagen.thumbnail(
+                        (1200, 1200),
+                        Image.Resampling.LANCZOS
+                    )
+
+
+                    # ==================================
+                    # NOMBRE DE LA IMAGEN
+                    # ==================================
+
+                    if nombre_imagen:
+
+                        # Si escribió:
+                        # arroz-costeno.png
+                        #
+                        # quitamos .png
+                        nombre_base = os.path.splitext(
+                            nombre_imagen
+                        )[0]
+
+                    else:
+
+                        nombre_base = producto.nombre
+
+
+                    # Convertir a nombre seguro
+                    nombre_base = slugify(
+                        nombre_base
+                    )
+
+
+                    if not nombre_base:
+
+                        nombre_base = 'producto'
+
+
+                    # ==================================
+                    # CARPETA DE DESTINO
+                    # ==================================
+
+                    carpeta_productos = os.path.join(
+                        settings.BASE_DIR,
+                        'static',
+                        'img',
+                        'productos'
+                    )
+
+
+                    # Crear carpeta si no existe
+                    os.makedirs(
+                        carpeta_productos,
+                        exist_ok=True
+                    )
+
+
+                    # ==================================
+                    # NOMBRE FINAL
+                    # ==================================
+
+                    nombre_archivo = (
+                        f'{nombre_base}{extension}'
+                    )
+
+
+                    ruta_archivo = os.path.join(
+                        carpeta_productos,
+                        nombre_archivo
+                    )
+
+
+                    # ==================================
+                    # EVITAR SOBRESCRIBIR
+                    # ==================================
+
+                    contador = 1
+
+                    while os.path.exists(
+                        ruta_archivo
+                    ):
+
+                        nombre_archivo = (
+                            f'{nombre_base}-{contador}'
+                            f'{extension}'
+                        )
+
+                        ruta_archivo = os.path.join(
+                            carpeta_productos,
+                            nombre_archivo
+                        )
+
+                        contador += 1
+
+
+                    # ==================================
+                    # COMPRIMIR
+                    # ==================================
+
+                    buffer = BytesIO()
+
+
+                    if extension == '.jpg':
+
+                        imagen.save(
+                            buffer,
+                            format='JPEG',
+                            quality=80,
+                            optimize=True
+                        )
+
+
+                    elif extension == '.png':
+
+                        imagen.save(
+                            buffer,
+                            format='PNG',
+                            optimize=True
+                        )
+
+
+                    elif extension == '.webp':
+
+                        imagen.save(
+                            buffer,
+                            format='WEBP',
+                            quality=80,
+                            method=6
+                        )
+
+
+                    # ==================================
+                    # GUARDAR ARCHIVO
+                    # ==================================
+
+                    with open(
+                        ruta_archivo,
+                        'wb'
+                    ) as archivo:
+
+                        archivo.write(
+                            buffer.getvalue()
+                        )
+
+
+                    # ==================================
+                    # GUARDAR NOMBRE EN BASE DE DATOS
+                    # ==================================
+
+                    producto.imagen = nombre_archivo
+
+
+                    # ==================================
+                    # INFORMACIÓN PARA COMPROBAR
+                    # ==================================
+                    print(
+                        '===================================='
+                    )
+                    print(
+                        'IMAGEN GUARDADA EN:'
+                    )
+                    print(
+                        ruta_archivo
+                    )
+                    print(
+                        'NOMBRE GUARDADO EN BD:'
+                    )
+                    print(
+                        producto.imagen
+                    )
+                    print(
+                        '===================================='
+                    )
+                except Exception as e:
+                    messages.error(
+                        request,
+                        f'Error al guardar la imagen: {e}'
+                    )
+                    return render(
+                        request,
+                        'productos/registros_productos.html',
+                        {
+                            'form': form
+                        }
+                    )
+
+            # ==========================================
+            # GUARDAR PRODUCTO
+            # ==========================================
+            producto.save()
+            messages.success(
+                request,
+                'Producto creado correctamente.'
+            )
+            return redirect(
+                'lista_productos'
+            )
+    else:
+        form = ProductoForm()
+    return render(
+        request,
+        'productos/registros_productos.html',
+        {
+            'form': form
+        }
+    )
 
 def lista_productos(request):
 	query = request.GET.get('q', '').strip()
@@ -38,12 +354,9 @@ def lista_productos(request):
 		productos = productos.filter(
 			Q(nombre__icontains=query) | Q(detalle__icontains=query)
 		)
-
 	if tipo:
 		productos = productos.filter(tipoProducto__iexact=tipo)
-
 	tipos_disponibles = Producto.objects.values_list('tipoProducto', flat=True).distinct().order_by('tipoProducto')
-
 	paginator = Paginator(productos, 14)  # Mostrar 14 productos por página
 	page_number = request.GET.get('page')
 	page_obj = paginator.get_page(page_number)
@@ -84,7 +397,6 @@ def productos_vencer(request):
 	fecha_str = request.GET.get('fecha', '').strip()
 	hoy = timezone.now().date()
 	hasta = hoy + datetime.timedelta(days=7)
-
 	productos = Producto.objects.filter(fechaVencimiento__isnull=False)
 
 	if fecha_str:

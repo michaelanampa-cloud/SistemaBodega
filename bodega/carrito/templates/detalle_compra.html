@@ -89,81 +89,56 @@
   }
 </style>
 
-
 <div class="container py-4">
-
   <div class="boleta-container print-area">
-
     <!-- ENCABEZADO -->
     <div class="boleta-header mb-4">
-
       <div class="row align-items-center">
-
         <div class="col-md-7">
-
           <div class="boleta-logo">
             <i class="fas fa-store"></i>
             Bodega Doña Catita
           </div>
-
           <div class="boleta-subtitle">
             Venta de productos de bodega
           </div>
-
           <small>
-            RUC: 1012038912<br>
+            RUC: 10470273793<br>
             Dirección: calle 3 de octubre 1598
           </small>
-
         </div>
-
         <div class="col-md-5 text-md-end mt-3 mt-md-0">
-
           <div class="border rounded p-3">
-
             <div class="text-muted">
               DETALLE DE COMPRA
             </div>
-
             <h5 class="mb-0">
               {{ compra.codigo }}
             </h5>
-
           </div>
-
         </div>
-
       </div>
-
     </div>
-
 
     <!-- INFORMACIÓN DE LA COMPRA -->
     <div class="card mb-4">
-
       <div class="card-header bg-dark text-white">
         <h5 class="mb-0">
           <i class="fas fa-circle-info"></i>
           Información de la Compra
         </h5>
       </div>
-
       <div class="card-body">
-
         <div class="row">
-
           <div class="col-md-6">
-
             <p class="mb-2">
               <span class="info-label">Código:</span>
               {{ compra.codigo }}
             </p>
-
             <p class="mb-2">
               <span class="info-label">Fecha:</span>
               {{ compra.fecha|date:'d/m/Y H:i' }}
             </p>
-
             <p class="mb-2">
               <span class="info-label">Usuario:</span>
 
@@ -174,23 +149,16 @@
               {% endif %}
 
             </p>
-
             <p class="mb-0">
               <span class="info-label">Estado:</span>
-
               <span class="badge bg-success">
                 {{ compra.estado }}
               </span>
-
             </p>
-
           </div>
 
-
           <div class="col-md-6">
-
             <p class="mb-2">
-
               <span class="info-label">
                 Cliente:
               </span>
@@ -211,256 +179,166 @@
               Sin cliente asignado
 
               {% endif %}
-
             </p>
-
-
             <p class="mb-0">
-
               <span class="info-label">
                 Tipo de compra:
               </span>
-
               <span class="badge bg-primary">
                 {{ compra.get_tipo_compra_display }}
               </span>
-
             </p>
-
           </div>
-
         </div>
-
       </div>
-
     </div>
-
-
     <!-- PRODUCTOS -->
     <div class="card mb-4">
-
       <div class="card-header bg-success text-white">
-
         <h5 class="mb-0">
           <i class="fas fa-shopping-basket"></i>
           Productos de la compra
         </h5>
-
       </div>
 
-
       <div class="card-body p-0">
-
         <div class="table-responsive">
-
           <table class="table table-bordered table-hover mb-0">
-
             <thead class="table-light">
-
               <tr>
-
                 <th style="width: 45%;">
                   Producto
                 </th>
-
                 <th class="text-end">
                   Precio
                 </th>
-
                 <th class="text-center">
                   Cantidad
                 </th>
-
                 <th class="text-end">
                   Subtotal
                 </th>
-
               </tr>
-
             </thead>
-
-
             <tbody>
-            
               {% for item in compra.items.all %}
-            
               <tr>
-            
                 <td>
                   {{ item.producto.nombre }}
                 </td>
-            
                 <td class="text-end">
                   S/ {{ item.precio|floatformat:2 }}
                 </td>
-            
                 <td class="text-center">
                   {{ item.cantidad }}
                 </td>
-            
                 <td class="text-end">
                   S/ {{ item.subtotal|floatformat:2 }}
                 </td>
-            
               </tr>
-            
               {% empty %}
-            
+
               <tr>
                 <td colspan="4" class="text-center text-muted py-4">
                   No hay productos registrados en esta compra.
                 </td>
               </tr>
-            
+
               {% endfor %}
-            
+
             </tbody>
-
           </table>
-
         </div>
-
       </div>
-
     </div>
-
-
     <!-- NOTA -->
     {% if compra.descripcion %}
 
     <div class="nota-box mb-4">
-
       <div class="fw-bold mb-1">
-
         <i class="fas fa-note-sticky"></i>
         Nota sobre la compra
-
       </div>
-
       <div>
         {{ compra.descripcion }}
       </div>
-
     </div>
-
     {% endif %}
-
 
     <!-- TOTALES -->
     <div class="card mb-4">
-
       <div class="card-body">
-
         <div class="total-box">
-
           <div class="d-flex justify-content-between mb-2">
-
             <span>
               Subtotal:
             </span>
-
             <strong>
               S/ {{ compra.subtotal|floatformat:2 }}
             </strong>
-
           </div>
-
-
           {% if compra.descuento > 0 %}
 
           <div class="d-flex justify-content-between mb-2 text-danger">
-
             <span>
               Descuento:
             </span>
-
             <strong>
               - S/ {{ compra.descuento|floatformat:2 }}
             </strong>
-
           </div>
-
           {% endif %}
 
-
           {% if compra.adicional > 0 %}
-
           <div class="d-flex justify-content-between mb-2 text-warning">
-
             <span>
               Adicional:
             </span>
-
             <strong>
               + S/ {{ compra.adicional|floatformat:2 }}
             </strong>
-
           </div>
-
           {% endif %}
-
-
           <hr>
 
-
           <div class="d-flex justify-content-between">
-
             <span class="fw-bold">
               TOTAL:
             </span>
-
             <span class="total-final text-primary">
               S/ {{ compra.total|floatformat:2 }}
             </span>
-
           </div>
-
 
           {% if compra.tipo_compra == 'efectivo' and compra.dinero_recibido > 0 %}
 
           <hr>
-
           <div class="d-flex justify-content-between mb-2">
-
             <span>
               Dinero recibido:
             </span>
-
             <strong>
               S/ {{ compra.dinero_recibido|floatformat:2 }}
             </strong>
-
           </div>
 
-
           <div class="vuelto-box">
-
             <div class="d-flex justify-content-between">
-
               <span class="fw-bold">
                 Vuelto:
               </span>
-
               <strong class="text-success">
                 S/ {{ compra.vuelto|floatformat:2 }}
               </strong>
-
             </div>
-
           </div>
-
           {% endif %}
-
         </div>
-
       </div>
-
     </div>
-
 
     <!-- PIE DE BOLETA -->
     <div class="text-center text-muted mb-4">
-
       <small>
         Gracias por su compra.
       </small>
@@ -543,14 +421,14 @@
 
 
           <select id="clienteEmail" name="cliente" class="form-select">
-          
+
             <option value="">
               -- Ingresar correo manualmente --
             </option>
-          
+
             {% for cliente in clientes %}
             {% with cliente_id_str=cliente.id|stringformat:'s' %}
-          
+
             {% if selected_cliente_id and cliente_id_str == selected_cliente_id %}
             <option value="{{ cliente.id }}" data-email="{{ cliente.email }}" selected>
               {{ cliente.nombre }}{% if cliente.email %} - {{ cliente.email }}{% endif %}
@@ -560,10 +438,10 @@
               {{ cliente.nombre }}{% if cliente.email %} - {{ cliente.email }}{% endif %}
             </option>
             {% endif %}
-          
+
             {% endwith %}
             {% endfor %}
-          
+
           </select>
 
         </div>

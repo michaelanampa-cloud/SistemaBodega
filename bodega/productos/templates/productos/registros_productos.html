@@ -3,72 +3,398 @@
 {% block title %}Registrar Producto{% endblock %}
 
 {% block content %}
+
 <div class="row justify-content-center">
   <div class="col-md-8">
-    <div class="card">
+    <div class="card shadow-sm">
       <div class="card-body">
-        <h2 class="card-title mb-3 text-center"><i class="fa-brands fa-product-hunt"></i> Registrar Producto</h2>
-        <form method="post">
+        <h2 class="card-title mb-4 text-center">
+          <i class="fa-brands fa-product-hunt"></i>
+          Registrar Producto
+        </h2>
+        <form method="post" enctype="multipart/form-data" id="productoForm">
+
           {% csrf_token %}
+
           {{ form.non_field_errors }}
+
+          <!-- ===================================== -->
+          <!-- CAMPOS DEL PRODUCTO -->
+          <!-- ===================================== -->
+
           {% for field in form %}
-            <div class="mb-3">
-              {{ field.label_tag }}
-              {{ field }}
-              {% if field.help_text %}<small class="form-text text-muted">{{ field.help_text }}</small>{% endif %}
+
+          {% if field.name != 'archivo_imagen' and field.name != 'nombre_imagen' %}
+
+          <div class="mb-3">
+            {{ field.label_tag }}
+
+            {{ field }}
+
+            {% if field.help_text %}
+            <small class="form-text text-muted">
+              {{ field.help_text }}
+            </small>
+            {% endif %}
+
+            {% if field.errors %}
+            <div class="text-danger small mt-1">
               {{ field.errors }}
             </div>
+            {% endif %}
+          </div>
+
+          {% endif %}
+
           {% endfor %}
-          <button class="btn btn-success" type="submit"><i class="fas fa-save"></i> Guardar</button>
-          <a class="btn btn-secondary" href="{% url 'lista_productos' %}"><i class="fas fa-arrow-left"></i> Volver</a>
+
+          <!-- ===================================== -->
+          <!-- FOTO DEL PRODUCTO -->
+          <!-- ===================================== -->
+
+          <div class="mb-3">
+            <label class="form-label fw-bold">
+              <i class="fas fa-camera"></i>
+              Foto del producto
+            </label>
+
+            <!-- BOTONES DE IMAGEN -->
+            <div class="d-flex flex-wrap gap-2 mb-3">
+              <!-- TOMAR FOTO -->
+              <button type="button" class="btn btn-primary" id="btnTomarFoto">
+                <i class="fas fa-camera"></i>
+                Tomar foto
+              </button>
+
+              <!-- SELECCIONAR FOTO -->
+              <button type="button" class="btn btn-outline-primary" id="btnSeleccionarFoto">
+                <i class="fas fa-image"></i>
+                Seleccionar imagen
+              </button>
+            </div>
+
+            <!-- INPUT REAL -->
+            <input type="file" name="archivo_imagen" id="id_archivo_imagen" accept="image/*" class="d-none">
+            <small class="text-muted">
+              Puedes tomar una fotografía con la cámara
+              o seleccionar una imagen de tu dispositivo.
+            </small>
+          </div>
+
+          <!-- ===================================== -->
+          <!-- PREVISUALIZACIÓN -->
+          <!-- ===================================== -->
+          <div id="previewContainer" class="mb-4" style="display:none;">
+            <div class="card border">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <strong>
+                  <i class="fas fa-eye"></i>
+                  Previsualización
+                </strong>
+                <button type="button" class="btn btn-sm btn-outline-danger" id="btnEliminarImagen">
+                  <i class="fas fa-trash"></i>
+                  Quitar
+                </button>
+              </div>
+              <div class="card-body text-center">
+                <img id="previewImage" src="" alt="Vista previa del producto" class="img-fluid rounded" style="
+                                        max-width:100%;
+                                        max-height:350px;
+                                        object-fit:contain;
+                                    ">
+                <div id="imageInfo" class="small text-muted mt-3"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===================================== -->
+          <!-- NOMBRE DE LA IMAGEN -->
+          <!-- ===================================== -->
+          <div id="nombreImagenContainer" class="mb-4" style="display:none;">
+            <label for="id_nombre_imagen" class="form-label fw-bold">
+              <i class="fas fa-file-image"></i>
+              Nombre de la imagen
+            </label>
+
+            {{ form.nombre_imagen }}
+
+            <small class="text-muted">
+              Puedes modificar el nombre.
+              No escribas la extensión .jpg.
+            </small>
+
+            {% if form.nombre_imagen.errors %}
+
+            <div class="text-danger small">
+              {{ form.nombre_imagen.errors }}
+            </div>
+
+            {% endif %}
+          </div>
+
+          <!-- ===================================== -->
+          <!-- BOTONES -->
+          <!-- ===================================== -->
+          <div class="mt-3">
+            <button class="btn btn-success" type="submit"><i class="fas fa-save"></i> Guardar</button>
+            <a class="btn btn-secondary" href="{% url 'lista_productos' %}"><i class="fas fa-arrow-left"></i> Volver</a>
+          </div>
         </form>
       </div>
     </div>
   </div>
 </div>
 
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const form = document.querySelector('form');
-    form.addEventListener('submit', function (event) {
-      event.preventDefault();
-      const modal = new bootstrap.Modal(document.getElementById('confirmarGastoModal'));
-      modal.show();
-    });
+<!-- ========================================== -->
+<!-- MODAL DE CONFIRMACIÓN -->
+<!-- ========================================== -->
 
-    const btnConfirmarRegistro = document.getElementById('btnConfirmarRegistro');
-    btnConfirmarRegistro.addEventListener('click', function () {
-      form.submit();
-    });
-  });
-</script>
-
-<!-- Modal de confirmación -->
 <div class="modal fade" id="confirmarGastoModal" tabindex="-1" aria-labelledby="confirmarGastoLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-              <h5 class="modal-title" id="confirmarGastoLabel">
-                Confirmar registro
-              </h5>
-              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-
-            <div class="modal-body">
-                ¿Estás seguro de registrar este producto?
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-primary" id="btnConfirmarRegistro">
-              Sí, registrar
-              </button>
-              <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
-                Cancelar
-              </button>
-            </div>
-
-        </div>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="confirmarGastoLabel">
+          Confirmar registro
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        ¿Estás seguro de registrar este producto?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="btnConfirmarRegistro">
+          Sí, registrar
+        </button>
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal"> Cancelar</button>
+      </div>
     </div>
+  </div>
 </div>
 
+<script>
+
+  document.addEventListener('DOMContentLoaded', function () {
+    /*
+    ==================================================
+    ELEMENTOS
+    ==================================================
+    */
+    const form = document.getElementById('productoForm');
+    const inputImagen = document.getElementById('id_archivo_imagen');
+    const btnTomarFoto = document.getElementById('btnTomarFoto');
+    const btnSeleccionarFoto = document.getElementById('btnSeleccionarFoto');
+    const btnEliminarImagen = document.getElementById('btnEliminarImagen');
+    const previewContainer = document.getElementById('previewContainer');
+    const previewImage = document.getElementById('previewImage');
+    const imageInfo = document.getElementById('imageInfo');
+    const nombreContainer = document.getElementById('nombreImagenContainer');
+    const nombreImagen = document.getElementById('id_nombre_imagen');
+
+    /*
+    ==================================================
+    SELECCIONAR IMAGEN
+    ==================================================
+    */
+    btnSeleccionarFoto.addEventListener(
+      'click',
+      function () {
+        /*
+        Abrir selector normal
+        */
+        inputImagen.removeAttribute('capture');
+        inputImagen.click();
+      }
+    );
+
+    /*
+    ==================================================
+    TOMAR FOTO
+    ==================================================
+    */
+    btnTomarFoto.addEventListener(
+      'click',
+      function () {
+        /*
+        En dispositivos móviles,
+        capture="environment" solicita
+        utilizar la cámara trasera.
+        */
+        inputImagen.setAttribute(
+          'capture',
+          'environment'
+        );
+        inputImagen.click();
+      }
+    );
+
+    /*
+    ==================================================
+    CUANDO SE SELECCIONA LA IMAGEN
+    ==================================================
+    */
+    inputImagen.addEventListener(
+      'change',
+      function () {
+        const archivo =
+          this.files[0];
+
+        /*
+        Si no hay archivo
+        */
+        if (!archivo) {
+          ocultarImagen();
+          return;
+        }
+
+        /*
+        ==========================================
+        VALIDAR QUE SEA UNA IMAGEN
+        ==========================================
+        */
+        if (!archivo.type.startsWith('image/')) {
+          alert(
+            'El archivo seleccionado no es una imagen.'
+          );
+          this.value = '';
+          ocultarImagen();
+          return;
+        }
+
+        /*
+        ==========================================
+        MOSTRAR PREVISUALIZACIÓN
+        ==========================================
+        */
+        const reader =
+          new FileReader();
+        reader.onload =
+          function (e) {
+            previewImage.src =
+              e.target.result;
+            previewContainer.style.display =
+              'block';
+          };
+
+        reader.readAsDataURL(archivo);
+
+        /*
+        ==========================================
+        INFORMACIÓN
+        ==========================================
+        */
+        const tamanoMB =
+          (
+            archivo.size /
+            (1024 * 1024)
+          ).toFixed(2);
+
+        imageInfo.innerHTML =
+          '<i class="fas fa-file-image"></i> ' +
+          archivo.name +
+          '<br>' +
+          '<i class="fas fa-weight-hanging"></i> ' +
+          tamanoMB +
+          ' MB';
+
+        /*
+        ==========================================
+        MOSTRAR NOMBRE
+        ==========================================
+        */
+        nombreContainer.style.display =
+          'block';
+
+        /*
+        ==========================================
+        COLOCAR NOMBRE AUTOMÁTICO
+        ==========================================
+        */
+        let nombre = archivo.name;
+        const posicion = nombre.lastIndexOf('.');
+
+        if (posicion > 0) {
+          nombre =
+            nombre.substring(
+              0,
+              posicion
+            );
+        }
+        nombreImagen.value =
+          nombre;
+      }
+    );
+
+    /*
+    ==================================================
+    QUITAR IMAGEN
+    ==================================================
+    */
+    btnEliminarImagen.addEventListener(
+      'click',
+      function () {
+        inputImagen.value = '';
+        ocultarImagen();
+      }
+    );
+
+    /*
+    ==================================================
+    FUNCIÓN OCULTAR IMAGEN
+    ==================================================
+    */
+    function ocultarImagen() {
+      previewContainer.style.display ='none';
+      nombreContainer.style.display = 'none';
+      previewImage.src = '';
+      imageInfo.innerHTML = '';
+      nombreImagen.value = '';
+      inputImagen.value = '';
+    }
+
+    /*
+    ==================================================
+    CONFIRMACIÓN DEL FORMULARIO
+    ==================================================
+    */
+    form.addEventListener(
+      'submit',
+      function (event) {
+        event.preventDefault();
+        const modalElement =
+          document.getElementById(
+            'confirmarGastoModal'
+          );
+        const modal =
+          new bootstrap.Modal(
+            modalElement
+          );
+        modal.show();
+      }
+    );
+
+    /*
+    ==================================================
+    CONFIRMAR REGISTRO
+    ==================================================
+    */
+    const btnConfirmar =
+      document.getElementById(
+        'btnConfirmarRegistro'
+      );
+    btnConfirmar.addEventListener(
+      'click',
+      function () {
+
+        /*
+        IMPORTANTE:
+        submit() envía también request.FILES
+        porque el formulario tiene
+        enctype="multipart/form-data".
+        */
+        form.submit();
+      }
+    );
+  });
+</script>
 
 {% endblock %}

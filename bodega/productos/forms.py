@@ -1,6 +1,7 @@
 from django import forms
 from .models import Producto
 
+
 TIPO_PRODUCTO_CHOICES = [
     ('Cerveza', 'Cerveza'),
     ('Abarrotes', 'Abarrotes'),
@@ -25,19 +26,99 @@ UNIDAD_MEDIDA_CHOICES = [
     ('Kilo', 'Kilo'),
 ]
 
-
 class ProductoForm(forms.ModelForm):
+
+    # ==========================================
+    # FOTO DEL PRODUCTO
+    # ==========================================
+
+    archivo_imagen = forms.ImageField(
+        required=False,
+        label='Foto del producto',
+        widget=forms.ClearableFileInput(attrs={
+            'class': 'form-control',
+            'accept': 'image/*',
+            'capture': 'environment',
+        })
+    )
+
+    # ==========================================
+    # NOMBRE EDITABLE DE LA IMAGEN
+    # ==========================================
+
+    nombre_imagen = forms.CharField(
+        required=False,
+        max_length=150,
+        label='Nombre de la imagen',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Ejemplo: arroz-costeno',
+        })
+    )
+
     class Meta:
         model = Producto
-        fields = ['nombre', 'precio', 'costo', 'stock', 'tipoProducto', 'unidadMedida', 'fechaVencimiento', 'detalle', 'imagen']
-        widgets = {
-            'fechaVencimiento': forms.DateInput(attrs={'type': 'date'}),
-            'detalle': forms.Textarea(attrs={'rows': 2}),
-            'tipoProducto': forms.Select(choices=TIPO_PRODUCTO_CHOICES),
-            'unidadMedida': forms.Select(choices=UNIDAD_MEDIDA_CHOICES),
-        }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.widget.attrs.update({'class': 'form-control'})
+        fields = [
+            'nombre',
+            'precio',
+            'costo',
+            'stock',
+            'tipoProducto',
+            'unidadMedida',
+            'fechaVencimiento',
+            'detalle',
+            'archivo_imagen',
+            'nombre_imagen',
+        ]
+
+        widgets = {
+
+            'nombre': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Nombre del producto',
+            }),
+
+            'precio': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': '0.01',
+                'min': '0',
+            }),
+
+            'costo': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': '0.01',
+                'min': '0',
+            }),
+
+            'stock': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': '0.01',
+                'min': '0',
+            }),
+
+            'tipoProducto': forms.Select(
+                choices=TIPO_PRODUCTO_CHOICES,
+                attrs={
+                    'class': 'form-select',
+                }
+            ),
+
+            'unidadMedida': forms.Select(
+                choices=UNIDAD_MEDIDA_CHOICES,
+                attrs={
+                    'class': 'form-select',
+                }
+            ),
+
+            'fechaVencimiento': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date',
+            }),
+
+            'detalle': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Detalle del producto',
+            }),
+        }
