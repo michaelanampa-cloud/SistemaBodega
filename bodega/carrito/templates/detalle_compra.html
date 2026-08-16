@@ -210,10 +210,10 @@
                   Producto
                 </th>
                 <th class="text-end">
-                  Precio
-                </th>
-                <th class="text-center">
                   Cantidad
+                </th>
+                <th class="text-end">
+                  Precio final
                 </th>
                 <th class="text-end">
                   Subtotal
@@ -227,19 +227,23 @@
                   {{ item.producto.nombre }}
                 </td>
                 <td class="text-end">
-                  S/ {{ item.precio|floatformat:2 }}
-                </td>
-                <td class="text-center">
                   {{ item.cantidad }}
                 </td>
                 <td class="text-end">
-                  S/ {{ item.subtotal|floatformat:2 }}
+                  <span class="precio-final" data-precio="{{ item.precio }}">
+                    S/ {{ item.precio|floatformat:2 }}
+                  </span>
+                </td>
+                <td class="text-end">
+                  <span class="subtotal" data-precio="{{ item.subtotal }}">
+                    S/ {{ item.subtotal|floatformat:2 }}
+                  </span>
                 </td>
               </tr>
               {% empty %}
 
               <tr>
-                <td colspan="4" class="text-center text-muted py-4">
+                <td colspan="5" class="text-center text-muted py-4">
                   No hay productos registrados en esta compra.
                 </td>
               </tr>
@@ -273,10 +277,29 @@
             <span>
               Subtotal:
             </span>
-            <strong>
+            <strong id="subtotalFinal" data-subtotal="{{ compra.subtotal }}">
               S/ {{ compra.subtotal|floatformat:2 }}
             </strong>
           </div>
+          
+          <div class="d-flex justify-content-between mb-2">
+            <span>
+              Subtotal sin IGV:
+            </span>
+            <strong id="subtotalSinIGV">
+              S/ 0.00
+            </strong>
+          </div>
+          
+          <div class="d-flex justify-content-between mb-2">
+            <span>
+              IGV (18%):
+            </span>
+            <strong id="igv">
+              S/ 0.00
+            </strong>
+          </div>
+
           {% if compra.descuento > 0 %}
 
           <div class="d-flex justify-content-between mb-2 text-danger">
@@ -504,7 +527,6 @@
 
 
   function actualizarEmailCliente() {
-
     if (!clienteEmailSelect || !emailEnviarInput) {
       return;
     }
@@ -520,35 +542,54 @@
 
 
     if (email) {
-
       emailEnviarInput.value = email;
-
       emailEnviarInput.disabled = true;
-
       emailEnviarInput.classList.add('bg-light');
 
     } else {
-
       emailEnviarInput.disabled = false;
-
       emailEnviarInput.classList.remove('bg-light');
-
     }
-
   }
 
-
   if (clienteEmailSelect) {
-
     clienteEmailSelect.addEventListener(
       'change',
       actualizarEmailCliente
     );
-
     actualizarEmailCliente();
-
   }
 
+  document.addEventListener('DOMContentLoaded', function () {
+
+      const subtotalElemento = document.getElementById('subtotalFinal');
+      const subtotalSinIGVElemento = document.getElementById('subtotalSinIGV');
+      const igvElemento = document.getElementById('igv');
+
+      if (!subtotalElemento) {
+          return;
+      }
+
+      // Obtener directamente el valor numérico desde Django
+      const subtotal = parseFloat(subtotalElemento.dataset.subtotal);
+
+      if (isNaN(subtotal)) {
+          return;
+      }
+
+      // Calcular subtotal sin IGV
+      const subtotalSinIGV = subtotal / 1.18;
+
+      // Calcular IGV
+      const igv = subtotal - subtotalSinIGV;
+
+      // Mostrar con 2 decimales
+      subtotalSinIGVElemento.textContent =
+          'S/ ' + subtotalSinIGV.toFixed(2);
+
+      igvElemento.textContent =
+          'S/ ' + igv.toFixed(2);
+  });
 </script>
 
 {% endblock %}
