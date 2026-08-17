@@ -373,16 +373,240 @@ def detalle_producto(request, pk):
 	return render(request, 'productos/detalle_producto.html', {'producto': producto})
 
 def editar_producto(request, pk):
-	producto = get_object_or_404(Producto, pk=pk)
-	if request.method == 'POST':
-		form = ProductoForm(request.POST, instance=producto)
-		if form.is_valid():
-			form.save()
-			messages.success(request, 'Producto actualizado.')
-			return redirect('lista_productos')
-	else:
-		form = ProductoForm(instance=producto)
-	return render(request, 'productos/editar_producto.html', {'form': form, 'producto': producto})
+    producto = get_object_or_404(
+        Producto,
+        pk=pk
+    )
+    if request.method == 'POST':
+        form = ProductoForm(
+            request.POST,
+            request.FILES,
+            instance=producto
+        )
+        if form.is_valid():
+            producto_editado = form.save(
+                commit=False
+            )
+            archivo_imagen = form.cleaned_data.get(
+                'archivo_imagen'
+            )
+            nombre_imagen = form.cleaned_data.get(
+                'nombre_imagen',
+                ''
+            ).strip()
+            # ==================================================
+            # SI SE SELECCIONÓ UNA NUEVA IMAGEN
+            # ==================================================
+            if archivo_imagen:
+                try:
+                    # ------------------------------------------
+                    # ABRIR IMAGEN
+                    # ------------------------------------------
+                    imagen = Image.open(
+                        archivo_imagen
+                    )
+                    # ------------------------------------------
+                    # CORREGIR ORIENTACIÓN
+                    # ------------------------------------------
+                    imagen = ImageOps.exif_transpose(
+                        imagen
+                    )
+                    # ------------------------------------------
+                    # DETERMINAR FORMATO
+                    # ------------------------------------------
+                    formato = (
+                        imagen.format or 'JPEG'
+                    ).upper()
+                    if formato == 'PNG':
+                        extension = '.png'
+                    elif formato in ['JPEG', 'JPG']:
+                        extension = '.jpg'
+                    elif formato == 'WEBP':
+                        extension = '.webp'
+                    else:
+                        extension = '.jpg'
+                    # ------------------------------------------
+                    # PREPARAR IMAGEN
+                    # ------------------------------------------
+                    if extension == '.jpg':
+                        if imagen.mode != 'RGB':
+                            imagen = imagen.convert(
+                                'RGB'
+                            )
+                    elif extension == '.png':
+                        if imagen.mode not in [
+                            'RGB',
+                            'RGBA'
+                        ]:
+                            imagen = imagen.convert(
+                                'RGBA'
+                            )
+                    elif extension == '.webp':
+                        if imagen.mode != 'RGB':
+                            imagen = imagen.convert(
+                                'RGB'
+                            )
+                    # ------------------------------------------
+                    # REDUCIR DIMENSIONES
+                    # ------------------------------------------
+                    imagen.thumbnail(
+                        (1200, 1200),
+                        Image.Resampling.LANCZOS
+                    )
+                    # ------------------------------------------
+                    # NOMBRE DE IMAGEN
+                    # ------------------------------------------
+                    if nombre_imagen:
+                        nombre_base = os.path.splitext(
+                            nombre_imagen
+                        )[0]
+                    else:
+
+                        nombre_base = producto.nombre
+                    nombre_base = slugify(
+                        nombre_base
+                    )
+                    if not nombre_base:
+
+                        nombre_base = 'producto'
+                    # ------------------------------------------
+                    # CARPETA
+                    # ------------------------------------------
+                    carpeta_productos = os.path.join(
+                        settings.BASE_DIR,
+                        'static',
+                        'img',
+                        'productos'
+                    )
+                    os.makedirs(
+                        carpeta_productos,
+                        exist_ok=True
+                    )
+                    # ------------------------------------------
+                    # NOMBRE FINAL
+                    # ------------------------------------------
+                    nombre_archivo = (
+                        f'{nombre_base}{extension}'
+                    )
+                    ruta_archivo = os.path.join(
+                        carpeta_productos,
+                        nombre_archivo
+                    )
+                    # ------------------------------------------
+                    # EVITAR SOBRESCRIBIR
+                    # ------------------------------------------
+                    contador = 1
+                    while os.path.exists(
+                        ruta_archivo
+                    ):
+                        nombre_archivo = (
+                            f'{nombre_base}-'
+                            f'{contador}'
+                            f'{extension}'
+                        )
+                        ruta_archivo = os.path.join(
+                            carpeta_productos,
+                            nombre_archivo
+                        )
+                        contador += 1
+                    # ------------------------------------------
+                    # COMPRIMIR
+                    # ------------------------------------------
+                    buffer = BytesIO()
+                    if extension == '.jpg':
+                        imagen.save(
+                            buffer,
+                            format='JPEG',
+                            quality=80,
+                            optimize=True
+                        )
+                    elif extension == '.png':
+                        imagen.save(
+                            buffer,
+                            format='PNG',
+                            optimize=True
+                        )
+                    elif extension == '.webp':
+                        imagen.save(
+                            buffer,
+                            format='WEBP',
+                            quality=80,
+                            method=6
+                        )
+                    # ------------------------------------------
+                    # GUARDAR NUEVA IMAGEN
+                    # ------------------------------------------
+                    with open(
+                        ruta_archivo,
+                        'wb'
+                    ) as archivo:
+                        archivo.write(
+                            buffer.getvalue()
+                        )
+                    # ------------------------------------------
+                    # IMAGEN ANTERIOR
+                    # ------------------------------------------
+                    imagen_anterior = producto.imagen
+                    # ------------------------------------------
+                    # GUARDAR NOMBRE EN EL PRODUCTO
+                    # ------------------------------------------
+                    producto_editado.imagen = (
+                        nombre_archivo
+                    )
+                    # ------------------------------------------
+                    # ELIMINAR IMAGEN ANTERIOR
+                    # ------------------------------------------
+                    if imagen_anterior:
+                        ruta_anterior = os.path.join(
+                            carpeta_productos,
+                            imagen_anterior
+                        )
+                        if os.path.exists(
+                            ruta_anterior
+                        ):
+                            try:
+                                os.remove(
+                                    ruta_anterior
+                                )
+                            except OSError:
+                                pass
+                except Exception as e:
+                    messages.error(
+                        request,
+                        f'Error al actualizar la imagen: {e}'
+                    )
+                    return render(
+                        request,
+                        'productos/editar_producto.html',
+                        {
+                            'form': form,
+                            'producto': producto
+                        }
+                    )
+            # ==================================================
+            # GUARDAR PRODUCTO
+            # ==================================================
+            producto_editado.save()
+            messages.success(
+                request,
+                'Producto actualizado correctamente.'
+            )
+            return redirect(
+                'lista_productos'
+            )
+    else:
+
+        form = ProductoForm(
+            instance=producto
+        )
+    return render(
+        request,
+        'productos/editar_producto.html',
+        {
+            'form': form,
+            'producto': producto
+        }
+    )
 
 def eliminar_producto(request, pk):
 	producto = get_object_or_404(Producto, pk=pk)

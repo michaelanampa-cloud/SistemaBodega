@@ -1,27 +1,83 @@
 {% extends 'base_admin.html' %}
 
+{% load static %}
+
 {% block title %}Editar Producto{% endblock %}
 
 {% block content %}
+
 <div class="container">
   <br>
   <div class="row justify-content-center">
     <div class="col-md-8">
-      <div class="card">
+      <div class="card shadow-sm">
         <div class="card-body">
-          <h3 class="card-title mb-3"><i class="fas fa-edit"></i> Editar Producto</h3>
-          <form method="post">
+          <h3 class="card-title mb-4">
+            <i class="fas fa-edit"></i>
+            Editar Producto
+          </h3>
+          <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             {{ form.non_field_errors }}
+
             {% for field in form %}
-              <div class="mb-3">
-                {{ field.label_tag }}
-                {{ field }}
+
+            <div class="mb-3">
+              {{ field.label_tag }}
+
+              {{ field }}
+
+              {% if field.errors %}
+
+              <div class="text-danger small mt-1">
                 {{ field.errors }}
               </div>
+              {% endif %}
+            </div>
+            <!-- ================================= -->
+            <!-- CAMPO DE IMAGEN -->
+            <!-- ================================= -->
+            {% if field.name == 'archivo_imagen' %}
+            <div class="mb-4">
+              <label class="form-label fw-bold">
+                Vista previa
+              </label>
+              <div class="text-center border rounded p-3" style="background:#f8f9fa;">
+                {% if producto.imagen %}
+                <img id="previewImagen" src="{% static 'img/productos/' %}{{ producto.imagen }}"
+                  alt="{{ producto.nombre }}" class="img-fluid rounded" style="
+                                                    max-width:300px;
+                                                    max-height:300px;
+                                                    object-fit:contain;
+                                                ">
+                {% else %}
+                <div id="mensajeSinImagen" class="text-muted">
+                  <i class="fas fa-image fa-4x mb-2"></i>
+                  <p class="mb-0"> Este producto no tiene imagen.
+                  </p>
+                </div>
+                <img id="previewImagen" src="" alt="Previsualización" class="img-fluid rounded d-none" style="
+                                                    max-width:300px;
+                                                    max-height:300px;
+                                                    object-fit:contain;
+                                                ">
+                {% endif %}
+              </div>
+            </div>
+            {% endif %}
+
             {% endfor %}
-            <button class="btn btn-primary" type="submit"><i class="fas fa-save"></i> Actualizar</button>
-            <a class="btn btn-secondary" href="{% url 'lista_productos' %}"><i class="fas fa-arrow-left"></i> Cancelar</a>
+            <!-- ================================= -->
+            <!-- BOTONES -->
+            <!-- ================================= -->
+            <div class="mt-4">
+              <button class="btn btn-primary" type="submit">
+                <i class="fas fa-save"></i> Actualizar
+              </button>
+              <a class="btn btn-secondary" href="{% url 'lista_productos' %}">
+                <i class="fas fa-arrow-left"></i> Cancelar
+              </a>
+            </div>
           </form>
         </div>
       </div>
@@ -29,4 +85,49 @@
     </div>
   </div>
 </div>
+<!-- ================================================= -->
+<!-- PREVISUALIZACIÓN DE IMAGEN -->
+<!-- ================================================= -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const inputImagen = document.querySelector('input[name="archivo_imagen"]');
+    const previewImagen = document.getElementById('previewImagen');
+    const mensajeSinImagen = document.getElementById('mensajeSinImagen');
+
+    if (!inputImagen || !previewImagen) {
+      return;
+    }
+
+    inputImagen.addEventListener(
+      'change',
+      function () {
+        const archivo = this.files[0];
+        if (!archivo) {
+          return;
+        }
+        // Comprobar que sea una imagen
+        if (!archivo.type.startsWith('image/')) {
+          alert('Por favor selecciona una imagen válida.');
+          inputImagen.value = '';
+          return;
+        }
+        // Crear lector
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          previewImagen.src = e.target.result;
+          previewImagen.classList.remove(
+            'd-none'
+          );
+          if (mensajeSinImagen) {
+            mensajeSinImagen.classList.add(
+              'd-none'
+            );
+          }
+        };
+        reader.readAsDataURL(archivo);
+      }
+    );
+  });
+</script>
+
 {% endblock %}
