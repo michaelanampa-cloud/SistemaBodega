@@ -17,69 +17,132 @@
           </h3>
         </div>
         <div class="card-body">
-          <form method="post" novalidate>
+          <form method="post" novalidate id="clienteForm">
             {% csrf_token %}
-            
+        
             {% if form.non_field_errors %}
-              <div class="alert alert-danger" role="alert">
-                <strong>Error:</strong>
-                {% for error in form.non_field_errors %}
-                  <div>{{ error }}</div>
-                {% endfor %}
-              </div>
+            <div class="alert alert-danger" role="alert">
+              <strong>Error:</strong>
+              {% for error in form.non_field_errors %}
+              <div>{{ error }}</div>
+              {% endfor %}
+            </div>
             {% endif %}
-
+            <!-- DNI -->
             <div class="mb-3">
-              <label for="{{ form.nombre.id_for_label }}" class="form-label">Nombre:</label>
+              <label for="{{ form.dni.id_for_label }}" class="form-label">
+                <i class="fa-solid fa-id-card"></i>
+                DNI:
+              </label>
+              <div class="input-group">       
+                {{ form.dni }}
+        
+                <button type="button" class="btn btn-primary" id="btnBuscarDni">
+                  <i class="fa-solid fa-magnifying-glass"></i>
+                  Buscar DNI
+                </button>
+        
+              </div>
+        
+              {% if form.dni.errors %}
+              <div class="invalid-feedback d-block">
+                {{ form.dni.errors.0 }}
+              </div>
+              {% endif %}
+        
+              <div id="mensajeDni" class="mt-2"></div>
+            </div>
+        
+        
+            <!-- Nombre -->
+            <div class="mb-3">
+              <label for="{{ form.nombre.id_for_label }}" class="form-label">
+                Nombre:
+              </label>
+        
               {{ form.nombre }}
+        
               {% if form.nombre.errors %}
-                <div class="invalid-feedback d-block">
-                  {{ form.nombre.errors.0 }}
-                </div>
+              <div class="invalid-feedback d-block">
+                {{ form.nombre.errors.0 }}
+              </div>
               {% endif %}
             </div>
-
+        
+        
+            <!-- Email -->
             <div class="mb-3">
-              <label for="{{ form.email.id_for_label }}" class="form-label">Correo Electrónico:</label>
+              <label for="{{ form.email.id_for_label }}" class="form-label">
+                Correo Electrónico:
+              </label>
+        
               {{ form.email }}
+        
               {% if form.email.errors %}
-                <div class="invalid-feedback d-block">
-                  {{ form.email.errors.0 }}
-                </div>
+              <div class="invalid-feedback d-block">
+                {{ form.email.errors.0 }}
+              </div>
               {% endif %}
             </div>
-
+        
+        
+            <!-- Teléfono -->
             <div class="mb-3">
-              <label for="{{ form.telefono.id_for_label }}" class="form-label">Teléfono:</label>
+              <label for="{{ form.telefono.id_for_label }}" class="form-label">
+                Teléfono:
+              </label>
+        
               {{ form.telefono }}
+        
               {% if form.telefono.errors %}
-                <div class="invalid-feedback d-block">
-                  {{ form.telefono.errors.0 }}
-                </div>
+              <div class="invalid-feedback d-block">
+                {{ form.telefono.errors.0 }}
+              </div>
               {% endif %}
             </div>
-
+        
+        
+            <!-- Dirección -->
             <div class="mb-3">
-              <label for="{{ form.direccion.id_for_label }}" class="form-label">Dirección:</label>
+              <label for="{{ form.direccion.id_for_label }}" class="form-label">
+                Dirección:
+              </label>
+        
               {{ form.direccion }}
+        
               {% if form.direccion.errors %}
-                <div class="invalid-feedback d-block">
-                  {{ form.direccion.errors.0 }}
-                </div>
+              <div class="invalid-feedback d-block">
+                {{ form.direccion.errors.0 }}
+              </div>
               {% endif %}
             </div>
-
+        
+        
             <div class="d-flex gap-2">
-              <button type="submit" class="btn btn-success"><i class="fa-solid fa-address-card"></i> 
+        
+              <button type="submit" class="btn btn-success">
+        
+                <i class="fa-solid fa-address-card"></i>
+        
                 {% if cliente %}
-                  Actualizar Cliente
+                Actualizar Cliente
                 {% else %}
-                  Registrar Cliente
+                Registrar Cliente
                 {% endif %}
+        
               </button>
-              <a href="{% url 'lista_clientes' %}" class="btn btn-secondary"><i class="fa-solid fa-times"></i> Cancelar</a>
+        
+              <a href="{% url 'lista_clientes' %}" class="btn btn-secondary">
+        
+                <i class="fa-solid fa-times"></i>
+                Cancelar
+        
+              </a>
+        
             </div>
+        
           </form>
+        
         </div>
       </div>
     </div>
@@ -100,6 +163,281 @@
       });
     });
   });
+
+
+  document.addEventListener('DOMContentLoaded', function () {
+
+      const btnBuscarDni = document.getElementById('btnBuscarDni');
+      const dniInput = document.getElementById('id_dni');
+      const nombreInput = document.getElementById('id_nombre');
+      const emailInput = document.getElementById('id_email');
+      const telefonoInput = document.getElementById('id_telefono');
+      const direccionInput = document.getElementById('id_direccion');
+      const mensajeDni = document.getElementById('mensajeDni');
+
+
+      btnBuscarDni.addEventListener('click', function () {
+
+        const dni = dniInput.value.trim();
+
+
+        // ==============================
+        // VALIDAR DNI
+        // ==============================
+
+        if (!/^\d{8}$/.test(dni)) {
+
+          mensajeDni.innerHTML = `
+                <div class="alert alert-warning py-2 mb-0">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    El DNI debe contener exactamente 8 dígitos.
+                </div>
+            `;
+
+          dniInput.focus();
+          return;
+        }
+
+
+        // ==============================
+        // BOTÓN BUSCANDO
+        // ==============================
+
+        btnBuscarDni.disabled = true;
+
+        btnBuscarDni.innerHTML = `
+            <span class="spinner-border spinner-border-sm"
+                  role="status"
+                  aria-hidden="true"></span>
+            Buscando...
+        `;
+
+        mensajeDni.innerHTML = '';
+
+
+        // ==============================
+        // CONSULTAR DJANGO
+        // ==============================
+
+        fetch(`{% url 'consultar_dni' %}?dni=${encodeURIComponent(dni)}`)
+
+          .then(response => {
+
+            if (!response.ok) {
+              throw new Error('Error en la respuesta del servidor');
+            }
+
+            return response.json();
+          })
+
+          .then(data => {
+
+            console.log("RESPUESTA DJANGO:");
+            console.log(data);
+
+
+            // ==============================
+            // DNI NO ENCONTRADO
+            // ==============================
+
+            if (!data.success) {
+
+              mensajeDni.innerHTML = `
+                        <div class="alert alert-danger py-2 mb-0">
+                            <i class="fa-solid fa-circle-xmark"></i>
+                            ${data.mensaje || 'No se encontró el DNI.'}
+                        </div>
+                    `;
+
+              return;
+            }
+
+
+            // ==============================
+            // OBTENER DATOS
+            // ==============================
+
+            let datos = data.datos;
+
+
+            /*
+             * La API devuelve:
+             *
+             * {
+             *   success: true,
+             *   data: {
+             *      numero: "...",
+             *      nombre_completo: "...",
+             *      nombres: "...",
+             *      apellido_paterno: "...",
+             *      apellido_materno: "..."
+             *   }
+             * }
+             */
+
+
+            if (datos.data) {
+              datos = datos.data;
+            }
+
+
+            console.log("DATOS DEL DNI:");
+            console.log(datos);
+
+
+            // ==============================
+            // DNI
+            // ==============================
+
+            if (datos.numero) {
+              dniInput.value = datos.numero;
+            }
+
+
+            // ==============================
+            // NOMBRE COMPLETO
+            // ==============================
+
+            let nombreCompleto = '';
+
+
+            if (datos.nombre_completo) {
+
+              nombreCompleto = datos.nombre_completo;
+
+            } else {
+
+              nombreCompleto = [
+                datos.nombres,
+                datos.apellido_paterno,
+                datos.apellido_materno
+              ]
+                .filter(Boolean)
+                .join(' ');
+            }
+
+
+            nombreInput.value = nombreCompleto;
+
+
+            // ==============================
+            // DIRECCIÓN
+            // ==============================
+
+            if (datos.direccion_completa) {
+
+              direccionInput.value =
+                datos.direccion_completa;
+
+            } else if (datos.direccion) {
+
+              direccionInput.value =
+                datos.direccion;
+            }
+
+
+            // ==============================
+            // EMAIL Y TELÉFONO
+            // ==============================
+
+            /*
+             * La consulta de DNI no devuelve
+             * normalmente correo ni teléfono.
+             *
+             * Por eso solamente los llenamos
+             * si la API los proporciona.
+             */
+
+            if (datos.email) {
+              emailInput.value = datos.email;
+            }
+
+            if (datos.telefono) {
+              telefonoInput.value = datos.telefono;
+            }
+
+
+            // ==============================
+            // MENSAJE
+            // ==============================
+
+            mensajeDni.innerHTML = `
+                    <div class="alert alert-success py-2 mb-0">
+                        <i class="fa-solid fa-circle-check"></i>
+                        DNI encontrado correctamente.
+                    </div>
+                `;
+
+
+            // ==============================
+            // ENFOCAR SIGUIENTE CAMPO
+            // ==============================
+
+            emailInput.focus();
+
+          })
+
+          .catch(error => {
+
+            console.error(
+              'ERROR AL CONSULTAR DNI:',
+              error
+            );
+
+            mensajeDni.innerHTML = `
+                    <div class="alert alert-danger py-2 mb-0">
+                        <i class="fa-solid fa-circle-xmark"></i>
+                        Ocurrió un error al consultar el DNI.
+                    </div>
+                `;
+
+          })
+
+          .finally(() => {
+
+            btnBuscarDni.disabled = false;
+
+            btnBuscarDni.innerHTML = `
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    Buscar DNI
+                `;
+
+          });
+
+      });
+
+
+      // ==============================
+      // ENTER PARA BUSCAR
+      // ==============================
+
+      dniInput.addEventListener('keydown', function (event) {
+
+        if (event.key === 'Enter') {
+
+          event.preventDefault();
+
+          btnBuscarDni.click();
+        }
+
+      });
+
+
+      // ==============================
+      // SOLO NÚMEROS EN DNI
+      // ==============================
+
+      dniInput.addEventListener('input', function () {
+
+        this.value = this.value.replace(/\D/g, '');
+
+        if (this.value.length > 8) {
+          this.value = this.value.substring(0, 8);
+        }
+
+      });
+
+    });
 </script>
 
 <!-- Modal de confirmación -->

@@ -5,8 +5,16 @@ from .models import Cliente
 class ClienteForm(forms.ModelForm):
     class Meta:
         model = Cliente
-        fields = ['nombre', 'email', 'telefono', 'direccion']
+        fields = ['dni','nombre', 'email', 'telefono', 'direccion']
         widgets = {
+            'dni': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ingrese DNI de 8 dígitos',
+                'maxlength': '8',
+                'inputmode': 'numeric',
+                'autocomplete': 'off',
+                'id': 'id_dni'
+            }),
             'nombre': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Nombre del cliente'

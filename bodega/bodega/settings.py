@@ -138,3 +138,6 @@ DEFAULT_FROM_EMAIL = 'webmaster@localhost'
 # EMAIL_HOST_USER = 'tu_usuario@gmail.com'
 # EMAIL_HOST_PASSWORD = 'tu_contraseña'
 # EMAIL_USE_TLS = True
+
+
+API_DNI_TOKEN = 'c01ee5d518406fb2473555304c7f93fbe8ef0fc6cdefa7e26b25a3fb261b5720'
