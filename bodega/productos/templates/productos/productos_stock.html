@@ -1,0 +1,178 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}Productos con poco Stock{% endblock %}
+
+{% block content %}
+
+<br>
+
+<div class="container">
+
+    <h1 class="mb-4">
+        <i class="fas fa-box-open"></i> Productos con poco Stock
+    </h1>
+    <!-- Filtro de stock -->
+    <form method="get" class="row g-2 mb-4">
+        <div class="col-md-4">
+            <label for="stock" class="form-label"> Mostrar productos con stock hasta:
+            </label>
+            <input type="number" id="stock" name="stock" class="form-control" value="{{ stock_maximo }}" min="0" step="0.01">
+        </div>
+        <div class="col-auto align-self-end">
+            <button type="submit" class="btn btn-primary mt-2">
+                <i class="fas fa-search"></i> Buscar
+            </button>
+            <a href="{% url 'productos_stock' %}" class="btn btn-secondary mt-2">
+                Stock ≤ 5
+            </a>
+        </div>
+    </form>
+
+    {% if page_obj and page_obj.object_list %}
+        <!-- Información -->
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i> Se muestran productos con stock menor o igual a
+            <strong>{{ stock_maximo }}</strong>.
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Nombre</th>
+                        <th>Tipo</th>
+                        <th>Precio</th>
+                        <th>Costo</th>
+                        <th>Unidad</th>
+                        <th>Stock</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for producto in page_obj.object_list %}
+
+                    <tr>
+                        <td>
+                            {{ forloop.counter }}
+                        </td>
+                        <td>
+                            <strong>{{ producto.nombre }}</strong>
+                        </td>
+                        <td>
+                            {{ producto.tipoProducto }}
+                        </td>
+                        <td>
+                            S/ {{ producto.precio|floatformat:2 }}
+                        </td>
+                        <td>
+                            S/ {{ producto.costo|floatformat:2 }}
+                        </td>
+                        <td>
+                            {{ producto.unidadMedida }}
+                        </td>
+                        <td>
+                            {% if producto.stock <= 0 %}
+                                <span class="badge bg-danger fs-6">
+                                    {{ producto.stock }}
+                                </span>
+                            {% elif producto.stock <= 2 %}
+                                <span class="badge bg-danger fs-6">
+                                    {{ producto.stock }}
+                                </span>
+                            {% elif producto.stock <= 5 %}
+                                <span class="badge bg-warning text-dark fs-6">
+                                    {{ producto.stock }}
+                                </span>
+                            {% else %}
+                                <span class="badge bg-info text-dark fs-6">
+                                    {{ producto.stock }}
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if producto.stock <= 0 %}
+                                <span class="badge bg-danger">
+                                    <i class="fas fa-times-circle"></i>
+                                    Agotado
+                                </span>
+                            {% elif producto.stock <= 2 %}
+                                <span class="badge bg-danger">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    Crítico
+                                </span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">
+                                    <i class="fas fa-exclamation-triangle"></i> Poco Stock
+                                </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <!-- Paginación -->
+        {% if page_obj.paginator.num_pages > 1 %}
+        <nav aria-label="Paginación" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?stock={{ stock_maximo }}&page={{ page_obj.previous_page_number }}">
+                            Anterior
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link"> Anterior
+                        </span>
+                    </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+
+                    {% if num == page_obj.number %}
+                        <li class="page-item active">
+                            <span class="page-link"> {{ num }}
+                            </span>
+                        </li>
+
+                    {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+
+                        <li class="page-item">
+                            <a class="page-link" href="?stock={{ stock_maximo }}&page={{ num }}">
+                                {{ num }}
+                            </a>
+                        </li>
+                    {% endif %}
+
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+
+                    <li class="page-item">
+                        <a class="page-link" href="?stock={{ stock_maximo }}&page={{ page_obj.next_page_number }}">
+                            Siguiente
+                        </a>
+                    </li>
+
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link"> Siguiente</span>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+
+    {% else %}
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i>
+            ¡Excelente! No hay productos con stock menor o igual a
+            <strong>{{ stock_maximo }}</strong>.
+        </div>
+    {% endif %}
+</div>
+
+<br>
+
+{% endblock %}
