@@ -20,9 +20,11 @@
         <p><strong>Precio:</strong>S/ {{ producto.precio }}</p>
         <p><strong>Costo:</strong> S/ {{ producto.costo }}</p>
         <p><strong>Stock:</strong> {{ producto.stock }} {{ producto.unidadMedida }}</p>
+        <p><strong>Última edición:</strong> {{ producto.updated_at|date:'d/m/Y H:i' }}</p>
+        <p><strong>Fecha de ultima compra:</strong> {{ producto.updated_at|date:'d/m/Y H:i' }}</p>
         <p><strong>Vencimiento:</strong> {{ producto.fechaVencimiento|date:'d/m/Y' }}</p>
         <p><strong>Ganancia por unidad:</strong> <span id="ganancia_unit" class="text-primary">S/ 0.00</span></p>
-        <p><strong>Pörcentaje de Ganancia:</strong> <span id="ganancia_porcentaje" class="text-success"> 0.00 %</span></p>
+        <p><strong>Porcentaje de Ganancia:</strong> <span id="ganancia_porcentaje" class="text-success"> 0.00 %</span></p>
         <p><strong>Ganancia total:</strong> <span id="ganancia_total" class="text-success">S/ 0.00</span></p>
         <div id="producto_data" data-precio="{{ producto.precio }}" data-costo="{{ producto.costo }}" style="display:none;"></div>
         <p><strong>Detalle:</strong></p>
