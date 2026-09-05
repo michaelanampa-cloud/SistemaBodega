@@ -395,6 +395,171 @@
       }
     );
   });
+
+  document.addEventListener('DOMContentLoaded', function () {
+
+      const costoInput = document.getElementById('id_costo');
+      const precioInput = document.getElementById('id_precio');
+
+      if (!costoInput || !precioInput) {
+        return;
+      }
+
+      // ==========================================
+      // CREAR CUADRO DE INFORMACIÓN
+      // ==========================================
+
+      const infoGanancia = document.createElement('div');
+
+      infoGanancia.className = 'alert alert-info mt-2 py-2';
+      infoGanancia.style.display = 'none';
+
+      // Lo mostramos debajo del campo Precio
+      precioInput.parentNode.appendChild(infoGanancia);
+
+
+      // ==========================================
+      // CONVERTIR VALOR A NÚMERO
+      // ==========================================
+
+      function obtenerNumero(valor) {
+
+        const numero = parseFloat(
+          String(valor)
+            .trim()
+            .replace(',', '.')
+        );
+
+        return isNaN(numero) ? 0 : numero;
+      }
+
+
+      // ==========================================
+      // MOSTRAR GANANCIA REAL
+      // ==========================================
+
+      function mostrarGanancia() {
+
+        const costo = obtenerNumero(costoInput.value);
+        const precio = obtenerNumero(precioInput.value);
+
+        if (costo <= 0 || precio <= 0) {
+
+          infoGanancia.style.display = 'none';
+          return;
+        }
+
+
+        // Ganancia en soles
+        const ganancia = precio - costo;
+
+
+        // Porcentaje real de ganancia
+        const porcentajeGanancia =
+          (ganancia / costo) * 100;
+
+
+        infoGanancia.innerHTML = `
+            <div>
+                <i class="fa-solid fa-money-bill-trend-up"></i>
+
+                <strong>Ganancia estimada:</strong>
+
+                S/ ${ganancia.toFixed(2)}
+            </div>
+
+            <div class="mt-1">
+
+                <i class="fa-solid fa-percent"></i>
+
+                <strong>Porcentaje de ganancia:</strong>
+
+                ${porcentajeGanancia.toFixed(2)} %
+            </div>
+
+            <div class="mt-1">
+
+                <i class="fa-solid fa-tag"></i>
+
+                <strong>Precio de venta:</strong>
+
+                S/ ${precio.toFixed(2)}
+            </div>
+        `;
+
+        infoGanancia.style.display = 'block';
+      }
+
+
+      // ==========================================
+      // CALCULAR PRECIO SUGERIDO
+      // ==========================================
+
+      function calcularPrecioSugerido() {
+
+        const costo = obtenerNumero(costoInput.value);
+
+        if (costo <= 0) {
+
+          precioInput.value = '';
+          infoGanancia.style.display = 'none';
+
+          return;
+        }
+
+
+        // Ganancia sugerida 15%
+        const porcentajeSugerido = 15;
+
+        const gananciaSugerida =
+          costo * (porcentajeSugerido / 100);
+
+        const precioSugerido =
+          costo + gananciaSugerida;
+
+
+        // Colocar precio sugerido
+        precioInput.value =
+          precioSugerido.toFixed(2);
+
+
+        // Mostrar ganancia
+        mostrarGanancia();
+      }
+
+
+      // ==========================================
+      // AL CAMBIAR EL COSTO
+      // ==========================================
+
+      costoInput.addEventListener(
+        'input',
+        calcularPrecioSugerido
+      );
+
+
+      // ==========================================
+      // AL CAMBIAR MANUALMENTE EL PRECIO
+      // ==========================================
+
+      precioInput.addEventListener(
+        'input',
+        mostrarGanancia
+      );
+
+
+      // ==========================================
+      // CALCULAR AL CARGAR LA PÁGINA
+      // ==========================================
+
+      if (
+        obtenerNumero(costoInput.value) > 0 &&
+        obtenerNumero(precioInput.value) > 0
+      ) {
+        mostrarGanancia();
+      }
+
+    });
 </script>
 
 {% endblock %}
