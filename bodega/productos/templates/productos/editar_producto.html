@@ -90,43 +90,346 @@
 <!-- ================================================= -->
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    const inputImagen = document.querySelector('input[name="archivo_imagen"]');
-    const previewImagen = document.getElementById('previewImagen');
-    const mensajeSinImagen = document.getElementById('mensajeSinImagen');
 
-    if (!inputImagen || !previewImagen) {
+    // =================================================
+    // PREVISUALIZACIÓN DE IMAGEN
+    // =================================================
+
+    const inputImagen = document.querySelector(
+      'input[name="archivo_imagen"]'
+    );
+
+    const previewImagen = document.getElementById(
+      'previewImagen'
+    );
+
+    const mensajeSinImagen = document.getElementById(
+      'mensajeSinImagen'
+    );
+
+
+    if (inputImagen && previewImagen) {
+
+      inputImagen.addEventListener(
+        'change',
+        function () {
+
+          const archivo = this.files[0];
+
+          if (!archivo) {
+            return;
+          }
+
+          // Comprobar que sea una imagen
+          if (!archivo.type.startsWith('image/')) {
+
+            alert(
+              'Por favor selecciona una imagen válida.'
+            );
+
+            inputImagen.value = '';
+
+            return;
+          }
+
+          const reader = new FileReader();
+
+          reader.onload = function (e) {
+
+            previewImagen.src =
+              e.target.result;
+
+            previewImagen.classList.remove(
+              'd-none'
+            );
+
+            if (mensajeSinImagen) {
+
+              mensajeSinImagen.classList.add(
+                'd-none'
+              );
+
+            }
+
+          };
+
+          reader.readAsDataURL(
+            archivo
+          );
+
+        }
+      );
+
+    }
+
+
+    // =================================================
+    // PRECIO SUGERIDO Y GANANCIA
+    // =================================================
+
+    const costoInput = document.getElementById(
+      'id_costo'
+    );
+
+    const precioInput = document.getElementById(
+      'id_precio'
+    );
+
+
+    if (!costoInput || !precioInput) {
       return;
     }
 
-    inputImagen.addEventListener(
-      'change',
-      function () {
-        const archivo = this.files[0];
-        if (!archivo) {
-          return;
-        }
-        // Comprobar que sea una imagen
-        if (!archivo.type.startsWith('image/')) {
-          alert('Por favor selecciona una imagen válida.');
-          inputImagen.value = '';
-          return;
-        }
-        // Crear lector
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          previewImagen.src = e.target.result;
-          previewImagen.classList.remove(
-            'd-none'
-          );
-          if (mensajeSinImagen) {
-            mensajeSinImagen.classList.add(
-              'd-none'
-            );
-          }
-        };
-        reader.readAsDataURL(archivo);
-      }
+
+    // =================================================
+    // CREAR CUADRO DE INFORMACIÓN
+    // =================================================
+
+    const infoGanancia =
+      document.createElement('div');
+
+    infoGanancia.className =
+      'alert alert-info mt-2 py-2';
+
+    infoGanancia.style.display =
+      'none';
+
+
+    // Colocarlo debajo del campo Precio
+    precioInput.parentNode.appendChild(
+      infoGanancia
     );
+
+
+    // =================================================
+    // CONVERTIR VALOR A NÚMERO
+    // =================================================
+
+    function obtenerNumero(valor) {
+
+      const numero = parseFloat(
+        String(valor)
+          .trim()
+          .replace(',', '.')
+      );
+
+      return isNaN(numero)
+        ? 0
+        : numero;
+
+    }
+
+
+    // =================================================
+    // MOSTRAR GANANCIA ACTUAL
+    // =================================================
+
+    function mostrarGanancia() {
+
+      const costo =
+        obtenerNumero(
+          costoInput.value
+        );
+
+      const precio =
+        obtenerNumero(
+          precioInput.value
+        );
+
+
+      if (
+        costo <= 0 ||
+        precio <= 0
+      ) {
+
+        infoGanancia.style.display =
+          'none';
+
+        return;
+      }
+
+
+      // Ganancia real
+      const ganancia =
+        precio - costo;
+
+
+      // Porcentaje real de ganancia
+      const porcentajeGanancia =
+        (ganancia / costo) * 100;
+
+
+      // =================================================
+      // CAMBIAR COLOR SEGÚN GANANCIA
+      // =================================================
+
+      infoGanancia.classList.remove(
+        'alert-info',
+        'alert-success',
+        'alert-danger',
+        'alert-warning'
+      );
+
+
+      if (ganancia > 0) {
+
+        infoGanancia.classList.add(
+          'alert-success'
+        );
+
+      }
+      else if (ganancia < 0) {
+
+        infoGanancia.classList.add(
+          'alert-danger'
+        );
+
+      }
+      else {
+
+        infoGanancia.classList.add(
+          'alert-warning'
+        );
+
+      }
+
+
+      // =================================================
+      // MOSTRAR RESULTADO
+      // =================================================
+
+      infoGanancia.innerHTML = `
+
+            <div>
+                <i class="fa-solid fa-money-bill-trend-up"></i>
+
+                <strong>
+                    Ganancia estimada:
+                </strong>
+
+                S/ ${ganancia.toFixed(2)}
+            </div>
+
+
+            <div class="mt-1">
+
+                <i class="fa-solid fa-percent"></i>
+
+                <strong>
+                    Porcentaje de ganancia:
+                </strong>
+
+                ${porcentajeGanancia.toFixed(2)} %
+
+            </div>
+
+
+            <div class="mt-1">
+
+                <i class="fa-solid fa-tag"></i>
+
+                <strong>
+                    Precio de venta:
+                </strong>
+
+                S/ ${precio.toFixed(2)}
+
+            </div>
+
+        `;
+
+
+      infoGanancia.style.display =
+        'block';
+
+    }
+
+
+    // =================================================
+    // CALCULAR PRECIO SUGERIDO
+    // =================================================
+
+    function calcularPrecioSugerido() {
+
+      const costo =
+        obtenerNumero(
+          costoInput.value
+        );
+
+
+      if (costo <= 0) {
+
+        precioInput.value = '';
+
+        infoGanancia.style.display =
+          'none';
+
+        return;
+      }
+
+
+      // Porcentaje sugerido
+      const porcentajeSugerido =
+        15;
+
+
+      // Ganancia sugerida
+      const gananciaSugerida =
+        costo *
+        (porcentajeSugerido / 100);
+
+
+      // Precio sugerido
+      const precioSugerido =
+        costo +
+        gananciaSugerida;
+
+
+      // Colocar automáticamente
+      // en el campo Precio
+      precioInput.value =
+        precioSugerido.toFixed(2);
+
+
+      // Mostrar información
+      mostrarGanancia();
+
+    }
+
+
+    // =================================================
+    // AL CAMBIAR COSTO
+    // =================================================
+
+    costoInput.addEventListener(
+      'input',
+      calcularPrecioSugerido
+    );
+
+
+    // =================================================
+    // AL CAMBIAR PRECIO MANUALMENTE
+    // =================================================
+
+    precioInput.addEventListener(
+      'input',
+      mostrarGanancia
+    );
+
+
+    // =================================================
+    // MOSTRAR GANANCIA ACTUAL AL ABRIR EDITAR
+    // =================================================
+
+    if (
+      obtenerNumero(costoInput.value) > 0 &&
+      obtenerNumero(precioInput.value) > 0
+    ) {
+
+      mostrarGanancia();
+
+    }
+
   });
 </script>
 
