@@ -1,49 +1,64 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 
 <head>
 
     {% load static %}
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" href="{% static 'img/logo2.png' %}" type="image/png">
-    <title>{% block title %}Bodega{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="{% static 'css/style.css' %}" rel="stylesheet">
-    <link href="{% static 'css/sidebar.css' %}" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/catalogo.css' %}">
 
-    <!-- Animaciones Scroll -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/6.5.0/aos.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    <meta charset="utf-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta name="description" content="Bodega Doña Catita - Productos, promociones y buenos precios.">
+
+    <link rel="icon" href="{% static 'img/logoFinal1.png' %}" type="image/png">
+
+    <title>
+        {% block title %}Bodega Doña Catita{% endblock %}
+    </title>
+
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
-    {% block extra_head %}{% endblock %}
+
+    <!-- AOS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+
+    <!-- CSS DEL PROYECTO -->
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+
+    <link href="{% static 'css/sidebar.css' %}" rel="stylesheet">
+
+    <link href="{% static 'css/catalogo.css' %}" rel="stylesheet">
+
+
+    {% block extra_head %}
+    {% endblock %}
 
 </head>
-<script>
 
-    window.addEventListener("scroll", function () {
-
-        let header = document.getElementById("header");
-
-        if (window.scrollY > 80) {
-            header.classList.add("header-scrolled");
-        } else {
-            header.classList.remove("header-scrolled");
-        }
-
-    });
-
-</script>
 
 <body class="d-flex flex-column min-vh-100">
 
-    {% include 'includes/navbar_publico.html' %}
+    <!-- NAVBAR -->
+    {% block navbar %}
+        {% include 'includes/navbar_publico.html' %}
+    {% endblock %}
 
-    <main class="flex-fill page-content">
+
+    <!-- CONTENIDO -->
+    <main class="flex-fill {% block main_class %}page-content{% endblock %}">
 
         {% include 'includes/sweetalert_messages.html' %}
 
@@ -52,20 +67,109 @@
 
     </main>
 
+
+    <!-- FOOTER -->
     {% include 'includes/footer_publico.html' %}
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    {% block extra_js %}{% endblock %}
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
-
-    <script>
-        AOS.init({
-            duration: 900,
-            once: true
-        });
+    <!-- Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js">
     </script>
 
+
+    <!-- SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11">
+    </script>
+
+
+    <!-- AOS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js">
+    </script>
+
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            /* =====================================
+               AOS
+            ===================================== */
+
+            AOS.init({
+                duration: 900,
+                easing: "ease-out-cubic",
+                once: true,
+                offset: 70
+            });
+
+
+            /* =====================================
+               NAVBAR SCROLL
+            ===================================== */
+
+            const header = document.getElementById("header");
+
+            function actualizarNavbar() {
+
+                if (!header) {
+                    return;
+                }
+
+                if (window.scrollY > 50) {
+
+                    header.classList.add("header-scrolled");
+
+                } else {
+
+                    header.classList.remove("header-scrolled");
+
+                }
+
+            }
+
+            actualizarNavbar();
+
+            window.addEventListener(
+                "scroll",
+                actualizarNavbar,
+                { passive: true }
+            );
+
+
+            /* =====================================
+               CERRAR NAVBAR MÓVIL
+            ===================================== */
+
+            const menu = document.getElementById("menuPublico");
+
+            document
+                .querySelectorAll("#menuPublico .nav-link")
+                .forEach(function (link) {
+
+                    link.addEventListener("click", function () {
+
+                        if (
+                            menu &&
+                            menu.classList.contains("show")
+                        ) {
+
+                            const collapse =
+                                bootstrap.Collapse.getOrCreateInstance(menu);
+
+                            collapse.hide();
+                        }
+
+                    });
+
+                });
+
+        });
+
+    </script>
+
+
+    {% block extra_js %}
+    {% endblock %}
 
 </body>
 

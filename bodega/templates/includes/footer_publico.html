@@ -1,30 +1,224 @@
-<footer class="bg-dark text-center text-white p-4 mt-auto">
-    <div class="container">
-      <div class="row small">
-                <div class="col-md-4 mb-3">
-                    <h6 class="text-uppercase">Sobre nosotros</h6>
-                    <p class="mb-1">Doña Catita, tu bodega de confianza y con los mejores precios de la rica FM.</p>
+{% load static %}
+
+<footer class="dc-footer">
+
+    <!-- RESPLANDORES -->
+    <div class="dc-footer-glow dc-footer-glow-1"></div>
+    <div class="dc-footer-glow dc-footer-glow-2"></div>
+
+
+    <div class="container position-relative">
+
+        <!-- =========================
+             PARTE SUPERIOR
+        ========================== -->
+        <div class="row g-5 dc-footer-main">
+
+            <!-- MARCA -->
+            <div class="col-lg-4 col-md-6">
+
+                <a href="{% url 'inicio' %}" class="dc-footer-brand">
+
+                    <img src="{% static 'img/logo2.png' %}" alt="Bodega Doña Catita" class="dc-footer-logo">
+
+                    <div>
+                        <strong>Bodega</strong>
+                        <span>Doña Catita</span>
+                    </div>
+
+                </a>
+
+
+                <p class="dc-footer-description">
+                    Tu bodega de confianza. Encuentra productos
+                    para tu hogar, variedad, atención cercana y
+                    buenos precios todos los días.
+                </p>
+
+
+                <!-- REDES SOCIALES -->
+                <div class="dc-socials">
+
+                    <a href="#" aria-label="Facebook" title="Facebook">
+                        <i class="fa-brands fa-facebook-f"></i>
+                    </a>
+
+                    <a href="#" aria-label="Instagram" title="Instagram">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+
+                    <a href="#" aria-label="WhatsApp" title="WhatsApp">
+                        <i class="fa-brands fa-whatsapp"></i>
+                    </a>
+
+                    <a href="#" aria-label="TikTok" title="TikTok">
+                        <i class="fa-brands fa-tiktok"></i>
+                    </a>
+
                 </div>
-                <div class="col-md-4 mb-3">
-                    <h6 class="text-uppercase">Enlaces útiles</h6>
-                    <ul class="list-unstyled">
-                        <li><a href="{% url 'inicio' %}" class="text-white-50 text-decoration-none">Inicio</a></li>
-                        <li><a href="#" class="text-white-50 text-decoration-none">Noticias</a></li>
-                        <li><a href="#" class="text-white-50 text-decoration-none">Comunidad</a></li>
-                        <li><a href="#" class="text-white-50 text-decoration-none">Contacto</a></li>
-                        <li><a href="#" class="text-white-50 text-decoration-none">FAQ</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <h6 class="text-uppercase">Contacto</h6>
-                    <p class="mb-1">michaelanampa@gmail.com</p>
-                    <p class="mb-1">+51 930 233 684</p>
-                    <p class="mb-1">Calle 3 de Octubre #1598</p>
-                </div>
+
             </div>
-            <hr class="bg-secondary my-2">
-            <div class="text-center small text-white-50">
-                <small>© {% now "Y" %} AMAD. Todos los derechos reservados.</small>
+
+
+            <!-- NAVEGACIÓN -->
+            <div class="col-lg-2 col-md-6">
+
+                <h5 class="dc-footer-title">
+                    Navegación
+                </h5>
+
+                <ul class="dc-footer-links">
+
+                    <li>
+                        <a href="{% url 'inicio' %}">
+                            Inicio
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="/catalogo/">
+                            Catálogo
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{% url 'inicio' %}#productos">
+                            Productos
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{% url 'contacto' %}">
+                            Contacto
+                        </a>
+                    </li>
+
+                </ul>
+
             </div>
+
+
+            <!-- SERVICIOS -->
+            <div class="col-lg-2 col-md-6">
+
+                <h5 class="dc-footer-title">
+                    Servicios
+                </h5>
+
+                <ul class="dc-footer-links">
+
+                    <li>
+                        <a href="{% url 'inicio' %}#servicios">
+                            Compra fácil
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{% url 'inicio' %}#servicios">
+                            Atención rápida
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{% url 'inicio' %}#productos">
+                            Promociones
+                        </a>
+                    </li>
+
+                </ul>
+
+            </div>
+
+
+            <!-- CONTACTO -->
+            <div class="col-lg-4 col-md-6">
+
+                <h5 class="dc-footer-title">
+                    Contáctanos
+                </h5>
+
+
+                <div class="dc-contact-item">
+
+                    <div class="dc-contact-icon">
+                        <i class="fa-solid fa-envelope"></i>
+                    </div>
+
+                    <div>
+                        <span>Correo</span>
+
+                        <a href="mailto:michaelanampa@gmail.com">
+                            michaelanampa@gmail.com
+                        </a>
+                    </div>
+
+                </div>
+
+
+                <div class="dc-contact-item">
+
+                    <div class="dc-contact-icon">
+                        <i class="fa-solid fa-phone"></i>
+                    </div>
+
+                    <div>
+                        <span>Teléfono</span>
+
+                        <a href="tel:+51930233684">
+                            +51 930 233 684
+                        </a>
+                    </div>
+
+                </div>
+
+
+                <div class="dc-contact-item">
+
+                    <div class="dc-contact-icon">
+                        <i class="fa-solid fa-location-dot"></i>
+                    </div>
+
+                    <div>
+                        <span>Ubicación</span>
+
+                        <p>
+                            Calle 3 de Octubre #1598
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================
+             DIVISOR
+        ========================== -->
+
+        <div class="dc-footer-divider"></div>
+
+
+        <!-- =========================
+             FOOTER INFERIOR
+        ========================== -->
+
+        <div class="dc-footer-bottom">
+
+            <div>
+                © {% now "Y" %}
+                <strong>Bodega Doña Catita.</strong>
+                Todos los derechos reservados.
+            </div>
+
+            <div class="dc-footer-credit">
+                Desarrollado por
+                <span>AMAD</span>
+            </div>
+
+        </div>
+
     </div>
-  </footer>
+
+</footer>

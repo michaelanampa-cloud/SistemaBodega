@@ -1,7 +1,15 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
 .brand-logo {
-  max-height: 80px;
-  width: auto;
-  margin-right: 10px;
+    width: auto;
+    height: 55px;
+    max-height: 80px;
+    margin-right: 10px;
 }
 
 .welcome-logo {
@@ -38,45 +46,6 @@ footer {
     background-color: rgba(126, 125, 125, 0.12); /* Fondo semitransparente */
 }
 
-/*=========================
-    NAVBAR ESTILO KNIGHT
-==========================*/
-
-#header{
-    background: transparent;
-    transition: all .4s ease;
-    padding:18px 0;
-    z-index:9999;
-}
-
-#header.header-scrolled{
-    background:#111;
-    box-shadow:0 2px 20px rgba(0,0,0,.4);
-    padding:10px 0;
-}
-
-.brand-logo{
-    height:55px;
-}
-
-.navbar-brand{
-    font-size:28px;
-    font-weight:700;
-    color:rgb(255, 255, 255) !important;
-}
-
-.navbar-nav .nav-link{
-    color:rgb(255, 255, 255) !important;
-    font-weight:500;
-    letter-spacing:.4px;
-    margin:0 10px;
-    transition:.3s;
-}
-
-.navbar-nav .nav-link:hover{
-    color:rgb(236, 32, 32) !important;
-}
-
 .dropdown-menu{
     border:none;
     border-radius:10px;
@@ -93,95 +62,8 @@ footer {
     color:rgb(248, 248, 248);
 }
 
-.navbar-toggler{
-    border:none;
-}
-
-.navbar-toggler:focus{
-    box-shadow:none;
-}
-
 body{
     font-family:'Poppins',sans-serif;
-}
-
-/*=========================
-    Para pagina inicio */
-.hero{
-    position: relative;
-    width: 100%;
-    min-height: 100vh;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-
-    background: url("../img/bodega1.png") center center no-repeat;
-    background-size: cover;      /* Llena la pantalla sin deformarse */
-    background-attachment: scroll; /* Mejor en móviles */
-
-    overflow: hidden;
-}
-
-.hero-overlay{
-    position:absolute;
-    inset:0;
-    background:rgba(0,0,0,.50);
-}
-
-.hero-content {
-    position: relative;
-    z-index: 2;
-    color: white;
-    max-width: 700px;
-    padding: 20px;
-}
-
-.hero h1 {
-    font-size: 4rem;
-    font-weight: 700;
-}
-
-.hero p {
-    font-size: 1.4rem;
-}
-
-#header{
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    z-index:9999;
-
-    background:rgba(20,20,20,.65);
-    backdrop-filter:blur(8px);
-
-    transition:.3s;
-}
-
-#header.header-scrolled{
-    background:rgba(15,15,15,.90);
-}
-
-@media (max-width:768px){
-
-    .hero{
-        min-height:100vh;
-        padding:0 20px;
-    }
-
-    .hero h1{
-        font-size:2.5rem;
-    }
-
-    .hero p{
-        font-size:1.1rem;
-    }
-
-    #header{
-        background:rgba(15,15,15,.85);
-    }
 }
 
 /* Altura del navbar */
@@ -387,22 +269,14 @@ color:#c7a17a;
 
 }
 
-@media (max-width:768px){
+@media (max-width: 768px) {
 
-    h2{
-        font-size:1.5rem;
+    .table {
+        font-size: .9rem;
     }
 
-    .btn{
-        width:100%;
-    }
-
-    .table{
-        font-size:.9rem;
-    }
-
-    .page-link{
-        padding:.45rem .7rem;
+    .page-link {
+        padding: .45rem .7rem;
     }
 
 }
@@ -577,4 +451,2349 @@ color:#c7a17a;
         align-items: center;
     }
 
+}
+
+/* ==========================================================
+   BODEGA DOÑA CATITA
+   IDENTIDAD VISUAL OFICIAL
+
+   Azul oscuro = base
+   Rojo        = acciones principales
+   Verde       = acentos secundarios
+========================================================== */
+
+:root {
+
+    /* FONDOS */
+    --dc-dark: #06152D;
+    --dc-dark-2: #0A2348;
+    --dc-dark-3: #041020;
+
+    /* AZUL DE MARCA */
+    --dc-blue: #073E78;
+    --dc-blue-light: #0D5BA8;
+
+    /* ROJO DE MARCA */
+    --dc-primary: #E30613;
+    --dc-primary-light: #FF3540;
+    --dc-primary-dark: #B9040E;
+
+    /* VERDE DE MARCA */
+    --dc-secondary: #07852F;
+    --dc-secondary-light: #16A34A;
+
+    /* TEXTOS */
+    --dc-white: #FFFFFF;
+    --dc-muted: #AEB9C7;
+    --dc-muted-dark: #7E8A99;
+
+    /* BORDES */
+    --dc-border: rgba(255, 255, 255, .08);
+
+}
+
+
+/* ==========================================================
+   HERO
+========================================================== */
+
+.dc-hero {
+    position: relative;
+
+    min-height: 100vh;
+
+    overflow: hidden;
+
+    color: var(--dc-white);
+
+    background:
+        radial-gradient(
+            circle at 78% 38%,
+            rgba(227, 6, 19, .16),
+            transparent 30%
+        ),
+        radial-gradient(
+            circle at 12% 72%,
+            rgba(7, 133, 47, .11),
+            transparent 28%
+        ),
+        radial-gradient(
+            circle at 50% 5%,
+            rgba(13, 91, 168, .30),
+            transparent 42%
+        ),
+        linear-gradient(
+            145deg,
+            #06152D 0%,
+            #071B37 45%,
+            #041020 100%
+        );
+}
+
+
+/* CUADRÍCULA DE FONDO */
+
+.dc-hero::before {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    pointer-events: none;
+
+    background-image:
+        linear-gradient(
+            rgba(255, 255, 255, .022) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(255, 255, 255, .022) 1px,
+            transparent 1px
+        );
+
+    background-size: 60px 60px;
+
+    mask-image:
+        linear-gradient(
+            to bottom,
+            black,
+            transparent 88%
+        );
+
+    -webkit-mask-image:
+        linear-gradient(
+            to bottom,
+            black,
+            transparent 88%
+        );
+}
+
+
+/* ==========================================================
+   RESPLANDORES HERO
+========================================================== */
+
+.dc-glow {
+    position: absolute;
+
+    width: 450px;
+    height: 450px;
+
+    border-radius: 50%;
+
+    pointer-events: none;
+
+    filter: blur(120px);
+}
+
+
+.dc-glow-1 {
+    right: -100px;
+    top: 10%;
+
+    background:
+        rgba(227, 6, 19, .14);
+}
+
+
+.dc-glow-2 {
+    left: -250px;
+    bottom: -150px;
+
+    background:
+        rgba(7, 133, 47, .10);
+}
+
+
+/* ==========================================================
+   BADGE
+========================================================== */
+
+.dc-badge {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 9px 18px;
+
+    border:
+        1px solid rgba(227, 6, 19, .32);
+
+    border-radius: 50px;
+
+    background:
+        rgba(227, 6, 19, .09);
+
+    color: #FFFFFF;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    backdrop-filter:
+        blur(10px);
+
+    -webkit-backdrop-filter:
+        blur(10px);
+}
+
+
+.dc-badge i {
+    color: var(--dc-primary);
+}
+
+
+/* ==========================================================
+   TÍTULO HERO
+========================================================== */
+
+.dc-title {
+    max-width: 750px;
+
+    margin-bottom: 28px;
+
+    color: var(--dc-white);
+
+    font-size:
+        clamp(3rem, 6vw, 5.8rem);
+
+    font-weight: 800;
+
+    line-height: .98;
+
+    letter-spacing: -4px;
+}
+
+
+.dc-title span {
+    color: var(--dc-primary);
+}
+
+
+.dc-description {
+    max-width: 620px;
+
+    color: var(--dc-muted);
+
+    font-size: 1.15rem;
+
+    line-height: 1.8;
+}
+
+
+/* ==========================================================
+   BOTÓN PRINCIPAL
+========================================================== */
+
+.dc-btn-primary {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    padding: 14px 28px;
+
+    border:
+        1px solid var(--dc-primary);
+
+    border-radius: 50px;
+
+    background:
+        var(--dc-primary);
+
+    color: white;
+
+    font-weight: 700;
+
+    text-decoration: none;
+
+    transition:
+        background .3s ease,
+        border-color .3s ease,
+        transform .3s ease,
+        box-shadow .3s ease;
+}
+
+
+.dc-btn-primary:hover {
+    border-color:
+        var(--dc-primary-light);
+
+    background:
+        var(--dc-primary-light);
+
+    color: white;
+
+    transform:
+        translateY(-3px);
+
+    box-shadow:
+        0 12px 40px
+        rgba(227, 6, 19, .28);
+}
+
+
+/* ==========================================================
+   BOTÓN SECUNDARIO
+========================================================== */
+
+.dc-btn-outline {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    padding: 14px 28px;
+
+    border:
+        1px solid rgba(255, 255, 255, .20);
+
+    border-radius: 50px;
+
+    background:
+        rgba(255, 255, 255, .03);
+
+    color: white;
+
+    font-weight: 600;
+
+    text-decoration: none;
+
+    backdrop-filter:
+        blur(10px);
+
+    transition:
+        border-color .3s ease,
+        color .3s ease,
+        background .3s ease,
+        transform .3s ease;
+}
+
+
+.dc-btn-outline:hover {
+    border-color:
+        var(--dc-secondary);
+
+    background:
+        rgba(7, 133, 47, .08);
+
+    color:
+        #42D66F;
+
+    transform:
+        translateY(-3px);
+}
+
+
+/* ==========================================================
+   ESTADÍSTICAS
+========================================================== */
+
+.dc-stats {
+    max-width: 520px;
+}
+
+
+.dc-stats > div {
+    display: flex;
+
+    flex-direction: column;
+
+    border-right:
+        1px solid rgba(255, 255, 255, .12);
+}
+
+
+.dc-stats > div:last-child {
+    border-right: 0;
+}
+
+
+.dc-stats strong {
+    color: white;
+
+    font-size: 1.3rem;
+}
+
+
+.dc-stats span {
+    color: var(--dc-muted-dark);
+
+    font-size: .8rem;
+}
+
+
+/* ==========================================================
+   HERO IMAGE
+========================================================== */
+
+.dc-hero-image {
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-height: 600px;
+}
+
+
+/* CÍRCULO DEL LOGO */
+
+.dc-circle {
+    position: absolute;
+
+    width: 480px;
+    height: 480px;
+
+    border:
+        1px solid rgba(227, 6, 19, .18);
+
+    border-radius: 50%;
+
+    box-shadow:
+        0 0 100px rgba(227, 6, 19, .07),
+        inset 0 0 100px rgba(13, 91, 168, .08);
+
+    animation:
+        dcPulse 4s ease-in-out infinite;
+}
+
+
+.dc-circle::before,
+.dc-circle::after {
+    content: "";
+
+    position: absolute;
+
+    border-radius: 50%;
+}
+
+
+.dc-circle::before {
+    inset: 35px;
+
+    border:
+        1px solid rgba(7, 133, 47, .15);
+}
+
+
+.dc-circle::after {
+    inset: 75px;
+
+    border:
+        1px solid rgba(255, 255, 255, .07);
+}
+
+
+/* LOGO PRINCIPAL */
+
+.dc-main-image {
+    position: relative;
+
+    z-index: 2;
+
+    width: 430px;
+
+    max-width: 80%;
+
+    filter:
+        drop-shadow(
+            0 30px 45px
+            rgba(0, 0, 0, .48)
+        );
+
+    animation:
+        dcFloat 5s ease-in-out infinite;
+}
+
+
+/* ==========================================================
+   TARJETAS FLOTANTES
+========================================================== */
+
+.dc-floating-card {
+    position: absolute;
+
+    z-index: 5;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 14px 18px;
+
+    border:
+        1px solid rgba(255, 255, 255, .10);
+
+    border-radius: 15px;
+
+    background:
+        rgba(6, 21, 45, .78);
+
+    backdrop-filter:
+        blur(18px);
+
+    -webkit-backdrop-filter:
+        blur(18px);
+
+    box-shadow:
+        0 20px 50px
+        rgba(0, 0, 0, .30);
+
+    animation:
+        dcFloatCard 5s
+        ease-in-out infinite;
+}
+
+
+.dc-floating-card small,
+.dc-floating-card strong {
+    display: block;
+}
+
+
+.dc-floating-card small {
+    color: var(--dc-muted-dark);
+
+    font-size: .72rem;
+}
+
+
+.dc-floating-card strong {
+    color: white;
+
+    font-size: .9rem;
+}
+
+
+.dc-floating-icon {
+    width: 42px;
+    height: 42px;
+
+    display: grid;
+
+    place-items: center;
+
+    border-radius: 50%;
+
+    background:
+        var(--dc-primary);
+
+    color: white;
+}
+
+
+.dc-card-1 {
+    top: 25%;
+    right: 0;
+}
+
+
+.dc-card-2 {
+    left: 0;
+    bottom: 20%;
+
+    animation-delay: 1s;
+}
+
+
+/* SEGUNDA TARJETA EN VERDE */
+
+.dc-card-2 .dc-floating-icon {
+    background:
+        var(--dc-secondary);
+}
+
+
+/* ==========================================================
+   INDICADOR SCROLL
+========================================================== */
+
+.dc-scroll-down {
+    position: absolute;
+
+    left: 50%;
+    bottom: 25px;
+
+    width: 28px;
+    height: 45px;
+
+    border:
+        1px solid rgba(255, 255, 255, .30);
+
+    border-radius: 20px;
+
+    transform:
+        translateX(-50%);
+}
+
+
+.dc-scroll-down span {
+    position: absolute;
+
+    top: 8px;
+    left: 50%;
+
+    width: 4px;
+    height: 8px;
+
+    border-radius: 10px;
+
+    background:
+        var(--dc-primary);
+
+    transform:
+        translateX(-50%);
+
+    animation:
+        dcScroll 1.8s infinite;
+}
+
+
+/* ==========================================================
+   SECCIONES
+========================================================== */
+
+.dc-section {
+    padding: 110px 0;
+
+    background:
+        var(--dc-dark);
+
+    color: white;
+}
+
+
+.dc-section-label {
+    display: inline-block;
+
+    margin-bottom: 15px;
+
+    color:
+        var(--dc-primary);
+
+    font-size: .85rem;
+
+    font-weight: 700;
+
+    letter-spacing: 2px;
+
+    text-transform: uppercase;
+}
+
+
+.dc-section-title {
+    max-width: 750px;
+
+    margin-left: auto;
+    margin-right: auto;
+
+    color: white;
+
+    font-size:
+        clamp(2.3rem, 4vw, 3.8rem);
+
+    font-weight: 800;
+
+    letter-spacing: -2px;
+
+    line-height: 1.1;
+}
+
+
+.dc-section-title span {
+    color:
+        var(--dc-primary);
+}
+
+
+.dc-section-description {
+    max-width: 620px;
+
+    margin:
+        20px auto 0;
+
+    color:
+        var(--dc-muted);
+
+    font-size: 1.05rem;
+}
+
+
+/* ==========================================================
+   SERVICIOS
+========================================================== */
+
+.dc-service-card {
+    position: relative;
+
+    height: 100%;
+
+    padding: 38px;
+
+    overflow: hidden;
+
+    border:
+        1px solid var(--dc-border);
+
+    border-radius: 22px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(13, 91, 168, .10),
+            rgba(255, 255, 255, .018)
+        );
+
+    transition:
+        transform .4s ease,
+        border-color .4s ease,
+        box-shadow .4s ease;
+}
+
+
+.dc-service-card::before {
+    content: "";
+
+    position: absolute;
+
+    top: -80px;
+    right: -80px;
+
+    width: 160px;
+    height: 160px;
+
+    border-radius: 50%;
+
+    background:
+        var(--dc-primary);
+
+    filter:
+        blur(80px);
+
+    opacity: 0;
+
+    transition:
+        opacity .4s ease;
+}
+
+
+.dc-service-card:hover {
+    transform:
+        translateY(-12px);
+
+    border-color:
+        rgba(227, 6, 19, .32);
+
+    box-shadow:
+        0 25px 70px
+        rgba(0, 0, 0, .30);
+}
+
+
+.dc-service-card:hover::before {
+    opacity: .18;
+}
+
+
+/* ICONOS */
+
+.dc-service-icon {
+    width: 65px;
+    height: 65px;
+
+    display: grid;
+
+    place-items: center;
+
+    margin-bottom: 30px;
+
+    border-radius: 16px;
+
+    background:
+        rgba(227, 6, 19, .10);
+
+    color:
+        var(--dc-primary);
+
+    font-size: 1.5rem;
+
+    transition:
+        transform .3s ease,
+        background .3s ease,
+        color .3s ease;
+}
+
+
+.dc-service-card:hover
+.dc-service-icon {
+    background:
+        var(--dc-primary);
+
+    color: white;
+
+    transform:
+        rotate(-5deg)
+        scale(1.08);
+}
+
+
+.dc-service-card h4 {
+    margin-bottom: 15px;
+
+    color: white;
+
+    font-weight: 700;
+}
+
+
+.dc-service-card p {
+    color:
+        var(--dc-muted);
+
+    line-height: 1.8;
+}
+
+
+.dc-card-arrow {
+    margin-top: 25px;
+
+    color:
+        var(--dc-primary);
+
+    transition:
+        transform .3s ease;
+}
+
+
+.dc-service-card:hover
+.dc-card-arrow {
+    transform:
+        translateX(10px);
+}
+
+
+/* ==========================================================
+   ABOUT
+========================================================== */
+
+.dc-about {
+    position: relative;
+
+    padding: 120px 0;
+
+    overflow: hidden;
+
+    background:
+        linear-gradient(
+            145deg,
+            #071A35,
+            #0A2348
+        );
+
+    color: white;
+}
+
+
+.dc-about-image {
+    position: relative;
+
+    min-height: 520px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+}
+
+
+.dc-about-image img {
+    position: relative;
+
+    z-index: 2;
+
+    max-height: 470px;
+
+    filter:
+        drop-shadow(
+            0 30px 50px
+            rgba(0, 0, 0, .42)
+        );
+
+    transition:
+        transform .5s ease;
+}
+
+
+.dc-about-image:hover img {
+    transform:
+        scale(1.04)
+        rotate(-2deg);
+}
+
+
+.dc-about-glow {
+    position: absolute;
+
+    width: 350px;
+    height: 350px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(227, 6, 19, .10);
+
+    filter:
+        blur(80px);
+}
+
+
+.dc-about-text {
+    margin: 25px 0 35px;
+
+    color:
+        var(--dc-muted);
+
+    line-height: 1.9;
+
+    font-size: 1.05rem;
+}
+
+
+/* ==========================================================
+   FEATURES / CHECKS
+========================================================== */
+
+.dc-feature {
+    display: flex;
+
+    gap: 18px;
+
+    margin-bottom: 25px;
+}
+
+
+.dc-check {
+    flex:
+        0 0 42px;
+
+    width: 42px;
+    height: 42px;
+
+    display: grid;
+
+    place-items: center;
+
+    border-radius: 50%;
+
+    background:
+        rgba(7, 133, 47, .14);
+
+    color:
+        #20C657;
+}
+
+
+.dc-feature h5 {
+    margin-bottom: 5px;
+
+    color: white;
+
+    font-weight: 700;
+}
+
+
+.dc-feature p {
+    margin: 0;
+
+    color:
+        var(--dc-muted);
+}
+
+
+/* ==========================================================
+   CATEGORÍAS
+========================================================== */
+
+.dc-products {
+    background:
+        var(--dc-dark);
+}
+
+
+.dc-category {
+    position: relative;
+
+    padding: 35px 25px;
+
+    text-align: center;
+
+    border:
+        1px solid var(--dc-border);
+
+    border-radius: 20px;
+
+    background:
+        rgba(13, 91, 168, .055);
+
+    transition:
+        transform .35s ease,
+        border-color .35s ease,
+        background .35s ease,
+        box-shadow .35s ease;
+}
+
+
+.dc-category:hover {
+    transform:
+        translateY(-10px);
+
+    border-color:
+        rgba(7, 133, 47, .55);
+
+    background:
+        rgba(7, 133, 47, .07);
+
+    box-shadow:
+        0 20px 50px
+        rgba(0, 0, 0, .20);
+}
+
+
+.dc-category i {
+    margin-bottom: 25px;
+
+    color:
+        #20C657;
+
+    font-size: 2.3rem;
+
+    transition:
+        transform .35s ease,
+        color .35s ease;
+}
+
+
+.dc-category:hover i {
+    color:
+        var(--dc-secondary-light);
+
+    transform:
+        scale(1.18)
+        rotate(-5deg);
+}
+
+
+.dc-category h5 {
+    color: white;
+
+    font-weight: 700;
+}
+
+
+.dc-category p {
+    margin-bottom: 0;
+
+    color:
+        var(--dc-muted);
+}
+
+
+/* ==========================================================
+   CTA
+========================================================== */
+
+.dc-cta {
+    position: relative;
+
+    padding: 100px 0;
+
+    overflow: hidden;
+
+    background:
+        var(--dc-dark);
+
+    color: white;
+}
+
+
+.dc-cta-box {
+    position: relative;
+
+    overflow: hidden;
+
+    padding: 60px;
+
+    border:
+        1px solid rgba(227, 6, 19, .28);
+
+    border-radius: 30px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(227, 6, 19, .12),
+            rgba(13, 91, 168, .11),
+            rgba(255, 255, 255, .02)
+        );
+}
+
+
+.dc-cta-box::after {
+    content: "";
+
+    position: absolute;
+
+    top: -150px;
+    right: -150px;
+
+    width: 350px;
+    height: 350px;
+
+    border-radius: 50%;
+
+    background:
+        var(--dc-primary);
+
+    opacity: .08;
+
+    filter:
+        blur(30px);
+
+    pointer-events: none;
+}
+
+
+.dc-cta-box h2 {
+    position: relative;
+
+    z-index: 2;
+
+    max-width: 750px;
+
+    color: white;
+
+    font-size:
+        clamp(2rem, 4vw, 3.3rem);
+
+    font-weight: 800;
+
+    letter-spacing: -2px;
+}
+
+
+.dc-cta-box p {
+    position: relative;
+
+    z-index: 2;
+
+    margin-bottom: 0;
+
+    color:
+        var(--dc-muted);
+}
+
+
+/* ==========================================================
+   ANIMACIONES HOME
+========================================================== */
+
+@keyframes dcFloat {
+
+    0%,
+    100% {
+        transform:
+            translateY(0);
+    }
+
+    50% {
+        transform:
+            translateY(-20px);
+    }
+
+}
+
+
+@keyframes dcFloatCard {
+
+    0%,
+    100% {
+        transform:
+            translateY(0);
+    }
+
+    50% {
+        transform:
+            translateY(-12px);
+    }
+
+}
+
+
+@keyframes dcPulse {
+
+    0%,
+    100% {
+        transform:
+            scale(1);
+
+        opacity: .70;
+    }
+
+    50% {
+        transform:
+            scale(1.05);
+
+        opacity: 1;
+    }
+
+}
+
+
+@keyframes dcScroll {
+
+    0% {
+        opacity: 0;
+
+        transform:
+            translate(-50%, 0);
+    }
+
+    40% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+
+        transform:
+            translate(-50%, 18px);
+    }
+
+}
+
+
+/* ==========================================================
+   RESPONSIVE HOME
+========================================================== */
+
+@media (max-width: 991px) {
+
+    .dc-title {
+        letter-spacing: -2px;
+    }
+
+
+    .dc-hero {
+        padding-top: 80px;
+    }
+
+
+    .dc-hero-image {
+        min-height: 500px;
+    }
+
+
+    .dc-circle {
+        width: 390px;
+        height: 390px;
+    }
+
+
+    .dc-main-image {
+        width: 350px;
+    }
+
+}
+
+
+@media (max-width: 576px) {
+
+    .dc-title {
+        font-size: 3rem;
+
+        letter-spacing: -2px;
+    }
+
+
+    .dc-description {
+        font-size: 1rem;
+    }
+
+
+    .dc-hero-image {
+        min-height: 400px;
+    }
+
+
+    .dc-circle {
+        width: 300px;
+        height: 300px;
+    }
+
+
+    .dc-main-image {
+        width: 270px;
+    }
+
+
+    .dc-floating-card {
+        padding: 10px 12px;
+    }
+
+
+    .dc-card-1 {
+        right: 0;
+        top: 18%;
+    }
+
+
+    .dc-card-2 {
+        left: 0;
+        bottom: 15%;
+    }
+
+
+    .dc-stats {
+        margin-bottom: 20px;
+    }
+
+
+    .dc-section,
+    .dc-about {
+        padding: 75px 0;
+    }
+
+
+    .dc-service-card {
+        padding: 28px;
+    }
+
+
+    .dc-cta-box {
+        padding: 35px 25px;
+    }
+
+}
+
+
+/* ==========================================================
+   NAVBAR PÚBLICO
+========================================================== */
+
+.dc-navbar {
+    padding: 16px 0;
+
+    background: rgba(6, 21, 45, 0.96) !important;
+
+    border-bottom:
+        1px solid rgba(255, 255, 255, 0.08);
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    box-shadow:
+        0 5px 25px rgba(0, 0, 0, 0.15);
+
+    transition:
+        background .35s ease,
+        padding .35s ease,
+        border-color .35s ease,
+        box-shadow .35s ease;
+
+    z-index: 1050;
+}
+
+/* ==========================================================
+   NAVBAR EN PÁGINAS INTERNAS
+========================================================== */
+
+.internal-page .dc-navbar {
+    background: #06152D !important;
+
+    border-bottom:
+        1px solid rgba(255, 255, 255, 0.08);
+
+    box-shadow:
+        0 5px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Inicio después de hacer scroll */
+
+.home-page .dc-navbar.header-scrolled {
+    padding: 12px 0;
+
+    background: rgba(6, 21, 45, .94);
+
+    border-bottom:
+        1px solid rgba(255, 255, 255, .07);
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    box-shadow:
+        0 10px 40px rgba(0, 0, 0, .25);
+}
+
+/* NAVBAR AL HACER SCROLL */
+
+.dc-navbar.header-scrolled {
+    padding: 10px 0;
+
+    background: rgba(6, 21, 45, 0.99) !important;
+
+    border-bottom:
+        1px solid rgba(255, 255, 255, 0.10);
+
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+
+    box-shadow:
+        0 10px 35px rgba(0, 0, 0, 0.25);
+}
+
+
+/* ==========================================================
+   LOGO NAVBAR
+========================================================== */
+
+.dc-navbar-brand {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin-right: 30px;
+
+    color: white !important;
+
+    text-decoration: none;
+}
+
+
+.dc-navbar-logo {
+    width: 64px;
+    height: 64px;
+
+    object-fit: contain;
+
+    filter:
+        drop-shadow(
+            0 4px 8px rgba(0, 0, 0, .18)
+        );
+
+    transition:
+        transform .35s ease,
+        width .35s ease,
+        height .35s ease;
+}
+
+
+.header-scrolled .dc-navbar-logo,
+.internal-page .dc-navbar-logo {
+    width: 54px;
+    height: 54px;
+}
+
+
+.dc-navbar-brand:hover
+.dc-navbar-logo {
+    transform:
+        rotate(-3deg)
+        scale(1.06);
+}
+
+
+.header-scrolled
+.dc-navbar-logo {
+    width: 50px;
+    height: 50px;
+}
+
+
+/* TEXTO MARCA */
+
+.dc-brand-text {
+    display: flex;
+
+    flex-direction: column;
+
+    line-height: 1.05;
+}
+
+
+.dc-brand-text strong {
+    color: white;
+
+    font-size: 1rem;
+
+    font-weight: 700;
+
+    letter-spacing: .3px;
+}
+
+
+.dc-brand-text span {
+    margin-top: 4px;
+
+    color:
+        var(--dc-primary);
+
+    font-size: .76rem;
+
+    font-weight: 700;
+}
+
+
+/* ==========================================================
+   LINKS NAVBAR
+========================================================== */
+
+.dc-navbar-menu {
+    gap: 7px;
+}
+
+
+.dc-navbar-menu
+.nav-link {
+    position: relative;
+
+    padding:
+        10px 15px !important;
+
+    color:
+        rgba(255, 255, 255, .76);
+
+    font-size: .92rem;
+
+    font-weight: 500;
+
+    transition:
+        color .3s ease;
+}
+
+
+.dc-navbar-menu
+.nav-link:hover {
+    color: white;
+}
+
+
+/* LÍNEA ROJA */
+
+.dc-navbar-menu
+.nav-link::after {
+    content: "";
+
+    position: absolute;
+
+    left: 50%;
+    bottom: 3px;
+
+    width: 0;
+    height: 2px;
+
+    border-radius: 20px;
+
+    background:
+        var(--dc-primary);
+
+    transform:
+        translateX(-50%);
+
+    transition:
+        width .3s ease;
+}
+
+
+.dc-navbar-menu
+.nav-link:hover::after {
+    width: 24px;
+}
+
+
+/* ==========================================================
+   ACCIONES NAVBAR
+========================================================== */
+
+.dc-navbar-actions {
+    display: flex;
+
+    align-items: center;
+
+    gap: 20px;
+}
+
+
+.dc-login-link,
+.dc-user-link {
+    color: rgba(255, 255, 255, 0.88) !important;
+
+    font-size: .9rem;
+    font-weight: 500;
+
+    text-decoration: none;
+
+    transition: color .3s ease;
+}
+
+.dc-login-link:hover,
+.dc-user-link:hover {
+    color: #FF3B45 !important;
+}
+
+
+/* ==========================================================
+   BOTÓN NAVBAR
+========================================================== */
+
+.dc-navbar-button {
+    position: relative;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding:
+        11px 20px;
+
+    overflow: hidden;
+
+    border:
+        1px solid
+        var(--dc-primary);
+
+    border-radius: 50px;
+
+    background:
+        var(--dc-primary);
+
+    color: white;
+
+    font-size: .88rem;
+
+    font-weight: 700;
+
+    text-decoration: none;
+
+    transition:
+        transform .3s ease,
+        box-shadow .3s ease,
+        background .3s ease;
+}
+
+
+.dc-navbar-button:hover {
+    color: white;
+
+    background:
+        var(--dc-primary-light);
+
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 10px 30px
+        rgba(227, 6, 19, .27);
+}
+
+
+.dc-navbar-button i {
+    font-size: .8rem;
+
+    transition:
+        transform .3s ease;
+}
+
+
+.dc-navbar-button:hover i {
+    transform:
+        translateX(4px);
+}
+
+
+/* ==========================================================
+   BOTÓN HAMBURGUESA
+========================================================== */
+
+.dc-navbar-toggler {
+    width: 46px;
+    height: 46px;
+
+    display: none;
+
+    padding: 10px;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, .12);
+
+    border-radius: 12px;
+
+    background:
+        rgba(255, 255, 255, .05);
+
+    box-shadow:
+        none !important;
+}
+
+
+.dc-navbar-toggler span {
+    display: block;
+
+    width: 100%;
+    height: 2px;
+
+    margin: 5px 0;
+
+    border-radius: 10px;
+
+    background: white;
+
+    transition: .3s ease;
+}
+
+
+/* ==========================================================
+   RESPONSIVE NAVBAR
+========================================================== */
+
+@media (max-width: 991.98px) {
+
+    .dc-navbar {
+        padding: 12px 0;
+
+        background: #06152D !important;
+
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+    }
+
+
+    .dc-navbar-toggler {
+        display: block;
+    }
+
+
+    .dc-navbar .navbar-collapse {
+        margin-top: 12px;
+
+        padding: 20px;
+
+        border:
+            1px solid rgba(255, 255, 255, .08);
+
+        border-radius: 18px;
+
+        background: #0A2348;
+
+        box-shadow:
+            0 25px 60px rgba(0, 0, 0, .30);
+    }
+
+
+    .dc-navbar-menu .nav-link {
+        padding:
+            12px 5px !important;
+
+        color:
+            rgba(255, 255, 255, .88) !important;
+    }
+
+
+    .dc-navbar-menu .nav-link:hover {
+        color: #FFFFFF !important;
+    }
+}
+
+
+@media (max-width: 575.98px) {
+
+    .dc-navbar-logo {
+        width: 46px;
+        height: 46px;
+    }
+
+
+    .dc-brand-text strong {
+        font-size: .9rem;
+    }
+
+
+    .dc-brand-text span {
+        font-size: .68rem;
+    }
+
+}
+
+
+/* ==========================================================
+   FOOTER PÚBLICO
+========================================================== */
+
+.dc-footer {
+    position: relative;
+
+    overflow: hidden;
+
+    padding:
+        85px 0 25px;
+
+    border-top:
+        1px solid
+        rgba(255, 255, 255, .06);
+
+    background:
+        linear-gradient(
+            180deg,
+            #041020,
+            #020A14
+        );
+
+    color: white;
+}
+
+
+/* ==========================================================
+   GLOW FOOTER
+========================================================== */
+
+.dc-footer-glow {
+    position: absolute;
+
+    border-radius: 50%;
+
+    pointer-events: none;
+
+    filter:
+        blur(100px);
+}
+
+
+.dc-footer-glow-1 {
+    left: -180px;
+    top: -100px;
+
+    width: 350px;
+    height: 350px;
+
+    background:
+        rgba(227, 6, 19, .09);
+}
+
+
+.dc-footer-glow-2 {
+    right: -150px;
+    bottom: -100px;
+
+    width: 300px;
+    height: 300px;
+
+    background:
+        rgba(7, 133, 47, .07);
+}
+
+
+/* ==========================================================
+   MARCA FOOTER
+========================================================== */
+
+.dc-footer-brand {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    color: white;
+
+    text-decoration: none;
+}
+
+
+.dc-footer-logo {
+    width: 65px;
+    height: 65px;
+
+    object-fit: contain;
+
+    transition:
+        transform .35s ease;
+}
+
+
+.dc-footer-brand:hover
+.dc-footer-logo {
+    transform:
+        rotate(-4deg)
+        scale(1.08);
+}
+
+
+.dc-footer-brand div {
+    display: flex;
+
+    flex-direction: column;
+
+    line-height: 1.05;
+}
+
+
+.dc-footer-brand strong {
+    color: white;
+
+    font-size: 1.2rem;
+
+    font-weight: 700;
+}
+
+
+.dc-footer-brand span {
+    margin-top: 5px;
+
+    color:
+        var(--dc-primary);
+
+    font-size: .85rem;
+
+    font-weight: 700;
+}
+
+
+/* ==========================================================
+   DESCRIPCIÓN FOOTER
+========================================================== */
+
+.dc-footer-description {
+    max-width: 360px;
+
+    margin: 25px 0;
+
+    color:
+        var(--dc-muted);
+
+    line-height: 1.8;
+
+    font-size: .92rem;
+}
+
+
+/* ==========================================================
+   REDES SOCIALES
+========================================================== */
+
+.dc-socials {
+    display: flex;
+
+    gap: 10px;
+}
+
+
+.dc-socials a {
+    width: 42px;
+    height: 42px;
+
+    display: grid;
+
+    place-items: center;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, .09);
+
+    border-radius: 50%;
+
+    background:
+        rgba(255, 255, 255, .035);
+
+    color:
+        var(--dc-muted);
+
+    text-decoration: none;
+
+    transition:
+        color .3s ease,
+        background .3s ease,
+        border-color .3s ease,
+        transform .3s ease,
+        box-shadow .3s ease;
+}
+
+
+.dc-socials a:hover {
+    border-color:
+        var(--dc-primary);
+
+    background:
+        var(--dc-primary);
+
+    color: white;
+
+    transform:
+        translateY(-5px);
+
+    box-shadow:
+        0 10px 25px
+        rgba(227, 6, 19, .20);
+}
+
+
+/* ==========================================================
+   TÍTULOS FOOTER
+========================================================== */
+
+.dc-footer-title {
+    position: relative;
+
+    margin-bottom: 25px;
+
+    color: white;
+
+    font-size: 1rem;
+
+    font-weight: 700;
+}
+
+
+.dc-footer-title::after {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    bottom: -9px;
+
+    width: 25px;
+    height: 2px;
+
+    border-radius: 20px;
+
+    background:
+        var(--dc-primary);
+}
+
+
+/* ==========================================================
+   LINKS FOOTER
+========================================================== */
+
+.dc-footer-links {
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+
+.dc-footer-links li {
+    margin-bottom: 13px;
+}
+
+
+.dc-footer-links a {
+    position: relative;
+
+    color:
+        var(--dc-muted);
+
+    font-size: .9rem;
+
+    text-decoration: none;
+
+    transition:
+        color .3s ease,
+        padding-left .3s ease;
+}
+
+
+.dc-footer-links a::before {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    top: 50%;
+
+    width: 0;
+    height: 1px;
+
+    background:
+        var(--dc-primary);
+
+    transform:
+        translateY(-50%);
+
+    transition:
+        width .3s ease;
+}
+
+
+.dc-footer-links a:hover {
+    padding-left: 17px;
+
+    color:
+        var(--dc-primary-light);
+}
+
+
+.dc-footer-links a:hover::before {
+    width: 10px;
+}
+
+
+/* ==========================================================
+   CONTACTO FOOTER
+========================================================== */
+
+.dc-contact-item {
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    margin-bottom: 18px;
+}
+
+
+.dc-contact-icon {
+    flex: 0 0 42px;
+
+    width: 42px;
+    height: 42px;
+
+    display: grid;
+
+    place-items: center;
+
+    border-radius: 12px;
+
+    background:
+        rgba(7, 133, 47, .12);
+
+    color:
+        #20C657;
+}
+
+
+.dc-contact-item > div:last-child {
+    min-width: 0;
+}
+
+
+.dc-contact-item span {
+    display: block;
+
+    margin-bottom: 3px;
+
+    color:
+        var(--dc-muted-dark);
+
+    font-size: .72rem;
+
+    text-transform: uppercase;
+
+    letter-spacing: .8px;
+}
+
+
+.dc-contact-item a,
+.dc-contact-item p {
+    display: block;
+
+    margin: 0;
+
+    color:
+        var(--dc-muted);
+
+    font-size: .87rem;
+
+    text-decoration: none;
+
+    overflow-wrap: anywhere;
+
+    transition:
+        color .3s ease;
+}
+
+
+.dc-contact-item a:hover {
+    color:
+        var(--dc-primary-light);
+}
+
+
+/* ==========================================================
+   DIVISOR FOOTER
+========================================================== */
+
+.dc-footer-divider {
+    height: 1px;
+
+    margin:
+        55px 0 25px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, .12),
+            transparent
+        );
+}
+
+
+/* ==========================================================
+   FOOTER INFERIOR
+========================================================== */
+
+.dc-footer-bottom {
+    display: flex;
+
+    align-items: center;
+
+    justify-content:
+        space-between;
+
+    gap: 20px;
+
+    color:
+        var(--dc-muted-dark);
+
+    font-size: .8rem;
+}
+
+
+.dc-footer-bottom strong {
+    color:
+        var(--dc-muted);
+
+    font-weight: 500;
+}
+
+
+.dc-footer-credit span {
+    color:
+        var(--dc-primary);
+
+    font-weight: 700;
+}
+
+
+/* ==========================================================
+   RESPONSIVE FOOTER
+========================================================== */
+
+@media (max-width: 767.98px) {
+
+    .dc-footer {
+        padding-top: 65px;
+    }
+
+
+    .dc-footer-main {
+        text-align: left;
+    }
+
+
+    .dc-footer-bottom {
+        flex-direction: column;
+
+        text-align: center;
+    }
+
+
+    .dc-footer-divider {
+        margin-top: 40px;
+    }
+
+}
+
+
+/* ==========================================================
+   ACCESIBILIDAD
+   Reduce animaciones si el usuario lo solicita
+========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .dc-main-image,
+    .dc-floating-card,
+    .dc-circle,
+    .dc-scroll-down span {
+        animation: none !important;
+    }
+
+
+    .dc-service-card,
+    .dc-category,
+    .dc-navbar-logo,
+    .dc-footer-logo {
+        transition: none !important;
+    }
+
+}
+
+.dc-navbar .nav-link {
+    position: relative;
+
+    padding: 10px 15px !important;
+
+    color: rgba(255, 255, 255, 0.82) !important;
+
+    font-size: .92rem;
+    font-weight: 500;
+
+    transition:
+        color .3s ease;
+}
+
+
+.dc-navbar .nav-link:hover,
+.dc-navbar .nav-link:focus {
+    color: #FFFFFF !important;
+}
+
+
+.dc-navbar-menu .nav-link::after {
+    content: "";
+
+    position: absolute;
+
+    left: 50%;
+    bottom: 3px;
+
+    width: 0;
+    height: 2px;
+
+    border-radius: 20px;
+
+    background: #E30613;
+
+    transform: translateX(-50%);
+
+    transition: width .3s ease;
+}
+
+
+.dc-navbar-menu .nav-link:hover::after {
+    width: 24px;
 }

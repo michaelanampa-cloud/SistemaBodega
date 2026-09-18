@@ -1,714 +1,1469 @@
-/* =====================================
-   CATALOGO - ESTILO MENU
-===================================== */
+/* ==========================================================
+   BODEGA DOÑA CATITA
+   CATÁLOGO PÚBLICO
+   ========================================================== */
 
-body{
+:root {
+    --cat-blue-dark: #06152D;
+    --cat-blue: #073E78;
+    --cat-blue-light: #0D5BA8;
 
-    font-family:'Poppins', sans-serif;
+    --cat-red: #E30613;
+    --cat-red-light: #F02B36;
 
-}
+    --cat-green: #07852F;
+    --cat-green-light: #16A34A;
 
-.catalog-section{
+    --cat-white: #FFFFFF;
+    --cat-bg: #F6F8FC;
 
-    padding:20px 0;
-
-    background:#ffffff;
-
-}
-
-
-
-/* =====================================
-   CABECERA
-===================================== */
-
-
-.catalog-header{
-
-    margin-bottom:50px;
-
+    --cat-text: #162033;
+    --cat-muted: #6B7585;
+    --cat-border: #E4E9F0;
 }
 
 
-.catalog-subtitle{
-
-    color:#da1a1a;
-
-    font-size:18px;
-
-    text-transform:uppercase;
-
-    letter-spacing:3px;
-
-    font-weight:600;
-
-}
-
-
-.catalog-title{
-
-    margin-top:15px;
-
-    font-size:48px;
-
-    font-weight:700;
-
-    color:#222;
-
-}
-
-
-.catalog-description{
-
-    color:#da1a1a;
-
-    max-width:650px;
-
-    margin:auto;
-
-}
-
-
-
-.catalog-divider{
-
-    width:100px;
-
-    height:3px;
-
-    background:#da1a1a;
-
-    margin:25px auto;
-
-    position:relative;
-
-}
-
-
-.catalog-divider span{
-
-    width:15px;
-
-    height:15px;
-
-    background:#da1a1a;
-
-    border-radius:50%;
-
-    position:absolute;
-
-    left:50%;
-
-    top:50%;
-
-    transform:translate(-50%,-50%);
-
-}
-
-
-
-
-
-/* =====================================
-   BUSCADOR
-===================================== */
-
-
-.catalog-search{
-
-    background:#1c1b1b;
-
-    padding:30px;
-
-    border-radius:15px;
-
-    box-shadow:0 10px 35px rgba(0,0,0,.06);
-
-    margin-bottom:60px;
-
-}
-
-
-
-.catalog-search input,
-.catalog-search select{
-
-    height:55px;
-
-    border-radius:30px;
-
-    border:1px solid #ddd;
-
-    padding-left:25px;
-
-}
-
-
-.catalog-btn{
-
-    height:55px;
-
-    border-radius:30px;
-
-    background:#da1a1a;
-
-    color:white;
-
-    font-weight:600;
-
-    transition:.3s;
-
-}
-
-
-
-.catalog-btn:hover{
-
-    background:#da1a1a;
-
-    color:white;
-
-}
-
-
-
-
-
-/* =====================================
-   PRODUCTOS
-===================================== */
-
-/*
-.catalog-grid{
-
-    row-gap:40px;
-
-}
-
-
-.product-menu-item:hover{
-
-    transform:translateY(-8px);
-
-    box-shadow:0 15px 40px rgba(0,0,0,.08);
-
-}
-*/
-
-
-
-/* Imagen */
-
-/*
-.product-image img{
-
-    width:110px;
-
-    height:110px;
-
-    object-fit:cover;
-
-    border-radius:50%;
-
-    border:5px solid #e83939;
-
-    padding:4px;
-
-    background:white;
-
-    transition:.4s;
-
-}
-*/
-
-/*
-.product-heading h3{
-
-    font-size:23px;
-
-    font-weight:700;
-
-    margin:0;
-
-    color:#222;
-
-    white-space:nowrap;
-
-}
-
-.product-category{
-
-    display:block;
-
-    margin-top:8px;
-
-    color:#999;
-
-    font-size:13px;
-
-    text-transform:uppercase;
-
-    letter-spacing:1px;
-
-    font-weight:600;
-
-}
-
-
-
-.product-detail{
-
-    margin-top:12px;
-
-    color:#666;
-
-    line-height:1.7;
-
-}
-
-
-*/
-/* =====================================
-   PAGINACION
-===================================== */
-
-
-.catalog-pagination{
-
-    margin-top:60px;
-
-}
-
-
-
-.pagination .page-link{
-
-    color:#050505;
-
-    border-radius:50%;
-
-    margin:0 5px;
-
-    width:40px;
-
-    height:40px;
-
-    text-align:center;
-
-    border:1px solid #040404;
-
-}
-
-
-
-.pagination .active .page-link{
-
-    background:#080808;
-
-    border-color:#000000;
-
-    color:white;
-
-}
-
-.pagination .disabled .page-link{
-    background: #ae2c2c;
-    border-color: #ae2c2c;
-    color: #ffffff;
-}
-
-.pagination .page-item .page-link:hover{
-    background: #ae2c2c;
-    border-color: #ae2c2c;
-    color: #ffffff;
-}
-
-
-
-/* =====================================
-   RESPONSIVE
-===================================== */
-
-
-.product-menu-item{
-
-    overflow:hidden;
-
-}
-
-
-/* =====================================
-   FILTRO DE CATEGORIAS
-===================================== */
-
-
-.category-filter{
-
-    display:flex;
-
-    justify-content:center;
-
-    flex-wrap:wrap;
-
-    gap:15px;
-
-    margin-bottom:35px;
-
-}
-
-
-
-.category-filter a{
-
-    text-decoration:none;
-
-    color:#555;
-
-    padding:12px 28px;
-
-    border-radius:30px;
-
-    background:white;
-
-    border:1px solid #eee;
-
-    font-weight:500;
-
-    transition:.3s;
-
-}
-
-
-
-.category-filter a:hover{
-
-    color:white;
-
-    background:#da1a1a;
-
-}
-
-
-
-.category-filter a.active{
-
-    color:white;
-
-    background:#da1a1a;
-    border-color:#da1a1a;
-
-}
-
-.catalog-pagination{
-
-    padding-bottom:40px;
-
-}
-
-
-.pagination .page-item:first-child .page-link,
-.pagination .page-item:last-child .page-link{
-
-    width:auto;
-
-    padding:10px 20px;
-
-    border-radius:25px;
-
-}
-
-/* =====================================
-   MODAL PRODUCTO
-===================================== */
-
-
-.image-button{
-
-    border:none;
-    background:none;
-
-    padding:0;
-
-    width:100%;
-    height:100%;
-
-    cursor:pointer;
-
-}
-
-.product-modal{
-
-border-radius:25px;
-
-overflow:hidden;
-
-border:none;
-
-}
-
-
-
-.product-modal .modal-header{
-
-border:none;
-
-background:#faf8f5;
-
-}
-
-
-
-.modal-product-image{
-
-max-height:500px;
-
-object-fit:contain;
-
-border-radius:20px;
-
-}
-
-
-
-.modal-price{
-
-color:#da1a1a;
-
-font-size:30px;
-
-font-weight:700;
-
-}
-
-/*ultimo agregado */
-
-.catalog-grid{
-    row-gap:30px;
-}
-
-.product-card{
-
-    background:#1c1b1b;
-    border-radius:22px;
-    overflow:hidden;
-    box-shadow:0 15px 35px rgba(0,0,0,.08);
-    transition:.35s;
-    height:100%;
-    display:flex;
-    flex-direction:column;
-
-}
-
-.product-card:hover{
-
-    transform:translateY(-8px);
-    box-shadow:0 25px 45px rgba(0,0,0,.15);
-
-}
-
-.product-image{
-
-    position:relative;
-    height:260px;
-    overflow:hidden;
-
-}
-
-.product-card:hover img{
-
-    transform:scale(1.08);
-
-}
-
-.product-badge{
-
-    position:absolute;
-    left:15px;
-    top:15px;
-
-    background:#ff9800;
-    color:#fff;
-
-    padding:6px 14px;
-
-    border-radius:30px;
-
-    font-size:13px;
-    font-weight:600;
-
-}
-
-.product-body{
-    flex:1;
-    display:flex;
-    flex-direction:column;
-    padding:22px;
-
-}
-
-.product-body h3{
-
-    font-size:30px;
-    font-weight:700;
-    line-height:1.2;
-
-}
-
-.product-description{
-
-    color:#ffffff;
-    min-height:60px;
-
-}
-
-.product-nombre{
-    color: #e53935;
-}
-
-.product-stock{
-    color: #faf8f5;
-}
-
-.product-footer{
-
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-top:25px;
-
-}
-
-.price{
-
-    display:block;
-    font-size:28px;
-    font-weight:bold;
-    color:#e53935;
-
-}
-
-.btn-add{
-
-    width:55px;
-    height:55px;
-
-    border-radius:50%;
-    background:#e53935;
-
-    color:#fff;
-
-    display:flex;
-    justify-content:center;
-    align-items:center;
-
-    font-size:22px;
-
-    text-decoration:none;
-
-    transition:.3s;
-
-}
-
-.btn-add:hover{
-
-    background:#b71c1c;
-    color:#fff;
-
-    transform:rotate(90deg);
-
-}
-
-.product-image img{
-
-    width:100%;
-    height:100%;
-    object-fit:cover;
-
-    display:block;
-
-    transition:.5s;
-
-}
-
-.image-button img{
-
-    width:100%;
-    height:100%;
-
-    object-fit:cover;
-
-}
-
-.product-footer{
-
-    margin-top:auto;
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-}
-
-.product-image img{
-
-    width:100%;
-    height:100%;
-    object-fit:cover;
-
-    display:block;
-
-    transition:.5s;
-
-}
-
-/* =====================================
-   para el select
-===================================== */
-.filtro-categoria {
-    width: 260px;
-    height: 56px;
-    padding: 0 50px 0 20px;
-    border: none;
-    border-radius: 40px;
-    background: #fff;
-    color: #222;
-    font-size: 18px;
-    font-weight: 600;
-    cursor: pointer;
-    outline: none;
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-
-    box-shadow: 0 4px 12px rgba(0,0,0,.12);
-    transition: all .3s ease;
-}
-
-/* Hover */
-.filtro-categoria:hover{
-    box-shadow: 0 8px 20px rgba(0,0,0,.18);
-}
-
-/* Focus */
-.filtro-categoria:focus{
-    border: 2px solid #e71d1d;
-    box-shadow: 0 0 0 4px rgba(231,29,29,.15);
-}
-
-/* Flecha personalizada */
-.select-container{
+/* ==========================================================
+   SECCIÓN GENERAL
+   ========================================================== */
+
+.catalog-section {
     position: relative;
+
+    min-height: 100vh;
+
+    padding: 55px 0 100px;
+
+    overflow: hidden;
+
+    background:
+        radial-gradient(
+            circle at 90% 5%,
+            rgba(13, 91, 168, .07),
+            transparent 28%
+        ),
+        radial-gradient(
+            circle at 5% 45%,
+            rgba(7, 133, 47, .035),
+            transparent 25%
+        ),
+        linear-gradient(
+            180deg,
+            #F8FAFD 0%,
+            #FFFFFF 45%,
+            #F6F8FC 100%
+        );
 }
 
-.select-container::after{
-    content: "⌄";
+
+/* ==========================================================
+   CABECERA
+   ========================================================== */
+
+.catalog-header {
+    position: relative;
+
+    max-width: 850px;
+
+    margin:
+        0 auto 50px;
+}
+
+
+.catalog-subtitle {
+    display: inline-block;
+
+    margin-bottom: 12px;
+
+    color: var(--cat-red);
+
+    font-size: .85rem;
+
+    font-weight: 700;
+
+    letter-spacing: 2px;
+
+    text-transform: uppercase;
+}
+
+
+.catalog-title {
+    margin: 0;
+
+    color: var(--cat-blue-dark);
+
+    font-size:
+        clamp(2.5rem, 5vw, 3.8rem);
+
+    font-weight: 800;
+
+    line-height: 1.1;
+
+    letter-spacing: -2px;
+}
+
+
+.catalog-title i {
+    margin-right: 12px;
+
+    color: var(--cat-blue);
+}
+
+
+.catalog-description {
+    max-width: 650px;
+
+    margin:
+        20px auto 0;
+
+    color: var(--cat-muted);
+
+    font-size: 1.05rem;
+
+    line-height: 1.7;
+}
+
+
+/* ==========================================================
+   DIVISOR
+   ========================================================== */
+
+.catalog-divider {
+    position: relative;
+
+    width: 110px;
+    height: 16px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    margin:
+        22px auto 0;
+}
+
+
+.catalog-divider::before {
+    content: "";
+
     position: absolute;
-    right: 22px;
-    top: 50%;
-    transform: translateY(-55%);
-    font-size: 24px;
-    color: #444;
+
+    width: 100%;
+    height: 3px;
+
+    border-radius: 50px;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--cat-green) 0%,
+            var(--cat-green) 33%,
+            var(--cat-red) 33%,
+            var(--cat-red) 66%,
+            var(--cat-blue) 66%,
+            var(--cat-blue) 100%
+        );
+}
+
+
+.catalog-divider span {
+    position: relative;
+
+    z-index: 2;
+
+    width: 15px;
+    height: 15px;
+
+    border:
+        3px solid #FFFFFF;
+
+    border-radius: 50%;
+
+    background:
+        var(--cat-red);
+
+    box-shadow:
+        0 3px 10px
+        rgba(227, 6, 19, .25);
+}
+
+
+/* ==========================================================
+   BUSCADOR
+   ========================================================== */
+
+.catalog-search {
+    position: relative;
+
+    margin-bottom: 60px;
+
+    padding: 30px;
+
+    overflow: hidden;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, .08);
+
+    border-radius: 24px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #06152D 0%,
+            #0A2348 100%
+        );
+
+    box-shadow:
+        0 20px 55px
+        rgba(6, 21, 45, .16);
+}
+
+
+/* Brillo rojo */
+
+.catalog-search::before {
+    content: "";
+
+    position: absolute;
+
+    top: -120px;
+    right: -80px;
+
+    width: 280px;
+    height: 280px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(227, 6, 19, .13);
+
+    filter: blur(70px);
+
     pointer-events: none;
+}
+
+
+/* Brillo verde */
+
+.catalog-search::after {
+    content: "";
+
+    position: absolute;
+
+    left: -100px;
+    bottom: -170px;
+
+    width: 280px;
+    height: 280px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(7, 133, 47, .10);
+
+    filter: blur(75px);
+
+    pointer-events: none;
+}
+
+
+.catalog-search form {
+    position: relative;
+
+    z-index: 2;
+}
+
+
+/* ==========================================================
+   INPUT
+   ========================================================== */
+
+.catalog-search input.form-control {
+    width: 100%;
+    height: 56px;
+
+    padding:
+        0 24px;
+
+    border:
+        2px solid transparent;
+
+    border-radius: 50px;
+
+    outline: none;
+
+    background: #FFFFFF;
+
+    color:
+        var(--cat-blue-dark);
+
+    font-size: .95rem;
+
+    box-shadow:
+        0 5px 18px
+        rgba(0, 0, 0, .08);
+
+    transition:
+        border-color .3s ease,
+        box-shadow .3s ease,
+        transform .3s ease;
+}
+
+
+.catalog-search
+input.form-control::placeholder {
+    color: #8993A2;
+}
+
+
+.catalog-search
+input.form-control:hover {
+    border-color:
+        rgba(13, 91, 168, .25);
+}
+
+
+.catalog-search
+input.form-control:focus {
+    border-color:
+        var(--cat-blue-light);
+
+    box-shadow:
+        0 0 0 4px
+        rgba(13, 91, 168, .12);
+}
+
+
+/* ==========================================================
+   SELECT
+   ========================================================== */
+
+.filtro-categoria {
+    width: 100%;
+    height: 56px;
+
+    padding:
+        0 42px 0 20px;
+
+    border:
+        2px solid transparent;
+
+    border-radius: 50px;
+
+    outline: none;
+
+    background-color:
+        #FFFFFF;
+
+    color:
+        var(--cat-blue-dark);
+
+    font-size: .95rem;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 5px 18px
+        rgba(0, 0, 0, .08);
+
+    transition:
+        border-color .3s ease,
+        box-shadow .3s ease;
+
+    appearance: auto;
+    -webkit-appearance: auto;
+    -moz-appearance: auto;
+}
+
+
+.filtro-categoria:hover {
+    border-color:
+        rgba(7, 133, 47, .30);
+}
+
+
+.filtro-categoria:focus {
+    border-color:
+        var(--cat-green);
+
+    box-shadow:
+        0 0 0 4px
+        rgba(7, 133, 47, .12);
+}
+
+
+/* ==========================================================
+   BOTÓN BUSCAR
+   ========================================================== */
+
+.catalog-btn {
+    width: 100%;
+    height: 56px;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 9px;
+
+    border:
+        1px solid
+        var(--cat-red);
+
+    border-radius: 50px;
+
+    background:
+        var(--cat-red);
+
+    color: #FFFFFF;
+
+    font-size: .95rem;
+
+    font-weight: 700;
+
+    box-shadow:
+        0 8px 25px
+        rgba(227, 6, 19, .20);
+
+    transition:
+        transform .3s ease,
+        background .3s ease,
+        border-color .3s ease,
+        box-shadow .3s ease;
+}
+
+
+.catalog-btn:hover,
+.catalog-btn:focus {
+    border-color:
+        var(--cat-red-light);
+
+    background:
+        var(--cat-red-light);
+
+    color: #FFFFFF;
+
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 14px 32px
+        rgba(227, 6, 19, .30);
+}
+
+
+.catalog-btn i {
+    transition:
+        transform .3s ease;
+}
+
+
+.catalog-btn:hover i {
+    transform:
+        scale(1.15);
+}
+
+
+/* ==========================================================
+   GRID
+   ========================================================== */
+
+.catalog-grid {
+    row-gap: 30px;
+}
+
+
+/* ==========================================================
+   TARJETA PRODUCTO
+   ========================================================== */
+
+.product-card {
+    position: relative;
+
+    height: 100%;
+
+    display: flex;
+
+    flex-direction: column;
+
+    overflow: hidden;
+
+    border:
+        1px solid var(--cat-border);
+
+    border-radius: 22px;
+
+    background: #FFFFFF;
+
+    box-shadow:
+        0 10px 35px
+        rgba(6, 21, 45, .07);
+
+    transition:
+        transform .4s ease,
+        box-shadow .4s ease,
+        border-color .4s ease;
+}
+
+
+.product-card::before {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    z-index: 5;
+
+    width: 100%;
+    height: 4px;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--cat-green),
+            var(--cat-blue),
+            var(--cat-red)
+        );
+
+    opacity: 0;
+
+    transition:
+        opacity .35s ease;
+}
+
+
+.product-card:hover {
+    border-color:
+        rgba(7, 62, 120, .20);
+
+    transform:
+        translateY(-10px);
+
+    box-shadow:
+        0 25px 60px
+        rgba(6, 21, 45, .14);
+}
+
+
+.product-card:hover::before {
+    opacity: 1;
+}
+
+
+/* ==========================================================
+   IMAGEN
+   ========================================================== */
+
+.product-image {
+    position: relative;
+
+    height: 300px;
+
+    overflow: hidden;
+
+    background:
+        linear-gradient(
+            145deg,
+            #FFFFFF,
+            #F5F7FA
+        );
+}
+
+
+.image-button {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    padding: 0;
+
+    border: 0;
+
+    background: transparent;
+
+    cursor: pointer;
+}
+
+
+.image-button img,
+.product-image img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    padding: 14px;
+
+    object-fit: contain;
+
+    transition:
+        transform .5s
+        cubic-bezier(.2, .7, .2, 1);
+}
+
+
+.product-card:hover
+.image-button img {
+    transform:
+        scale(1.07);
+}
+
+
+/* Degradado inferior */
+
+.product-image::after {
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    pointer-events: none;
+
+    background:
+        linear-gradient(
+            to top,
+            rgba(6, 21, 45, .05),
+            transparent 40%
+        );
+}
+
+
+/* ==========================================================
+   BADGE
+   ========================================================== */
+
+.product-badge {
+    position: absolute;
+
+    top: 16px;
+    left: 16px;
+
+    z-index: 4;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    padding:
+        7px 14px;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, .20);
+
+    border-radius: 50px;
+
+    background:
+        var(--cat-green);
+
+    color: #FFFFFF;
+
+    font-size: .76rem;
+
+    font-weight: 700;
+
+    letter-spacing: .2px;
+
+    box-shadow:
+        0 7px 20px
+        rgba(7, 133, 47, .20);
+}
+
+
+/* ==========================================================
+   CUERPO DE LA TARJETA
+   ========================================================== */
+
+.product-body {
+    flex: 1;
+
+    min-height: 215px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    padding: 25px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #071B37,
+            #06152D
+        );
+
+    color: #FFFFFF;
+}
+
+
+/* ==========================================================
+   NOMBRE
+   ========================================================== */
+
+.product-body h3,
+.product-nombre {
+    margin:
+        0 0 12px;
+
+    color: #FFFFFF;
+
+    font-size: 1.45rem;
+
+    font-weight: 800;
+
+    line-height: 1.25;
+
+    letter-spacing: -.4px;
+
+    transition:
+        color .3s ease;
+}
+
+
+.product-card:hover
+.product-nombre {
+    color:
+        #FF626B;
+}
+
+
+/* ==========================================================
+   DESCRIPCIÓN
+   ========================================================== */
+
+.product-description {
+    min-height: 48px;
+
+    margin:
+        0 0 20px;
+
+    color:
+        #B8C2CF;
+
+    font-size: .88rem;
+
+    line-height: 1.6;
+}
+
+
+/* ==========================================================
+   FOOTER DE PRODUCTO
+   ========================================================== */
+
+.product-footer {
+    width: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-top: auto;
+
+    padding-top: 18px;
+
+    border-top:
+        1px solid
+        rgba(255, 255, 255, .08);
+}
+
+
+/*
+   En catalogo.html estas columnas no están
+   dentro de un .row, por eso ajustamos su
+   ancho manualmente.
+*/
+
+.product-footer .col-md-6,
+.product-footer .col-md-4 {
+    width: auto;
+
+    flex:
+        0 0 auto;
+}
+
+
+/* ==========================================================
+   PRECIO
+   ========================================================== */
+
+.product-footer .price,
+.product-card .price {
+    display: block;
+
+    color: #FFFFFF;
+
+    font-size: 1.35rem;
+
+    font-weight: 800;
+
+    line-height: 1.2;
+}
+
+
+/* ==========================================================
+   STOCK
+   ========================================================== */
+
+.product-stock {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding:
+        7px 12px;
+
+    border:
+        1px solid
+        rgba(22, 163, 74, .22);
+
+    border-radius: 50px;
+
+    background:
+        rgba(22, 163, 74, .12);
+
+    color:
+        #5FE589 !important;
+
+    font-size: .78rem;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+/* ==========================================================
+   BOTÓN AGREGAR
+   Por si vuelves a activar el carrito.
+   ========================================================== */
+
+.btn-add {
+    width: 50px;
+    height: 50px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex: 0 0 50px;
+
+    border-radius: 50%;
+
+    background:
+        var(--cat-red);
+
+    color: #FFFFFF;
+
+    font-size: 1.1rem;
+
+    text-decoration: none;
+
+    box-shadow:
+        0 8px 20px
+        rgba(227, 6, 19, .20);
+
+    transition:
+        transform .3s ease,
+        background .3s ease,
+        box-shadow .3s ease;
+}
+
+
+.btn-add:hover {
+    background:
+        var(--cat-red-light);
+
+    color: #FFFFFF;
+
+    transform:
+        rotate(90deg);
+
+    box-shadow:
+        0 12px 25px
+        rgba(227, 6, 19, .30);
+}
+
+
+/* ==========================================================
+   SIN RESULTADOS
+   ========================================================== */
+
+.catalog-grid
+.alert-warning {
+    padding: 25px;
+
+    border:
+        1px solid
+        rgba(227, 6, 19, .15);
+
+    border-radius: 18px;
+
+    background:
+        rgba(227, 6, 19, .05);
+
+    color:
+        #8F1C23;
+
+    text-align: center;
+
+    font-weight: 500;
+}
+
+
+/* ==========================================================
+   PAGINACIÓN
+   ========================================================== */
+
+.catalog-pagination {
+    margin-top: 60px;
+
+    padding-bottom: 40px;
+}
+
+
+.catalog-pagination
+.pagination {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    justify-content: center;
+
+    gap: 8px;
+}
+
+
+.catalog-pagination
+.page-item {
+    margin: 0;
+}
+
+
+.catalog-pagination
+.page-link {
+    min-width: 44px;
+    height: 44px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    margin: 0;
+
+    padding:
+        0 14px;
+
+    border:
+        1px solid var(--cat-border);
+
+    border-radius:
+        12px !important;
+
+    background: #FFFFFF;
+
+    color:
+        var(--cat-blue-dark);
+
+    font-size: .88rem;
+
+    font-weight: 600;
+
+    box-shadow:
+        0 5px 18px
+        rgba(6, 21, 45, .05);
+
+    transition:
+        transform .3s ease,
+        background .3s ease,
+        color .3s ease,
+        border-color .3s ease,
+        box-shadow .3s ease;
+}
+
+
+.catalog-pagination
+.page-link:hover {
+    border-color:
+        var(--cat-blue);
+
+    background:
+        var(--cat-blue);
+
+    color: #FFFFFF;
+
+    transform:
+        translateY(-3px);
+
+    box-shadow:
+        0 10px 25px
+        rgba(7, 62, 120, .20);
+}
+
+
+.catalog-pagination
+.page-item.active
+.page-link {
+    border-color:
+        var(--cat-red);
+
+    background:
+        var(--cat-red);
+
+    color: #FFFFFF;
+
+    box-shadow:
+        0 8px 22px
+        rgba(227, 6, 19, .22);
+}
+
+
+.catalog-pagination
+.page-item.disabled
+.page-link {
+    border-color: #E9EDF2;
+
+    background: #F1F3F6;
+
+    color: #9DA6B2;
+
+    box-shadow: none;
+
+    transform: none;
+}
+
+
+/* Anterior / Siguiente */
+
+.catalog-pagination
+.page-item:first-child
+.page-link,
+
+.catalog-pagination
+.page-item:last-child
+.page-link {
+    width: auto;
+
+    padding:
+        0 20px;
+
+    border-radius:
+        50px !important;
+}
+
+
+/* ==========================================================
+   FILTRO DE CATEGORÍAS
+   Si vuelves a activar category-filter en el HTML.
+   ========================================================== */
+
+.category-filter {
+    display: flex;
+
+    justify-content: center;
+
+    flex-wrap: wrap;
+
+    gap: 12px;
+
+    margin-bottom: 35px;
+}
+
+
+.category-filter a {
+    padding:
+        11px 24px;
+
+    border:
+        1px solid var(--cat-border);
+
+    border-radius: 50px;
+
+    background: #FFFFFF;
+
+    color:
+        var(--cat-blue-dark);
+
+    font-size: .88rem;
+
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition:
+        transform .3s ease,
+        background .3s ease,
+        color .3s ease,
+        border-color .3s ease;
+}
+
+
+.category-filter a:hover {
+    border-color:
+        var(--cat-blue);
+
+    background:
+        var(--cat-blue);
+
+    color: #FFFFFF;
+
+    transform:
+        translateY(-2px);
+}
+
+
+.category-filter a.active {
+    border-color:
+        var(--cat-red);
+
+    background:
+        var(--cat-red);
+
+    color: #FFFFFF;
+}
+
+
+/* ==========================================================
+   MODAL PRODUCTO
+   ========================================================== */
+
+.product-modal {
+    overflow: hidden;
+
+    border: 0;
+
+    border-radius: 24px;
+
+    background: #FFFFFF;
+
+    box-shadow:
+        0 30px 90px
+        rgba(6, 21, 45, .30);
+}
+
+
+.product-modal
+.modal-header {
+    padding:
+        20px 24px;
+
+    border: 0;
+
+    background:
+        linear-gradient(
+            135deg,
+            #06152D,
+            #0A2348
+        );
+
+    color: #FFFFFF;
+}
+
+
+.product-modal
+.modal-title {
+    color: #FFFFFF;
+
+    font-weight: 700;
+}
+
+
+.product-modal
+.btn-close {
+    filter: invert(1);
+
+    opacity: .85;
+}
+
+
+.product-modal
+.btn-close:hover {
+    opacity: 1;
+}
+
+
+.product-modal
+.modal-body {
+    padding: 30px;
+
+    background:
+        linear-gradient(
+            180deg,
+            #FFFFFF,
+            #F7F9FC
+        );
+}
+
+
+.modal-product-image {
+    width: 100%;
+    height: auto;
+
+    max-height: 60vh;
+
+    object-fit: contain;
+
+    border-radius: 18px;
+}
+
+
+.modal-price {
+    display: inline-block;
+
+    margin-bottom: 0;
+
+    padding:
+        10px 22px;
+
+    border-radius: 50px;
+
+    background:
+        rgba(227, 6, 19, .08);
+
+    color:
+        var(--cat-red);
+
+    font-size: 1.3rem;
+
+    font-weight: 800;
+}
+
+
+/* ==========================================================
+   TABLET
+   ========================================================== */
+
+@media (max-width: 991.98px) {
+
+    .catalog-section {
+        padding:
+            45px 0 80px;
+    }
+
+
+    .catalog-search {
+        padding: 24px;
+    }
+
+
+    .product-image {
+        height: 290px;
+    }
+
+
+    .product-body {
+        min-height: 205px;
+    }
+
+}
+
+
+/* ==========================================================
+   MÓVIL
+   ========================================================== */
+
+@media (max-width: 767.98px) {
+
+    .catalog-section {
+        padding:
+            35px 0 65px;
+    }
+
+
+    .catalog-header {
+        margin-bottom: 35px;
+    }
+
+
+    .catalog-title {
+        font-size: 2.25rem;
+
+        letter-spacing: -1px;
+    }
+
+
+    .catalog-title i {
+        display: block;
+
+        margin:
+            0 0 12px;
+    }
+
+
+    .catalog-description {
+        padding:
+            0 10px;
+
+        font-size: .95rem;
+    }
+
+
+    /* BUSCADOR */
+
+    .catalog-search {
+        margin-bottom: 40px;
+
+        padding: 20px;
+
+        border-radius: 20px;
+    }
+
+
+    .catalog-search
+    input.form-control,
+
+    .filtro-categoria,
+
+    .catalog-btn {
+        height: 52px;
+    }
+
+
+    /* PRODUCTO */
+
+    .product-card {
+        border-radius: 18px;
+    }
+
+
+    .product-image {
+        height: 280px;
+    }
+
+
+    .product-body {
+        min-height: auto;
+
+        padding: 22px;
+    }
+
+
+    .product-body h3,
+    .product-nombre {
+        font-size: 1.3rem;
+    }
+
+
+    .product-description {
+        min-height: auto;
+    }
+
+
+    /* MODAL */
+
+    .product-modal {
+        border-radius: 18px;
+    }
+
+
+    .product-modal
+    .modal-body {
+        padding: 18px;
+    }
+
+}
+
+
+/* ==========================================================
+   MÓVILES PEQUEÑOS
+   ========================================================== */
+
+@media (max-width: 575.98px) {
+
+    .catalog-title {
+        font-size: 2rem;
+    }
+
+
+    .catalog-search {
+        padding: 16px;
+    }
+
+
+    .product-image {
+        height: 250px;
+    }
+
+
+    .product-footer {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+
+    .product-footer
+    .col-md-6,
+
+    .product-footer
+    .col-md-4 {
+        width: 100%;
+    }
+
+
+    .product-stock {
+        margin-top: 4px;
+    }
+
+
+    .catalog-pagination
+    .page-link {
+        min-width: 40px;
+        height: 40px;
+
+        padding:
+            0 11px;
+
+        font-size: .8rem;
+    }
+
+
+    .catalog-pagination
+    .page-item:first-child
+    .page-link,
+
+    .catalog-pagination
+    .page-item:last-child
+    .page-link {
+        padding:
+            0 14px;
+    }
+
+}
+
+
+/* ==========================================================
+   ACCESIBILIDAD
+   ========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .product-card,
+    .image-button img,
+    .catalog-btn,
+    .catalog-pagination .page-link,
+    .btn-add {
+        transition: none !important;
+    }
+
 }

@@ -1,107 +1,493 @@
 {% extends 'base_public.html' %}
+{% load static %}
 
-{% block title %}Inicio{% endblock %}
-
-{% block main_class %}{% endblock %}
+{% block title %}Bodega Doña Catita{% endblock %}
 
 {% block content %}
 
-{% load static %}
+<!-- =========================
+     HERO
+========================= -->
+<section class="dc-hero">
 
-<section class="hero container-fluid p-0 m-0">
-    <div class="hero-overlay"></div>
+    <div class="dc-glow dc-glow-1"></div>
+    <div class="dc-glow dc-glow-2"></div>
 
-    <div class="hero-content">
-        <h1>Bienvenido a Bodega Doña Catita</h1>
+    <div class="container position-relative">
+        <div class="row align-items-center min-vh-100">
 
-        <p>
-            Productos de calidad, atención rápida y los mejores precios.
-        </p>
+            <!-- TEXTO -->
+            <div class="col-lg-6"
+                 data-aos="fade-right"
+                 data-aos-duration="1000">
 
-        {% if not user.is_authenticated %}
-            <a href="{% url 'login' %}" class="btn btn-warning btn-lg">
-                Iniciar sesión
-            </a>
-        {% endif %}
+                <div class="dc-badge mb-4">
+                    <i class="fa-solid fa-basket-shopping"></i>
+                    Tu bodega de confianza
+                </div>
+
+                <h1 class="dc-title">
+                    Todo lo que necesitas
+                    <span>cerca de ti.</span>
+                </h1>
+
+                <p class="dc-description">
+                    Encuentra tus productos favoritos, promociones
+                    y los mejores precios en
+                    <strong>Bodega Doña Catita.</strong>
+                </p>
+
+                <div class="d-flex flex-wrap gap-3 mt-4">
+
+                    <a href="#productos"
+                       class="btn dc-btn-primary">
+                        Ver productos
+                        <i class="fa-solid fa-arrow-right ms-2"></i>
+                    </a>
+
+                    {% if not user.is_authenticated %}
+                    <a href="{% url 'login' %}"
+                       class="btn dc-btn-outline">
+                        <i class="fa-solid fa-user me-2"></i>
+                        Iniciar sesión
+                    </a>
+                    {% endif %}
+
+                </div>
+
+                <!-- DATOS -->
+                <div class="row dc-stats mt-5">
+
+                    <div class="col-4">
+                        <strong>100+</strong>
+                        <span>Productos</span>
+                    </div>
+
+                    <div class="col-4">
+                        <strong>Calidad</strong>
+                        <span>Garantizada</span>
+                    </div>
+
+                    <div class="col-4">
+                        <strong>Todos</strong>
+                        <span>los días</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- IMAGEN -->
+            <div class="col-lg-6 text-center mt-5 mt-lg-0"
+                 data-aos="fade-left"
+                 data-aos-duration="1200">
+
+                <div class="dc-hero-image">
+
+                    <div class="dc-circle"></div>
+
+                    <img src="{% static 'img/logoFinal.jpeg' %}"
+                         alt="Bodega Doña Catita"
+                         class="dc-main-image">
+
+                    <!-- TARJETA FLOTANTE -->
+                    <div class="dc-floating-card dc-card-1">
+                        <div class="dc-floating-icon">
+                            <i class="fa-solid fa-tags"></i>
+                        </div>
+
+                        <div>
+                            <small>Promociones</small>
+                            <strong>Todos los días</strong>
+                        </div>
+                    </div>
+
+                    <!-- TARJETA FLOTANTE -->
+                    <div class="dc-floating-card dc-card-2">
+                        <div class="dc-floating-icon">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                        </div>
+
+                        <div>
+                            <small>Compra</small>
+                            <strong>Fácil y rápido</strong>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
     </div>
+
+    <a href="#servicios" class="dc-scroll-down">
+        <span></span>
+    </a>
+
 </section>
 
-<div class="container">
-  <div class="row mt-5 g-4">
 
-      <div class="col-md-4">
-          <div class="card shadow h-100 text-center p-4">
-              <i class="fa-solid fa-cart-shopping fa-3x text-warning mb-3"></i>
-              <h4>Compra fácil</h4>
-              <p>Encuentra tus productos rápidamente.</p>
-          </div>
-      </div>
+<!-- =========================
+     SERVICIOS
+========================= -->
+<section id="servicios" class="dc-section">
 
-      <div class="col-md-4">
-          <div class="card shadow h-100 text-center p-4">
-              <i class="fa-solid fa-truck fa-3x text-warning mb-3"></i>
-              <h4>Entrega rápida</h4>
-              <p>Recibe tus pedidos en el menor tiempo posible.</p>
-          </div>
-      </div>
+    <div class="container">
 
-      <div class="col-md-4">
-          <div class="card shadow h-100 text-center p-4">
-              <i class="fa-solid fa-tags fa-3x text-warning mb-3"></i>
-              <h4>Mejores precios</h4>
-              <p>Ofertas y promociones todos los días.</p>
-          </div>
-      </div>
+        <div class="text-center mb-5"
+             data-aos="fade-up">
 
-  </div>
+            <span class="dc-section-label">
+                ¿Por qué elegirnos?
+            </span>
+
+            <h2 class="dc-section-title">
+                Comprar nunca fue tan
+                <span>fácil.</span>
+            </h2>
+
+            <p class="dc-section-description">
+                Productos para tu hogar con atención rápida,
+                variedad y buenos precios.
+            </p>
+
+        </div>
 
 
-  <div class="row bg-light p-4 mb-4 rounded-3 text-center">
-    <div class="col-md-4">
-      <img src="{% static 'img/logo1.png' %}" alt="Logo Bodega" class="img-fluid">
+        <div class="row g-4">
+
+            <div class="col-lg-4 col-md-6"
+                 data-aos="fade-up"
+                 data-aos-delay="100">
+
+                <div class="dc-service-card">
+
+                    <div class="dc-service-icon">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                    </div>
+
+                    <h4>Compra fácil</h4>
+
+                    <p>
+                        Encuentra rápidamente los productos
+                        que necesitas para tu hogar.
+                    </p>
+
+                    <div class="dc-card-arrow">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-lg-4 col-md-6"
+                 data-aos="fade-up"
+                 data-aos-delay="200">
+
+                <div class="dc-service-card">
+
+                    <div class="dc-service-icon">
+                        <i class="fa-solid fa-truck-fast"></i>
+                    </div>
+
+                    <h4>Atención rápida</h4>
+
+                    <p>
+                        Nos preocupamos por brindarte una atención
+                        sencilla, rápida y cercana.
+                    </p>
+
+                    <div class="dc-card-arrow">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-lg-4 col-md-6"
+                 data-aos="fade-up"
+                 data-aos-delay="300">
+
+                <div class="dc-service-card">
+
+                    <div class="dc-service-icon">
+                        <i class="fa-solid fa-tags"></i>
+                    </div>
+
+                    <h4>Mejores precios</h4>
+
+                    <p>
+                        Descubre ofertas, promociones y productos
+                        para todos los presupuestos.
+                    </p>
+
+                    <div class="dc-card-arrow">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
-    <div class="col-md-8">
-      <span class="h3">Lorem ipsum dolor sit amet consectetur adipisicing elit. Id in enim, 
-        vero sunt illum quas possimus? Quasi corporis eos nisi aut eius itaque in laborum? Similique at tempore neque error.</span>
-    </div>
-  </div>
 
-  <div class="row p-4 mb-4 rounded-3 text-center bg-dark">
-    <div class="col-md-8">
-      <span class="h3 text-white">Lorem ipsum dolor sit amet consectetur adipisicing elit. Id in enim, 
-        vero sunt illum quas possimus? Quasi corporis eos nisi aut eius itaque in laborum? Similique at tempore neque error.</span>
-    </div>
-    <div class="col-md-4">
-      {% load static %}
-      <img src="{% static 'img/logo2.png' %}" alt="Logo Bodega" class="img-fluid">
-    </div>
-  </div>
-
-  <div class="row p-4 mb-4 rounded-3 text-center bg-light">
-    <div class="col-md-4">
-      {% load static %}
-      <img src="{% static 'img/logo.png' %}" alt="Logo Bodega" class="img-fluid">
-    </div>
-    <div class="col-md-8">
-      <span class="h3">Lorem ipsum dolor sit amet consectetur adipisicing elit. Id in enim, 
-        vero sunt illum quas possimus? Quasi corporis eos nisi aut eius itaque in laborum? Similique at tempore neque error.</span>
-    </div>
-  </div>
+</section>
 
 
-  <div class="p-5 mb-4 bg-light rounded-3 text-center">
-    <div class="container-fluid py-5">
-      {% load static %}
-      <img src="{% static 'img/logo.png' %}" alt="Logo Bodega" class="welcome-logo rounded-circle shadow-sm">
-      <h1 class="display-5 fw-bold">{{ mensaje }}</h1>
-      {% if not user.is_authenticated %}
-        <p class="col-md-8 mx-auto fs-4">Accede para ver el catálogo completo, productos, carrito y más.</p>
-        <a class="btn btn-primary btn-lg" href="{% url 'login' %}">Iniciar sesión</a>
-      {% else %}
-        <p class="col-md-8 mx-auto fs-4">Explora el sitio usando el menú superior.</p>
-      {% endif %}
-    </div>
-  </div>
+<!-- =========================
+     SOBRE NOSOTROS
+========================= -->
+<section class="dc-about">
 
-</div>
+    <div class="container">
+
+        <div class="row align-items-center g-5">
+
+            <div class="col-lg-6"
+                 data-aos="fade-right">
+
+                <div class="dc-about-image">
+
+                    <div class="dc-about-glow"></div>
+
+                    <img src="{% static 'img/logoFinal.jpeg' %}"
+                         class="img-fluid"
+                         alt="Bodega Doña Catita">
+
+                </div>
+
+            </div>
+
+
+            <div class="col-lg-6"
+                 data-aos="fade-left">
+
+                <span class="dc-section-label">
+                    Bodega Doña Catita
+                </span>
+
+                <h2 class="dc-section-title text-start">
+                    Tu bodega de confianza
+                    <span>siempre cerca.</span>
+                </h2>
+
+                <p class="dc-about-text">
+                    En Bodega Doña Catita trabajamos para ofrecerte
+                    productos de calidad, variedad y buenos precios
+                    para tu hogar.
+                </p>
+
+
+                <div class="dc-feature">
+
+                    <div class="dc-check">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+
+                    <div>
+                        <h5>Productos seleccionados</h5>
+                        <p>Variedad para las necesidades de tu hogar.</p>
+                    </div>
+
+                </div>
+
+
+                <div class="dc-feature">
+
+                    <div class="dc-check">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+
+                    <div>
+                        <h5>Atención cercana</h5>
+                        <p>
+                            Queremos que comprar sea una experiencia
+                            rápida y agradable.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="dc-feature">
+
+                    <div class="dc-check">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+
+                    <div>
+                        <h5>Buenos precios</h5>
+                        <p>
+                            Ofertas y promociones para ayudarte
+                            a ahorrar.
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     CATEGORÍAS
+========================= -->
+<section id="productos" class="dc-section dc-products">
+
+    <div class="container">
+
+        <div class="text-center mb-5"
+             data-aos="fade-up">
+
+            <span class="dc-section-label">
+                Nuestros productos
+            </span>
+
+            <h2 class="dc-section-title">
+                Encuentra todo en
+                <span>un solo lugar.</span>
+            </h2>
+
+        </div>
+
+
+        <div class="row g-4">
+
+            <div class="col-lg-3 col-md-6"
+                 data-aos="zoom-in"
+                 data-aos-delay="100">
+
+                <div class="dc-category">
+                    <i class="fa-solid fa-bottle-water"></i>
+                    <h5>Bebidas</h5>
+                    <p>Gaseosas, agua, jugos y más.</p>
+                </div>
+
+            </div>
+
+
+            <div class="col-lg-3 col-md-6"
+                 data-aos="zoom-in"
+                 data-aos-delay="200">
+
+                <div class="dc-category">
+                    <i class="fa-solid fa-cookie-bite"></i>
+                    <h5>Snacks</h5>
+                    <p>Galletas, piqueos y golosinas.</p>
+                </div>
+
+            </div>
+
+
+            <div class="col-lg-3 col-md-6"
+                 data-aos="zoom-in"
+                 data-aos-delay="300">
+
+                <div class="dc-category">
+                    <i class="fa-solid fa-basket-shopping"></i>
+                    <h5>Abarrotes</h5>
+                    <p>Productos esenciales para tu hogar.</p>
+                </div>
+
+            </div>
+
+
+            <div class="col-lg-3 col-md-6"
+                 data-aos="zoom-in"
+                 data-aos-delay="400">
+
+                <div class="dc-category">
+                    <i class="fa-solid fa-soap"></i>
+                    <h5>Limpieza</h5>
+                    <p>Todo para mantener tu hogar limpio.</p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     CTA
+========================= -->
+<section class="dc-cta">
+
+    <div class="dc-cta-glow"></div>
+
+    <div class="container position-relative">
+
+        <div class="dc-cta-box"
+             data-aos="zoom-in">
+
+            <div class="row align-items-center">
+
+                <div class="col-lg-8">
+
+                    <span class="dc-section-label">
+                        Empieza ahora
+                    </span>
+
+                    <h2>
+                        Descubre todo lo que
+                        Bodega Doña Catita tiene para ti.
+                    </h2>
+
+                    <p>
+                        Productos, promociones y una atención
+                        pensada para ti.
+                    </p>
+
+                </div>
+
+
+                <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+
+                    {% if not user.is_authenticated %}
+
+                    <a href="{% url 'login' %}"
+                       class="btn dc-btn-primary">
+                        Iniciar sesión
+
+                        <i class="fa-solid fa-arrow-right ms-2"></i>
+                    </a>
+
+                    {% else %}
+
+                    <a href="#productos"
+                       class="btn dc-btn-primary">
+                        Ver productos
+
+                        <i class="fa-solid fa-arrow-right ms-2"></i>
+                    </a>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
 {% endblock %}
+
