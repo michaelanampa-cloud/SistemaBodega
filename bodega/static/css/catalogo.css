@@ -814,9 +814,8 @@ input.form-control:focus {
     line-height: 1.2;
 }
 
-
 /* ==========================================================
-   STOCK
+   ESTADO DEL STOCK
    ========================================================== */
 
 .product-stock {
@@ -826,26 +825,106 @@ input.form-control:focus {
 
     justify-content: center;
 
-    padding:
-        7px 12px;
+    gap: 7px;
 
-    border:
-        1px solid
-        rgba(22, 163, 74, .22);
+    padding: 8px 13px;
+
+    border: 1px solid transparent;
 
     border-radius: 50px;
 
+    font-size: .78rem;
+
+    font-weight: 700;
+
+    line-height: 1;
+
+    white-space: nowrap;
+
+    transition:
+        transform .3s ease,
+        background .3s ease,
+        border-color .3s ease;
+}
+
+
+.product-stock i {
+    font-size: .82rem;
+}
+
+
+/* =========================
+   DISPONIBLE
+   ========================= */
+
+.stock-disponible {
+    border-color:
+        rgba(22, 163, 74, .25);
+
     background:
-        rgba(22, 163, 74, .12);
+        rgba(22, 163, 74, .13);
 
     color:
         #5FE589 !important;
+}
 
-    font-size: .78rem;
 
-    font-weight: 600;
+.stock-disponible i {
+    color:
+        #5FE589;
+}
 
-    white-space: nowrap;
+
+/* =========================
+   POCO STOCK
+   ========================= */
+
+.stock-bajo {
+    border-color:
+        rgba(245, 158, 11, .30);
+
+    background:
+        rgba(245, 158, 11, .14);
+
+    color:
+        #FFC857 !important;
+}
+
+
+.stock-bajo i {
+    color:
+        #FFC857;
+}
+
+
+/* =========================
+   AGOTADO
+   ========================= */
+
+.stock-agotado {
+    border-color:
+        rgba(239, 68, 68, .30);
+
+    background:
+        rgba(239, 68, 68, .14);
+
+    color:
+        #FF6B72 !important;
+}
+
+
+.stock-agotado i {
+    color:
+        #FF6B72;
+}
+
+
+/* Efecto sutil */
+
+.product-card:hover
+.product-stock {
+    transform:
+        translateY(-2px);
 }
 
 

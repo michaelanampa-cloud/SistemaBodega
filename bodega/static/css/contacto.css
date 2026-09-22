@@ -1,0 +1,1008 @@
+/* ==========================================================
+   BODEGA DOÑA CATITA
+   CONTACTO
+========================================================== */
+
+:root {
+    --contact-blue-dark: #06152D;
+    --contact-blue: #073E78;
+    --contact-blue-light: #0D5BA8;
+
+    --contact-red: #E30613;
+    --contact-red-light: #F32A36;
+
+    --contact-green: #07852F;
+
+    --contact-bg: #F7F9FC;
+    --contact-white: #FFFFFF;
+
+    --contact-text: #172033;
+    --contact-muted: #6E7888;
+    --contact-border: #E3E8EF;
+}
+
+
+/* ==========================================================
+   SECCIÓN
+========================================================== */
+
+.contact-section {
+    position: relative;
+
+    min-height: 100vh;
+
+    padding:
+        65px 0 90px;
+
+    overflow: hidden;
+
+    background:
+        radial-gradient(circle at 95% 10%,
+            rgba(13, 91, 168, .07),
+            transparent 28%),
+        radial-gradient(circle at 5% 70%,
+            rgba(7, 133, 47, .04),
+            transparent 25%),
+        #F7F9FC;
+}
+
+
+/* ==========================================================
+   DECORACIÓN
+========================================================== */
+
+.contact-decoration {
+    position: absolute;
+
+    border-radius: 50%;
+
+    pointer-events: none;
+
+    filter: blur(80px);
+}
+
+
+.contact-decoration-1 {
+    top: 100px;
+    right: -150px;
+
+    width: 350px;
+    height: 350px;
+
+    background:
+        rgba(227, 6, 19, .06);
+}
+
+
+.contact-decoration-2 {
+    left: -180px;
+    bottom: 100px;
+
+    width: 400px;
+    height: 400px;
+
+    background:
+        rgba(13, 91, 168, .06);
+}
+
+
+/* ==========================================================
+   ENCABEZADO
+========================================================== */
+
+.contact-header {
+    max-width: 780px;
+
+    margin:
+        0 auto 55px;
+}
+
+
+.contact-label {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    margin-bottom: 18px;
+
+    padding:
+        8px 16px;
+
+    border:
+        1px solid rgba(227, 6, 19, .15);
+
+    border-radius: 50px;
+
+    background:
+        rgba(227, 6, 19, .06);
+
+    color:
+        var(--contact-red);
+
+    font-size: .8rem;
+
+    font-weight: 700;
+
+    letter-spacing: .5px;
+
+    text-transform: uppercase;
+}
+
+
+.contact-title {
+    margin: 0;
+
+    color:
+        var(--contact-blue-dark);
+
+    font-size:
+        clamp(2.5rem, 5vw, 4rem);
+
+    font-weight: 800;
+
+    line-height: 1.08;
+
+    letter-spacing: -2px;
+}
+
+
+.contact-title span {
+    color:
+        var(--contact-red);
+}
+
+
+.contact-description {
+    max-width: 650px;
+
+    margin:
+        20px auto 0;
+
+    color:
+        var(--contact-muted);
+
+    font-size: 1.05rem;
+
+    line-height: 1.8;
+}
+
+
+/* ==========================================================
+   DIVISOR
+========================================================== */
+
+.contact-divider {
+    position: relative;
+
+    width: 110px;
+    height: 15px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    margin:
+        22px auto 0;
+}
+
+
+.contact-divider::before {
+    content: "";
+
+    width: 100%;
+    height: 3px;
+
+    border-radius: 20px;
+
+    background:
+        linear-gradient(90deg,
+            var(--contact-green),
+            var(--contact-red),
+            var(--contact-blue));
+}
+
+
+.contact-divider span {
+    position: absolute;
+
+    width: 14px;
+    height: 14px;
+
+    border:
+        3px solid #F7F9FC;
+
+    border-radius: 50%;
+
+    background:
+        var(--contact-red);
+}
+
+
+/* ==========================================================
+   TARJETA FORMULARIO
+========================================================== */
+
+.contact-card {
+    padding: 35px;
+
+    border:
+        1px solid var(--contact-border);
+
+    border-radius: 25px;
+
+    background:
+        #FFFFFF;
+
+    box-shadow:
+        0 18px 55px rgba(6, 21, 45, .08);
+}
+
+
+.contact-card-header {
+    display: flex;
+
+    align-items: center;
+
+    gap: 18px;
+
+    margin-bottom: 32px;
+
+    padding-bottom: 25px;
+
+    border-bottom:
+        1px solid #EBEFF4;
+}
+
+
+.contact-header-icon {
+    width: 58px;
+    height: 58px;
+
+    display: grid;
+
+    place-items: center;
+
+    flex: 0 0 58px;
+
+    border-radius: 17px;
+
+    background:
+        rgba(227, 6, 19, .08);
+
+    color:
+        var(--contact-red);
+
+    font-size: 1.35rem;
+}
+
+
+.contact-card-header span {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color:
+        var(--contact-red);
+
+    font-size: .72rem;
+
+    font-weight: 700;
+
+    letter-spacing: 1.4px;
+}
+
+
+.contact-card-header h2 {
+    margin: 0;
+
+    color:
+        var(--contact-blue-dark);
+
+    font-size: 1.45rem;
+
+    font-weight: 750;
+}
+
+
+/* ==========================================================
+   CAMPOS
+========================================================== */
+
+.contact-field {
+    margin-bottom: 22px;
+}
+
+
+.contact-field .form-label {
+    margin-bottom: 8px;
+
+    color:
+        var(--contact-blue-dark);
+
+    font-size: .88rem;
+
+    font-weight: 650;
+}
+
+
+.contact-input {
+    position: relative;
+}
+
+
+.contact-input>i {
+    position: absolute;
+
+    top: 50%;
+    left: 18px;
+
+    z-index: 2;
+
+    color:
+        #8994A4;
+
+    font-size: .9rem;
+
+    transform:
+        translateY(-50%);
+
+    transition:
+        color .3s ease;
+}
+
+
+.contact-input .form-control {
+    height: 55px;
+
+    padding:
+        0 18px 0 48px;
+
+    border:
+        1px solid #DDE3EB;
+
+    border-radius: 13px;
+
+    background:
+        #FAFBFD;
+
+    color:
+        var(--contact-blue-dark);
+
+    font-size: .92rem;
+
+    box-shadow: none;
+
+    transition:
+        border-color .3s ease,
+        background .3s ease,
+        box-shadow .3s ease;
+}
+
+
+.contact-input .form-control::placeholder {
+    color:
+        #99A2AE;
+}
+
+
+.contact-input .form-control:focus {
+    border-color:
+        var(--contact-blue-light);
+
+    background:
+        #FFFFFF;
+
+    box-shadow:
+        0 0 0 4px rgba(13, 91, 168, .09);
+}
+
+
+.contact-input:focus-within>i {
+    color:
+        var(--contact-blue);
+}
+
+
+/* TEXTAREA */
+
+.contact-textarea>i {
+    top: 20px;
+
+    transform: none;
+}
+
+
+.contact-textarea .form-control {
+    height: auto;
+
+    min-height: 165px;
+
+    padding:
+        16px 18px 16px 48px;
+
+    resize: vertical;
+}
+
+
+/* ==========================================================
+   BOTÓN
+========================================================== */
+
+.contact-submit {
+    display: flex;
+
+    align-items: center;
+
+    gap: 20px;
+
+    margin-top: 5px;
+}
+
+
+.contact-btn {
+    min-width: 180px;
+
+    height: 52px;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    padding:
+        0 24px;
+
+    border:
+        1px solid var(--contact-red);
+
+    border-radius: 50px;
+
+    background:
+        var(--contact-red);
+
+    color:
+        #FFFFFF;
+
+    font-size: .9rem;
+
+    font-weight: 700;
+
+    box-shadow:
+        0 10px 25px rgba(227, 6, 19, .20);
+
+    transition:
+        transform .3s ease,
+        background .3s ease,
+        box-shadow .3s ease;
+}
+
+
+.contact-btn:hover {
+    background:
+        var(--contact-red-light);
+
+    transform:
+        translateY(-3px);
+
+    box-shadow:
+        0 15px 32px rgba(227, 6, 19, .28);
+}
+
+
+.contact-btn i {
+    transition:
+        transform .3s ease;
+}
+
+
+.contact-btn:hover i {
+    transform:
+        translate(3px, -2px);
+}
+
+
+.contact-submit small {
+    max-width: 240px;
+
+    color:
+        #8A94A2;
+
+    font-size: .72rem;
+
+    line-height: 1.5;
+}
+
+
+.contact-submit small i {
+    margin-right: 4px;
+
+    color:
+        var(--contact-green);
+}
+
+
+/* ==========================================================
+   TARJETA INFORMACIÓN
+========================================================== */
+
+.contact-info-card {
+    padding: 35px;
+
+    overflow: hidden;
+
+    border:
+        1px solid rgba(255, 255, 255, .08);
+
+    border-radius: 25px;
+
+    background:
+        linear-gradient(145deg,
+            #071B37,
+            #06152D);
+
+    color:
+        #FFFFFF;
+
+    box-shadow:
+        0 20px 60px rgba(6, 21, 45, .18);
+}
+
+
+.contact-info-header {
+    margin-bottom: 28px;
+}
+
+
+.contact-info-header>span {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color:
+        #FF4C56;
+
+    font-size: .72rem;
+
+    font-weight: 700;
+
+    letter-spacing: 1.5px;
+}
+
+
+.contact-info-header h2 {
+    margin-bottom: 12px;
+
+    color: #FFFFFF;
+
+    font-size: 1.55rem;
+
+    font-weight: 750;
+
+    line-height: 1.3;
+}
+
+
+.contact-info-header p {
+    margin: 0;
+
+    color:
+        #AEB9C7;
+
+    font-size: .9rem;
+
+    line-height: 1.7;
+}
+
+
+/* ==========================================================
+   INFORMACIÓN
+========================================================== */
+
+.contact-info-list {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 13px;
+
+    margin-bottom: 25px;
+}
+
+
+.contact-info-item {
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    padding: 13px;
+
+    border:
+        1px solid rgba(255, 255, 255, .07);
+
+    border-radius: 15px;
+
+    background:
+        rgba(255, 255, 255, .035);
+
+    transition:
+        transform .3s ease,
+        background .3s ease,
+        border-color .3s ease;
+}
+
+
+.contact-info-item:hover {
+    border-color:
+        rgba(255, 255, 255, .13);
+
+    background:
+        rgba(255, 255, 255, .06);
+
+    transform:
+        translateX(5px);
+}
+
+
+.contact-info-icon {
+    width: 43px;
+    height: 43px;
+
+    display: grid;
+
+    place-items: center;
+
+    flex: 0 0 43px;
+
+    border-radius: 13px;
+}
+
+
+.contact-icon-red {
+    background:
+        rgba(227, 6, 19, .13);
+
+    color:
+        #FF5962;
+}
+
+
+.contact-icon-green {
+    background:
+        rgba(7, 133, 47, .17);
+
+    color:
+        #52DF7E;
+}
+
+
+.contact-icon-blue {
+    background:
+        rgba(13, 91, 168, .18);
+
+    color:
+        #5EA8F2;
+}
+
+
+.contact-info-item small {
+    display: block;
+
+    margin-bottom: 3px;
+
+    color:
+        #7F8DA0;
+
+    font-size: .65rem;
+
+    font-weight: 700;
+
+    letter-spacing: 1px;
+}
+
+
+.contact-info-item p {
+    margin: 0;
+
+    color:
+        #FFFFFF;
+
+    font-size: .85rem;
+
+    font-weight: 550;
+
+    overflow-wrap: anywhere;
+}
+
+
+/* ==========================================================
+   MAPA
+========================================================== */
+
+.contact-map {
+    padding-top: 22px;
+
+    border-top:
+        1px solid rgba(255, 255, 255, .08);
+}
+
+
+.contact-map-title span {
+    display: block;
+
+    color:
+        #FFFFFF;
+
+    font-size: .9rem;
+
+    font-weight: 700;
+}
+
+
+.contact-map-title span i {
+    margin-right: 6px;
+
+    color:
+        var(--contact-red);
+}
+
+
+.contact-map-title p {
+    margin:
+        3px 0 12px;
+
+    color:
+        #7F8DA0;
+
+    font-size: .72rem;
+}
+
+
+.contact-map-frame {
+    position: relative;
+
+    height: 225px;
+
+    overflow: hidden;
+
+    border:
+        1px solid rgba(255, 255, 255, .10);
+
+    border-radius: 17px;
+}
+
+
+.contact-map-frame iframe {
+    width: 100%;
+    height: 100%;
+
+    border: 0;
+}
+
+
+/* ==========================================================
+   BENEFICIOS
+========================================================== */
+
+.contact-benefits {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 20px;
+
+    margin-top: 35px;
+
+    padding: 25px 30px;
+
+    border:
+        1px solid var(--contact-border);
+
+    border-radius: 20px;
+
+    background:
+        rgba(255, 255, 255, .85);
+
+    box-shadow:
+        0 10px 35px rgba(6, 21, 45, .05);
+}
+
+
+.contact-benefit {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 13px;
+}
+
+
+.contact-benefit-icon {
+    width: 43px;
+    height: 43px;
+
+    display: grid;
+
+    place-items: center;
+
+    flex: 0 0 43px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(7, 133, 47, .09);
+
+    color:
+        var(--contact-green);
+}
+
+
+.contact-benefit strong {
+    display: block;
+
+    color:
+        var(--contact-blue-dark);
+
+    font-size: .85rem;
+}
+
+
+.contact-benefit span {
+    display: block;
+
+    margin-top: 2px;
+
+    color:
+        var(--contact-muted);
+
+    font-size: .7rem;
+}
+
+
+/* ==========================================================
+   TABLET
+========================================================== */
+
+@media (max-width: 991.98px) {
+
+    .contact-section {
+        padding:
+            50px 0 75px;
+    }
+
+
+    .contact-info-card {
+        margin-top: 5px;
+    }
+
+
+    .contact-benefits {
+        grid-template-columns:
+            repeat(3, 1fr);
+    }
+
+}
+
+
+/* ==========================================================
+   MÓVIL
+========================================================== */
+
+@media (max-width: 767.98px) {
+
+    .contact-section {
+        padding:
+            35px 0 60px;
+    }
+
+
+    .contact-header {
+        margin-bottom: 35px;
+    }
+
+
+    .contact-title {
+        font-size: 2.25rem;
+
+        letter-spacing: -1px;
+    }
+
+
+    .contact-description {
+        font-size: .92rem;
+    }
+
+
+    .contact-card,
+    .contact-info-card {
+        padding: 23px;
+
+        border-radius: 20px;
+    }
+
+
+    .contact-card-header {
+        align-items: flex-start;
+    }
+
+
+    .contact-submit {
+        align-items: stretch;
+
+        flex-direction: column;
+    }
+
+
+    .contact-btn {
+        width: 100%;
+    }
+
+
+    .contact-submit small {
+        max-width: none;
+
+        text-align: center;
+    }
+
+
+    .contact-benefits {
+        grid-template-columns: 1fr;
+
+        padding: 20px;
+    }
+
+
+    .contact-benefit {
+        justify-content: flex-start;
+    }
+
+}
+
+
+/* ==========================================================
+   MÓVIL PEQUEÑO
+========================================================== */
+
+@media (max-width: 575.98px) {
+
+    .contact-title {
+        font-size: 2rem;
+    }
+
+
+    .contact-card,
+    .contact-info-card {
+        padding: 20px;
+    }
+
+
+    .contact-header-icon {
+        width: 48px;
+        height: 48px;
+
+        flex-basis: 48px;
+    }
+
+
+    .contact-card-header h2,
+    .contact-info-header h2 {
+        font-size: 1.25rem;
+    }
+
+
+    .contact-map-frame {
+        height: 210px;
+    }
+
+}

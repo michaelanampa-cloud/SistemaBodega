@@ -95,9 +95,40 @@
               </span>
             </div>
             <div class="col-md-4">
-              <small class="product-stock text-end">
-                Stock: {{ producto.stock }}
-              </small>
+              {% if producto.stock <= 0 %}
+
+                <small class="product-stock stock-agotado">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                    Agotado
+                </small>
+
+              {% elif producto.unidadMedida == "Kilo" and producto.stock < 0.5 %}
+
+                <small class="product-stock stock-bajo">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    Poco stock: {{ producto.stock }} kg
+                </small>
+
+              {% elif producto.unidadMedida != "Kilo" and producto.stock <= 5 %}
+
+                <small class="product-stock stock-bajo">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    Poco stock: {{ producto.stock }}
+                </small>
+
+              {% else %}
+
+                <small class="product-stock stock-disponible">
+                    <i class="fa-solid fa-circle-check"></i>
+
+                    {% if producto.unidadMedida == "Kilo" %}
+                        Stock: {{ producto.stock }} kg
+                    {% else %}
+                        Stock: {{ producto.stock }}
+                    {% endif %}
+                </small>
+
+              {% endif %}
             </div>
 
             <!--Para agregar al carrito

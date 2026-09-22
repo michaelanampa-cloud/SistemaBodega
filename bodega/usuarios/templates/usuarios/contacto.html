@@ -1,68 +1,408 @@
 {% extends 'base_public.html' %}
+{% load static %}
 
 {% block title %}Contacto{% endblock %}
 
-{% block content %}
-<div class="container">
-	<h1 class="mb-4">Contáctanos</h1>
-
-	<div class="row">
-		<div class="col-md-7">
-			<div class="card mb-4">
-				<div class="card-body">
-					<form method="post" action="">
-						{% csrf_token %}
-
-						<div class="mb-3">
-							<label for="id_asunto" class="form-label">Asunto</label>
-							<input type="text" name="asunto" id="id_asunto" class="form-control" placeholder="Asunto" required>
-						</div>
-
-						<div class="mb-3">
-							<label for="id_numero" class="form-label">Número de contacto</label>
-							<input type="tel" name="numero" id="id_numero" class="form-control" placeholder="+51 9xx xxx xxx" required>
-						</div>
-
-						<div class="mb-3">
-							<label for="id_correo" class="form-label">Correo electrónico</label>
-							<input type="email" name="correo" id="id_correo" class="form-control" placeholder="tu@correo.com" required>
-						</div>
-
-						<div class="mb-3">
-							<label for="id_mensaje" class="form-label">Mensaje</label>
-							<textarea name="mensaje" id="id_mensaje" class="form-control" rows="6" placeholder="Escribe tu mensaje aquí" required></textarea>
-						</div>
-
-						<button type="submit" class="btn btn-dark"><i class="fa-solid fa-paper-plane"></i> Enviar mensaje</button>
-					</form>
-				</div>
-			</div>
-		</div>
-
-		<div class="col-md-5">
-			<div class="mb-4">
-				<h5>Información de la web</h5>
-				<p>Doña Catita, tu bodega de confianza y con los mejores precios de la rica FM.</p>
-				<p><strong>Correo:</strong> michaelanampa@gmail.com</p>
-				<p><strong>Teléfono:</strong> +51 930 233 684</p>
-				<p><strong>Dirección:</strong> Calle 3 de Octubre #1598</p>
-			</div>
-
-			<div>
-				<h5>Ubicación</h5>
-				<div class="ratio ratio-4x3">
-					<iframe
-						src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d640.3506163283389!2d-79.0288525247173!3d-8.07878976430411!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1ses!2spe!4v1782415447266!5m2!1ses!2spe"
-						style="border:0;"
-						allowfullscreen=""
-						loading="lazy"
-						referrerpolicy="no-referrer-when-downgrade">
-					</iframe>
-				</div>
-			</div>
-		</div>
-	</div>
-
-</div>
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/contacto.css' %}">
 {% endblock %}
 
+{% block content %}
+
+<section class="contact-section">
+
+	<!-- Decoraciones de fondo -->
+	<div class="contact-decoration contact-decoration-1"></div>
+	<div class="contact-decoration contact-decoration-2"></div>
+
+	<div class="container position-relative">
+
+		<!-- ==================================================
+             ENCABEZADO
+        =================================================== -->
+
+		<div class="contact-header text-center" data-aos="fade-up">
+
+			<span class="contact-label">
+				<i class="fa-regular fa-comments"></i>
+				Estamos para ayudarte
+			</span>
+
+			<h1 class="contact-title">
+				Ponte en <span>contacto</span> con nosotros
+			</h1>
+
+			<p class="contact-description">
+				¿Tienes alguna consulta sobre nuestros productos,
+				precios o disponibilidad? Escríbenos y estaremos
+				encantados de atenderte.
+			</p>
+
+			<div class="contact-divider">
+				<span></span>
+			</div>
+
+		</div>
+
+
+		<!-- ==================================================
+             FORMULARIO + INFORMACIÓN
+        =================================================== -->
+
+		<div class="row g-4 align-items-stretch">
+
+			<!-- ================= FORMULARIO ================= -->
+
+			<div class="col-lg-7" data-aos="fade-right">
+
+				<div class="contact-card contact-form-card h-100">
+
+					<div class="contact-card-header">
+
+						<div class="contact-header-icon">
+							<i class="fa-regular fa-envelope"></i>
+						</div>
+
+						<div>
+							<span>ENVÍANOS UN MENSAJE</span>
+
+							<h2>
+								¿En qué podemos ayudarte?
+							</h2>
+						</div>
+
+					</div>
+
+
+					<form method="post" action="" class="contact-form">
+
+						{% csrf_token %}
+
+
+						<!-- Asunto -->
+
+						<div class="contact-field">
+
+							<label for="id_asunto" class="form-label">
+
+								Asunto
+
+							</label>
+
+							<div class="contact-input">
+
+								<i class="fa-regular fa-message"></i>
+
+								<input type="text" name="asunto" id="id_asunto" class="form-control"
+									placeholder="¿En qué podemos ayudarte?" required>
+
+							</div>
+
+						</div>
+
+
+						<!-- Teléfono y correo -->
+
+						<div class="row g-3">
+
+							<div class="col-md-6">
+
+								<div class="contact-field">
+
+									<label for="id_numero" class="form-label">
+
+										Número de contacto
+
+									</label>
+
+									<div class="contact-input">
+
+										<i class="fa-solid fa-phone"></i>
+
+										<input type="tel" name="numero" id="id_numero" class="form-control"
+											placeholder="+51 9xx xxx xxx" required>
+
+									</div>
+
+								</div>
+
+							</div>
+
+
+							<div class="col-md-6">
+
+								<div class="contact-field">
+
+									<label for="id_correo" class="form-label">
+
+										Correo electrónico
+
+									</label>
+
+									<div class="contact-input">
+
+										<i class="fa-regular fa-envelope"></i>
+
+										<input type="email" name="correo" id="id_correo" class="form-control"
+											placeholder="tu@correo.com" required>
+
+									</div>
+
+								</div>
+
+							</div>
+
+						</div>
+
+
+						<!-- Mensaje -->
+
+						<div class="contact-field">
+
+							<label for="id_mensaje" class="form-label">
+
+								Mensaje
+
+							</label>
+
+							<div class="contact-input contact-textarea">
+
+								<i class="fa-regular fa-pen-to-square"></i>
+
+								<textarea name="mensaje" id="id_mensaje" class="form-control" rows="6"
+									placeholder="Escribe tu mensaje aquí..." required></textarea>
+
+							</div>
+
+						</div>
+
+
+						<!-- Botón -->
+
+						<div class="contact-submit">
+
+							<button type="submit" class="contact-btn">
+
+								<span>
+									Enviar mensaje
+								</span>
+
+								<i class="fa-solid fa-paper-plane"></i>
+
+							</button>
+
+							<small>
+								<i class="fa-solid fa-lock"></i>
+								Tus datos serán utilizados únicamente
+								para responder tu consulta.
+							</small>
+
+						</div>
+
+					</form>
+
+				</div>
+
+			</div>
+
+
+			<!-- ================= INFORMACIÓN ================= -->
+
+			<div class="col-lg-5" data-aos="fade-left">
+
+				<div class="contact-info-card h-100">
+
+					<!-- Encabezado -->
+
+					<div class="contact-info-header">
+
+						<span>
+							BODEGA DOÑA CATITA
+						</span>
+
+						<h2>
+							Visítanos o comunícate con nosotros
+						</h2>
+
+						<p>
+							Tu bodega de confianza, con variedad
+							de productos y buenos precios.
+						</p>
+
+					</div>
+
+
+					<!-- Datos -->
+
+					<div class="contact-info-list">
+
+						<!-- Correo -->
+
+						<div class="contact-info-item">
+
+							<div class="contact-info-icon contact-icon-red">
+
+								<i class="fa-regular fa-envelope"></i>
+
+							</div>
+
+							<div>
+
+								<small>
+									CORREO
+								</small>
+
+								<p>
+									michaelanampa@gmail.com
+								</p>
+
+							</div>
+
+						</div>
+
+
+						<!-- Teléfono -->
+
+						<div class="contact-info-item">
+
+							<div class="contact-info-icon contact-icon-green">
+
+								<i class="fa-solid fa-phone"></i>
+
+							</div>
+
+							<div>
+
+								<small>
+									TELÉFONO
+								</small>
+
+								<p>
+									+51 930 233 684
+								</p>
+
+							</div>
+
+						</div>
+
+
+						<!-- Dirección -->
+
+						<div class="contact-info-item">
+
+							<div class="contact-info-icon contact-icon-blue">
+
+								<i class="fa-solid fa-location-dot"></i>
+
+							</div>
+
+							<div>
+
+								<small>
+									DIRECCIÓN
+								</small>
+
+								<p>
+									Calle 3 de Octubre #1598
+								</p>
+
+							</div>
+
+						</div>
+
+					</div>
+
+
+					<!-- ================= MAPA ================= -->
+
+					<div class="contact-map">
+
+						<div class="contact-map-title">
+
+							<div>
+
+								<span>
+									<i class="fa-solid fa-location-dot"></i>
+									Nuestra ubicación
+								</span>
+
+								<p>
+									Encuéntranos fácilmente
+								</p>
+
+							</div>
+
+						</div>
+
+
+						<div class="contact-map-frame">
+
+							<iframe src="TU_MISMO_SRC_ACTUAL_DE_GOOGLE_MAPS" style="border:0;" allowfullscreen=""
+								loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+							</iframe>
+
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+
+		</div>
+
+
+		<!-- ==================================================
+             BENEFICIOS
+        =================================================== -->
+
+		<div class="contact-benefits" data-aos="fade-up">
+
+			<div class="contact-benefit">
+
+				<div class="contact-benefit-icon">
+					<i class="fa-solid fa-handshake"></i>
+				</div>
+
+				<div>
+					<strong>Atención cercana</strong>
+					<span>Siempre dispuestos a ayudarte</span>
+				</div>
+
+			</div>
+
+
+			<div class="contact-benefit">
+
+				<div class="contact-benefit-icon">
+					<i class="fa-solid fa-tags"></i>
+				</div>
+
+				<div>
+					<strong>Buenos precios</strong>
+					<span>Productos para tu día a día</span>
+				</div>
+
+			</div>
+
+
+			<div class="contact-benefit">
+
+				<div class="contact-benefit-icon">
+					<i class="fa-solid fa-basket-shopping"></i>
+				</div>
+
+				<div>
+					<strong>Compra fácil</strong>
+					<span>Todo lo que necesitas cerca de ti</span>
+				</div>
+
+			</div>
+
+		</div>
+
+	</div>
+
+</section>
+
+{% endblock %}
