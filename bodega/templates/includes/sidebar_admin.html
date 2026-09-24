@@ -1,246 +1,809 @@
-<div class="sidebar" id="sidebar">
-    {% load static %}
-    <div class="sidebar-header">
-        <img src="{% static 'img/logo2.png' %}" alt="Logo" class="brand-logo">
-        <a href="{% url 'perfil' %}" class="sidebar-user">
-            <div class="sidebar-avatar">
-                {{ user.username|first|upper }}
+{% load static %}
+
+{% with current_url=request.resolver_match.url_name %}
+
+<aside class="dc-admin-sidebar" id="sidebar">
+
+
+    <!-- =========================================
+         LOGO
+    ========================================== -->
+
+    <div class="dc-sidebar-brand">
+
+        <a href="{% url 'dashboard' %}" class="dc-sidebar-logo">
+
+            <div class="dc-sidebar-logo-box">
+
+                <img src="{% static 'img/logo2.png' %}" alt="Bodega Doña Catita">
+
             </div>
-            <div class="sidebar-user-info">
+
+
+            <div class="dc-sidebar-brand-text">
+
                 <strong>
-                    {{ user.username }}
+                    Doña Catita
                 </strong>
-                <small>
-                    <i class="fa-solid fa-circle"></i>
-                    Cuenta activa
-                </small>
+
+                <span>
+                    Panel administrativo
+                </span>
+
             </div>
-            <i class="fa-solid fa-chevron-right sidebar-user-arrow"></i>
+
         </a>
+
+
+        <button type="button" class="dc-sidebar-mobile-close" id="sidebarClose" aria-label="Cerrar menú">
+
+            <i class="fa-solid fa-xmark"></i>
+
+        </button>
+
     </div>
-    <ul class="menu">
-        <li>
-            <a href="{% url 'dashboard' %}">
-                <i class="fa-solid fa-chart-line"></i>
-                <span>Dashboard</span>
-            </a>
-        </li>
-        <!-- Productos -->
-        <li class="submenu">
-            <a href="{% url 'lista_productos' %}" class="submenu-toggle">
-                <div>
-                    <i class="fa-solid fa-box"></i>
-                    <span>Productos</span>
-                </div>
-                <i class="fa-solid fa-chevron-down arrow"></i>
-            </a>
-            <ul class="submenu-items">
-                <li>
-                    <a href="{% url 'lista_productos' %}">
-                        Todos los productos
-                    </a>
-                </li>
+
+
+    <!-- =========================================
+         USUARIO
+    ========================================== -->
+
+    <a href="{% url 'perfil' %}" class="dc-sidebar-user">
+
+        <div class="dc-sidebar-avatar">
+
+            {{ user.username|first|upper }}
+
+            <span class="dc-user-status"></span>
+
+        </div>
+
+
+        <div class="dc-sidebar-user-info">
+
+            <small>
+                Bienvenido
+            </small>
+
+            <strong>
+                {{ user.username }}
+            </strong>
+
+            <span>
+                <i class="fa-solid fa-circle"></i>
+
+                Cuenta activa
+            </span>
+
+        </div>
+
+
+        <i class="fa-solid fa-chevron-right dc-user-arrow"></i>
+
+    </a>
+
+
+    <!-- =========================================
+         NAVEGACIÓN
+    ========================================== -->
+
+    <nav class="dc-sidebar-nav">
+
+        <span class="dc-sidebar-section-title">
+            Principal
+        </span>
+
+
+        <!-- DASHBOARD -->
+
+        <a href="{% url 'dashboard' %}" class="dc-nav-item
+            {% if current_url == 'dashboard' %}
+                active
+            {% endif %}">
+
+            <span class="dc-nav-icon">
+                <i class="fa-solid fa-chart-pie"></i>
+            </span>
+
+            <span class="dc-nav-label">
+                Dashboard
+            </span>
+
+        </a>
+
+
+        <span class="dc-sidebar-section-title">
+            Gestión
+        </span>
+
+
+        <!-- =====================================
+             PRODUCTOS
+        ====================================== -->
+
+        <div class="dc-nav-group
+            {% if current_url == 'lista_productos' or current_url == 'registros_productos' or current_url == 'productos_vencer' or current_url == 'productos_stock' %}
+                open
+            {% endif %}">
+
+            <button type="button" class="dc-nav-item dc-nav-toggle">
+
+                <span class="dc-nav-icon">
+                    <i class="fa-solid fa-box-open"></i>
+                </span>
+
+                <span class="dc-nav-label">
+                    Productos
+                </span>
+
+                <i class="fa-solid fa-chevron-down dc-nav-arrow"></i>
+
+            </button>
+
+
+            <div class="dc-nav-submenu">
+
+
+                <a href="{% url 'lista_productos' %}" class="
+                    {% if current_url == 'lista_productos' %}
+                        active
+                    {% endif %}">
+
+                    <span></span>
+
+                    Todos los productos
+
+                </a>
+
+
                 {% if perms.productos.add_producto %}
-                <li>
-                    <a href="{% url 'registros_productos' %}">
-                        <i class="fa-solid fa-plus me-2"></i>
-                        Nuevo producto
-                    </a>
-                </li>
+
+                <a href="{% url 'registros_productos' %}" class="
+                        {% if current_url == 'registros_productos' %}
+                            active
+                        {% endif %}">
+
+                    <span></span>
+
+                    Nuevo producto
+
+                </a>
+
                 {% endif %}
-                <li>
-                    <a href="{% url 'productos_vencer' %}">
-                        Productos por vencer
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'productos_stock' %}">
-                        Poco Stock
-                    </a>
-                </li>
-            </ul>
-        </li>
-        <li class="submenu">
-            <a href="{% url 'lista_clientes' %}" class="submenu-toggle">
-                <div>
+
+
+                <a href="{% url 'productos_vencer' %}" class="
+                    {% if current_url == 'productos_vencer' %}
+                        active
+                    {% endif %}">
+
+                    <span></span>
+
+                    Productos por vencer
+
+                </a>
+
+
+                <a href="{% url 'productos_stock' %}" class="
+                    {% if current_url == 'productos_stock' %}
+                        active
+                    {% endif %}">
+
+                    <span></span>
+
+                    Poco stock
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================
+             CLIENTES
+        ====================================== -->
+
+        <div class="dc-nav-group
+            {% if current_url == 'lista_clientes' or current_url == 'registro_cliente' %}
+                open
+            {% endif %}">
+
+            <button type="button" class="dc-nav-item dc-nav-toggle">
+
+                <span class="dc-nav-icon">
                     <i class="fa-solid fa-users"></i>
-                    <span>Clientes</span>
-                </div>
-                <i class="fa-solid fa-chevron-down arrow"></i>
-            </a>
-            <ul class="submenu-items">
-                <li>
-                    <a href="{% url 'lista_clientes' %}">
-                        Todos los clientes
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'registro_cliente' %}">
-                        Nuevo cliente
-                    </a>
-                </li>
-            </ul>
-        </li>
-        <li class="submenu">
-            <a href="{% url 'lista_compras' %}" class="submenu-toggle">
-                <div>
+                </span>
+
+                <span class="dc-nav-label">
+                    Clientes
+                </span>
+
+                <i class="fa-solid fa-chevron-down dc-nav-arrow"></i>
+
+            </button>
+
+
+            <div class="dc-nav-submenu">
+
+
+                <a href="{% url 'lista_clientes' %}" class="
+                    {% if current_url == 'lista_clientes' %}
+                        active
+                    {% endif %}">
+
+                    <span></span>
+
+                    Todos los clientes
+
+                </a>
+
+
+                <a href="{% url 'registro_cliente' %}" class="
+                    {% if current_url == 'registro_cliente' %}
+                        active
+                    {% endif %}">
+
+                    <span></span>
+
+                    Nuevo cliente
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================
+             COMPRAS
+        ====================================== -->
+
+        <div class="dc-nav-group
+            {% if current_url == 'lista_compras' or current_url == 'carrito' %}
+                open
+            {% endif %}">
+
+            <button type="button" class="dc-nav-item dc-nav-toggle">
+
+                <span class="dc-nav-icon">
                     <i class="fa-solid fa-cart-shopping"></i>
-                    <span>Compras</span>
-                </div>
-                <i class="fa-solid fa-chevron-down arrow"></i>
-            </a>
-            <ul class="submenu-items">
-                <li>
-                    <a href="{% url 'lista_compras' %}">
-                        Todas las compras
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'carrito' %}">
-                        carrito de compras
-                    </a>
-                </li>
-            </ul>
-        </li>
+                </span>
 
-        <li class="submenu">
-            <a href="{% url 'lista_gastos' %}" class="submenu-toggle">
-                <div>
-                    <i class="fa-solid fa-money-bill-wave"></i>
-                    <span>Gastos</span>
-                </div>
-                <i class="fa-solid fa-chevron-down arrow"></i>
-            </a>
-            <ul class="submenu-items">
-                <li>
-                    <a href="{% url 'lista_gastos' %}">
-                        Todas los gastos
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'registrar_gastos' %}">
-                        Nuevo gasto
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'cotizacion' %}">
-                        Cotizar gasto
-                    </a>
-                </li>
-            </ul>
-        </li>
+                <span class="dc-nav-label">
+                    Compras
+                </span>
 
-        <li class="submenu">
-            <a href="{% url 'lista_proveedores' %}" class="submenu-toggle">
-                <div>
+                <i class="fa-solid fa-chevron-down dc-nav-arrow"></i>
+
+            </button>
+
+
+            <div class="dc-nav-submenu">
+
+
+                <a href="{% url 'lista_compras' %}" class="
+                    {% if current_url == 'lista_compras' %}
+                        active
+                    {% endif %}">
+
+                    <span></span>
+
+                    Todas las compras
+
+                </a>
+
+
+                <a href="{% url 'carrito' %}" class="
+                    {% if current_url == 'carrito' %}
+                        active
+                    {% endif %}">
+
+                    <span></span>
+
+                    Carrito de compras
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================
+             GASTOS
+        ====================================== -->
+
+        <div class="dc-nav-group
+            {% if current_url == 'lista_gastos' or current_url == 'registrar_gastos' or current_url == 'cotizacion' %}
+                open
+            {% endif %}">
+
+            <button type="button" class="dc-nav-item dc-nav-toggle">
+
+                <span class="dc-nav-icon">
+                    <i class="fa-solid fa-wallet"></i>
+                </span>
+
+                <span class="dc-nav-label">
+                    Gastos
+                </span>
+
+                <i class="fa-solid fa-chevron-down dc-nav-arrow"></i>
+
+            </button>
+
+
+            <div class="dc-nav-submenu">
+
+
+                <a href="{% url 'lista_gastos' %}" class="
+                    {% if current_url == 'lista_gastos' %}
+                        active
+                    {% endif %}">
+
+                    <span></span>
+
+                    Todos los gastos
+
+                </a>
+
+
+                <a href="{% url 'registrar_gastos' %}" class="
+                    {% if current_url == 'registrar_gastos' %}
+                        active
+                    {% endif %}">
+
+                    <span></span>
+
+                    Nuevo gasto
+
+                </a>
+
+
+                <a href="{% url 'cotizacion' %}" class="
+                    {% if current_url == 'cotizacion' %}
+                        active
+                    {% endif %}">
+
+                    <span></span>
+
+                    Cotizar gasto
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================
+             PROVEEDORES
+        ====================================== -->
+
+        <div class="dc-nav-group
+            {% if current_url == 'lista_proveedores' or current_url == 'nuevo_proveedor' %}
+                open
+            {% endif %}">
+
+            <button type="button" class="dc-nav-item dc-nav-toggle">
+
+                <span class="dc-nav-icon">
                     <i class="fa-solid fa-truck"></i>
-                    <span>Proveedores</span>
-                </div>
-                <i class="fa-solid fa-chevron-down arrow"></i>
-            </a>
-            <ul class="submenu-items">
-                <li>
-                    <a href="{% url 'lista_proveedores' %}">
-                        Todos los proveedores
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'nuevo_proveedor' %}">
-                        Nuevo proveedor
-                    </a>
-                </li>
-            </ul>
-        </li>
+                </span>
 
-        <li class="submenu">
-            <a href="{% url 'perfil' %}" class="submenu-toggle">
-                <div>
-                    <i class="fa-solid fa-user"></i>
-                    <span>Perfil</span>
-                </div>
-                <i class="fa-solid fa-chevron-down arrow"></i>
-            </a>
-            <ul class="submenu-items">
-                <li>
-                    <a href="{% url 'perfil' %}">
-                        Perfil
-                    </a>
-                </li>
-                <li>
-                    {% if user.is_superuser or user.groups.all|length %}
-                    <a href="{% url 'registro' %}">
-                        Registrar usuario
-                    </a>
-                    {% endif %}
-                </li>
-                {% if perms.auth.view_user %}
-                <li>
-                    <a href="{% url 'lista_usuarios' %}">
-                        <i class="fa-solid fa-users-gear"></i>
-                        <span>Usuarios</span>
-                    </a>
-                </li>
+                <span class="dc-nav-label">
+                    Proveedores
+                </span>
+
+                <i class="fa-solid fa-chevron-down dc-nav-arrow"></i>
+
+            </button>
+
+
+            <div class="dc-nav-submenu">
+
+
+                <a href="{% url 'lista_proveedores' %}" class="
+                    {% if current_url == 'lista_proveedores' %}
+                        active
+                    {% endif %}">
+
+                    <span></span>
+
+                    Todos los proveedores
+
+                </a>
+
+
+                <a href="{% url 'nuevo_proveedor' %}" class="
+                    {% if current_url == 'nuevo_proveedor' %}
+                        active
+                    {% endif %}">
+
+                    <span></span>
+
+                    Nuevo proveedor
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================
+             CUENTA
+        ====================================== -->
+
+        <span class="dc-sidebar-section-title">
+            Cuenta
+        </span>
+
+
+        <div class="dc-nav-group
+            {% if current_url == 'perfil' or current_url == 'registro' or current_url == 'lista_usuarios' %}
+                open
+            {% endif %}">
+
+            <button type="button" class="dc-nav-item dc-nav-toggle">
+
+                <span class="dc-nav-icon">
+                    <i class="fa-solid fa-circle-user"></i>
+                </span>
+
+                <span class="dc-nav-label">
+                    Perfil
+                </span>
+
+                <i class="fa-solid fa-chevron-down dc-nav-arrow"></i>
+
+            </button>
+
+
+            <div class="dc-nav-submenu">
+
+
+                <a href="{% url 'perfil' %}" class="
+                    {% if current_url == 'perfil' %}
+                        active
+                    {% endif %}">
+
+                    <span></span>
+
+                    Mi perfil
+
+                </a>
+
+
+                {% if user.is_superuser or user.groups.all|length %}
+
+                <a href="{% url 'registro' %}" class="
+                        {% if current_url == 'registro' %}
+                            active
+                        {% endif %}">
+
+                    <span></span>
+
+                    Registrar usuario
+
+                </a>
+
                 {% endif %}
-            </ul>
-        </li>
-        <!-- 
-        <li class="{% if request.resolver_match.url_name == 'perfil' or request.resolver_match.url_name == 'editar_perfil' %}active{% endif %}">
-            <a href="{% url 'perfil' %}">
-        
-                <i class="fa-solid fa-user"></i>
-        
-                <span>Perfil</span>
-        
-            </a>
-        </li> -->
 
-    </ul>
-    <div class="logout">
-        <a href="{% url 'logout' %}">
-            <i class="fa-solid fa-right-from-bracket"></i>
-            <span>Cerrar sesión</span>
+
+                {% if perms.auth.view_user %}
+
+                <a href="{% url 'lista_usuarios' %}" class="
+                        {% if current_url == 'lista_usuarios' %}
+                            active
+                        {% endif %}">
+
+                    <span></span>
+
+                    Usuarios
+
+                </a>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+    <!-- =========================================
+         FOOTER
+    ========================================== -->
+
+    <div class="dc-sidebar-footer">
+
+        <a href="{% url 'logout' %}" class="dc-sidebar-logout">
+
+            <span class="dc-nav-icon">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </span>
+
+            <span class="dc-nav-label">
+                Cerrar sesión
+            </span>
+
         </a>
+
     </div>
+
+</aside>
+
+
+<!-- =============================================
+     BOTÓN MÓVIL
+============================================= -->
+
+<button type="button" class="dc-mobile-menu-btn" id="menuBtn" aria-label="Abrir menú">
+
+    <i class="fa-solid fa-bars"></i>
+
+</button>
+
+
+<!-- OVERLAY -->
+
+<div class="dc-sidebar-overlay" id="sidebarOverlay">
 </div>
 
-<!-- Botón para móviles -->
-<button class="menu-btn" id="menuBtn">
-    <i class="fa-solid fa-bars"></i>
-</button>
-<div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 <script>
 
-    const submenus = document.querySelectorAll(".submenu");
-    submenus.forEach(menu => {
-        menu.querySelector(".submenu-toggle").addEventListener("click", function (e) {
-            e.preventDefault();
-            menu.classList.toggle("active");
-        });
-
-    });
+    document.addEventListener(
+        'DOMContentLoaded',
+        function () {
 
 
-    const sidebar = document.getElementById("sidebar");
-    const btn = document.getElementById("menuBtn");
-    const overlay = document.getElementById("sidebarOverlay");
+            /* =========================================
+               ELEMENTOS
+            ========================================== */
 
-    btn.addEventListener("click", () => {
-        sidebar.classList.toggle("show");
-        overlay.classList.toggle("active");
-    });
+            const sidebar =
+                document.getElementById('sidebar');
 
-    overlay.addEventListener("click", () => {
-        sidebar.classList.remove("show");
-        overlay.classList.remove("active");
-    });
+            const menuBtn =
+                document.getElementById('menuBtn');
 
-    document.addEventListener("click", (event) => {
-        const isClickInside = sidebar.contains(event.target) || btn.contains(event.target) || overlay.contains(event.target);
-        if (!isClickInside && sidebar.classList.contains("show")) {
-            sidebar.classList.remove("show");
-            overlay.classList.remove("active");
+            const sidebarClose =
+                document.getElementById('sidebarClose');
+
+            const overlay =
+                document.getElementById('sidebarOverlay');
+
+            const desktopToggle =
+                document.getElementById('desktopSidebarToggle');
+
+
+            /* =========================================
+               SUBMENÚS
+            ========================================== */
+
+            const navGroups =
+                document.querySelectorAll('.dc-nav-group');
+
+
+            navGroups.forEach(function (group) {
+
+                const toggle =
+                    group.querySelector('.dc-nav-toggle');
+
+                if (!toggle) {
+                    return;
+                }
+
+
+                toggle.addEventListener(
+                    'click',
+                    function () {
+
+
+                        /* Cerrar otros grupos */
+
+                        navGroups.forEach(
+                            function (otherGroup) {
+
+                                if (
+                                    otherGroup !== group
+                                ) {
+
+                                    otherGroup.classList
+                                        .remove('open');
+
+                                }
+
+                            }
+                        );
+
+
+                        /* Abrir / cerrar actual */
+
+                        group.classList.toggle('open');
+
+                    }
+                );
+
+            });
+
+
+            /* =========================================
+               ABRIR SIDEBAR MÓVIL
+            ========================================== */
+
+            if (menuBtn) {
+
+                menuBtn.addEventListener(
+                    'click',
+                    function () {
+
+                        sidebar.classList.add('show');
+
+                        overlay.classList.add('active');
+
+                        document.body.classList.add(
+                            'sidebar-mobile-open'
+                        );
+
+                    }
+                );
+
+            }
+
+
+            /* =========================================
+               CERRAR SIDEBAR MÓVIL
+            ========================================== */
+
+            function closeMobileSidebar() {
+
+                sidebar.classList.remove('show');
+
+                overlay.classList.remove('active');
+
+                document.body.classList.remove(
+                    'sidebar-mobile-open'
+                );
+
+            }
+
+
+            if (sidebarClose) {
+
+                sidebarClose.addEventListener(
+                    'click',
+                    closeMobileSidebar
+                );
+
+            }
+
+
+            if (overlay) {
+
+                overlay.addEventListener(
+                    'click',
+                    closeMobileSidebar
+                );
+
+            }
+
+
+            /* =========================================
+               CERRAR AL SELECCIONAR EN MÓVIL
+            ========================================== */
+
+            document
+                .querySelectorAll(
+                    '.dc-nav-submenu a, .dc-nav-item[href]'
+                )
+                .forEach(function (link) {
+
+                    link.addEventListener(
+                        'click',
+                        function () {
+
+                            if (
+                                window.innerWidth < 992
+                            ) {
+
+                                closeMobileSidebar();
+
+                            }
+
+                        }
+                    );
+
+                });
+
+
+            /* =========================================
+               CONTRAER SIDEBAR EN PC
+            ========================================== */
+
+            if (desktopToggle) {
+
+                desktopToggle.addEventListener(
+                    'click',
+                    function () {
+
+                        document.body.classList.toggle(
+                            'sidebar-collapsed'
+                        );
+
+
+                        /* Guardar preferencia */
+
+                        try {
+
+                            localStorage.setItem(
+                                'dcSidebarCollapsed',
+                                document.body.classList.contains(
+                                    'sidebar-collapsed'
+                                )
+                                    ? '1'
+                                    : '0'
+                            );
+
+                        } catch (error) {
+                            // localStorage no disponible
+                        }
+
+                    }
+                );
+
+            }
+
+
+            /* =========================================
+               RESTAURAR ESTADO
+            ========================================== */
+
+            try {
+
+                if (
+                    localStorage.getItem(
+                        'dcSidebarCollapsed'
+                    ) === '1'
+                ) {
+
+                    document.body.classList.add(
+                        'sidebar-collapsed'
+                    );
+
+                }
+
+            } catch (error) {
+                // localStorage no disponible
+            }
+
+
+            /* =========================================
+               RESIZE
+            ========================================== */
+
+            window.addEventListener(
+                'resize',
+                function () {
+
+                    if (
+                        window.innerWidth >= 992
+                    ) {
+
+                        closeMobileSidebar();
+
+                    }
+
+                }
+            );
+
         }
-    });
+    );
 
 </script>
+
+{% endwith %}

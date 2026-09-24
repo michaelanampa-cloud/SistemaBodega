@@ -1,60 +1,290 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 
 <head>
 
     {% load static %}
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" href="{% static 'img/logo2.png' %}" type="image/png">
-    <title>{% block title %}Bodega{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="{% static 'css/style.css' %}" rel="stylesheet">
-    <link href="{% static 'css/sidebar.css' %}" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/catalogo.css' %}">
 
-    <!-- Animaciones Scroll -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/6.5.0/aos.css" rel="stylesheet">
+    <meta charset="utf-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta name="theme-color" content="#06152D">
+
+    <link rel="icon" href="{% static 'img/logo2.png' %}" type="image/png">
+
+    <title>
+        {% block title %}Bodega Doña Catita{% endblock %}
+    </title>
+
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+
+    <!-- AOS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+
+
+    <!-- CSS proyecto -->
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+
+    <link href="{% static 'css/sidebar.css' %}" rel="stylesheet">
+
+    <link href="{% static 'css/catalogo.css' %}" rel="stylesheet">
+
 
     {% block extra_head %}{% endblock %}
 
 </head>
 
-<script>
-    window.addEventListener("scroll", function () {
-        let header = document.getElementById("header");
-        if (window.scrollY > 80) {
-            header.classList.add("header-scrolled");
-        } else {
-            header.classList.remove("header-scrolled");
-        }
-    });
 
-</script>
+<body class="dc-admin-body">
 
-<body>
+
+    <!-- =========================================
+         SIDEBAR
+    ========================================== -->
+
     {% include 'includes/sidebar_admin.html' %}
-    <main class="main-content">
-        {% include 'includes/sweetalert_messages.html' %}
 
-        {% block content %}
-        {% endblock %}
 
-    </main>
+    <!-- =========================================
+         CONTENIDO PRINCIPAL
+    ========================================== -->
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    {% block extra_js %}{% endblock %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
-    <script>
-        AOS.init({
-            duration: 900,
-            once: true
-        });
+    <div class="dc-admin-wrapper">
+
+
+        <!-- =====================================
+             TOPBAR
+        ====================================== -->
+
+        <header class="dc-admin-topbar">
+
+
+            <!-- IZQUIERDA -->
+
+            <div class="dc-topbar-left">
+
+                <button type="button" class="dc-sidebar-toggle" id="desktopSidebarToggle" aria-label="Contraer menú"
+                    title="Contraer menú">
+                    <i class="fa-solid fa-bars-staggered"></i>
+                </button>
+
+
+                <div class="dc-topbar-brand">
+
+                    <span>
+                        Administración
+                    </span>
+
+                    <small>
+                        Bodega Doña Catita
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <!-- DERECHA -->
+
+            <div class="dc-topbar-actions">
+
+
+                <!-- FECHA -->
+
+                <div class="dc-topbar-date d-none d-md-flex">
+
+                    <i class="fa-regular fa-calendar"></i>
+
+                    <span>
+                        {% now "d/m/Y" %}
+                    </span>
+
+                </div>
+
+
+                <!-- IR A INICIO -->
+
+                <a href="{% url 'inicio' %}" class="dc-topbar-button d-none d-sm-flex" title="Ver página pública">
+
+                    <i class="fa-solid fa-store"></i>
+
+                    <span>
+                        Ver tienda
+                    </span>
+
+                </a>
+
+
+                <!-- USUARIO -->
+
+                <div class="dropdown">
+
+                    <button class="dc-topbar-user" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+
+                        <div class="dc-topbar-avatar">
+
+                            {{ user.username|first|upper }}
+
+                        </div>
+
+
+                        <div class="dc-topbar-user-info d-none d-md-block">
+
+                            <strong>
+                                {{ user.username }}
+                            </strong>
+
+                            <small>
+                                {% if user.is_superuser %}
+                                Administrador
+                                {% else %}
+                                Usuario
+                                {% endif %}
+                            </small>
+
+                        </div>
+
+
+                        <i class="fa-solid fa-chevron-down dc-topbar-chevron"></i>
+
+                    </button>
+
+
+                    <ul class="dropdown-menu dropdown-menu-end dc-admin-dropdown">
+
+                        <li class="dc-dropdown-user">
+
+                            <small>
+                                Sesión iniciada como
+                            </small>
+
+                            <strong>
+                                {{ user.username }}
+                            </strong>
+
+                        </li>
+
+
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+
+
+                        <li>
+
+                            <a class="dropdown-item" href="{% url 'perfil' %}">
+
+                                <i class="fa-regular fa-user"></i>
+
+                                Mi perfil
+
+                            </a>
+
+                        </li>
+
+
+                        <li>
+
+                            <a class="dropdown-item" href="{% url 'inicio' %}">
+
+                                <i class="fa-solid fa-store"></i>
+
+                                Ver tienda
+
+                            </a>
+
+                        </li>
+
+
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+
+
+                        <li>
+
+                            <a class="dropdown-item dc-dropdown-logout" href="{% url 'logout' %}">
+
+                                <i class="fa-solid fa-right-from-bracket"></i>
+
+                                Cerrar sesión
+
+                            </a>
+
+                        </li>
+
+                    </ul>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- =====================================
+             CONTENIDO
+        ====================================== -->
+
+        <main class="main-content">
+
+            {% include 'includes/sweetalert_messages.html' %}
+
+            {% block content %}
+            {% endblock %}
+
+        </main>
+
+    </div>
+
+
+    <!-- Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js">
     </script>
+
+
+    <!-- SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11">
+    </script>
+
+
+    <!-- AOS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js">
+    </script>
+
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+
+            if (typeof AOS !== 'undefined') {
+
+                AOS.init({
+                    duration: 700,
+                    once: true
+                });
+
+            }
+
+        });
+
+    </script>
+
+
+    {% block extra_js %}{% endblock %}
 
 </body>
 

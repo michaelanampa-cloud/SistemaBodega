@@ -1,82 +1,414 @@
 {% extends 'dashboard_base.html' %}
 
-{% block title %}Lista de Proveedores{% endblock %}
+{% block title %}Proveedores | Doña Catita{% endblock %}
 
 {% block content %}
-<div class="container">
-  
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1><i class="fa-solid fa-truck"></i> Proveedores</h1>
-    <a href="{% url 'nuevo_proveedor' %}" class="btn btn-dark"><i class="fa-regular fa-square-plus"></i> Nuevo Proveedor</a>
+
+<div class="dc-list-page">
+
+  <!-- ==========================================
+         CABECERA
+    =========================================== -->
+
+  <div class="dc-page-header">
+
+    <div class="dc-page-heading">
+
+      <div class="dc-page-heading-icon">
+        <i class="fa-solid fa-truck"></i>
+      </div>
+
+      <div>
+        <h1>Proveedores</h1>
+
+        <p>
+          Consulta y administra los proveedores de la bodega.
+        </p>
+      </div>
+
+    </div>
+
+
+    <div class="dc-page-actions">
+
+      <a href="{% url 'nuevo_proveedor' %}" class="dc-btn dc-btn-primary">
+        <i class="fa-solid fa-plus"></i>
+        Nuevo proveedor
+      </a>
+
+    </div>
+
   </div>
 
-  {% if proveedores %}
-    <div class="table-responsive">
-      <table class="table table-striped table-hover table-bordered">
-        <thead class="table-dark">
+
+  <!-- ==========================================
+         TABLA
+    =========================================== -->
+
+  <div class="dc-table-card">
+
+    <!-- CABECERA DE TABLA -->
+
+    <div class="dc-table-card-header">
+
+      <h2>
+        <i class="fa-solid fa-truck-fast"></i>
+        Proveedores registrados
+      </h2>
+
+
+      {% if page_obj %}
+
+      <span class="dc-table-count">
+        {{ page_obj.paginator.count }} proveedores
+      </span>
+
+      {% endif %}
+
+    </div>
+
+
+    {% if proveedores %}
+
+    <div class="dc-table-responsive">
+
+      <table class="dc-admin-table">
+
+        <thead>
+
           <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Correo</th>
-            <th>Teléfono</th>
-            <th>Dirección</th>
-            <th>Acciones</th>
+
+            <th>
+              ID
+            </th>
+
+            <th>
+              Proveedor
+            </th>
+
+            <th>
+              Correo
+            </th>
+
+            <th>
+              Teléfono
+            </th>
+
+            <th>
+              Dirección
+            </th>
+
+            <th class="text-center">
+              Acciones
+            </th>
+
           </tr>
+
         </thead>
+
+
         <tbody>
+
           {% for proveedor in proveedores %}
-            <tr>
-              <td>{{ proveedor.id }}</td> 
-              <td>{{ proveedor.nombre }}</td>
-              <td>{{ proveedor.email }}</td>
-              <td>{{ proveedor.telefono }}</td>
-              <td>{{ proveedor.direccion|default:'-' }}</td>
-              <td class="text-center">
-                <a href="{% url 'editar_proveedor' proveedor.pk %}" class="btn btn-sm btn-warning me-2"><i class="fa-solid fa-edit"></i> Editar</a>
-                <form method="post" action="{% url 'eliminar_proveedor' proveedor.pk %}" class="d-inline">
+
+          <tr>
+
+            <!-- ID -->
+
+            <td data-label="ID">
+
+              <span class="dc-code">
+                #{{ proveedor.id }}
+              </span>
+
+            </td>
+
+
+            <!-- PROVEEDOR -->
+
+            <td data-label="Proveedor">
+
+              <span class="dc-record-title">
+                {{ proveedor.nombre }}
+              </span>
+
+
+              {% if proveedor.activo %}
+
+              <span class="dc-record-subtitle">
+
+                <i class="fa-solid fa-circle" style="
+                                                    color:#16A34A;
+                                                    font-size:5px;
+                                                    margin-right:4px;
+                                                "></i>
+
+                Proveedor activo
+
+              </span>
+
+              {% else %}
+
+              <span class="dc-record-subtitle">
+
+                <i class="fa-solid fa-circle" style="
+                                                    color:#E30613;
+                                                    font-size:5px;
+                                                    margin-right:4px;
+                                                "></i>
+
+                Proveedor inactivo
+
+              </span>
+
+              {% endif %}
+
+            </td>
+
+
+            <!-- CORREO -->
+
+            <td data-label="Correo">
+
+              {% if proveedor.email %}
+
+              <i class="fa-regular fa-envelope me-1 text-muted"></i>
+
+              {{ proveedor.email }}
+
+              {% else %}
+
+              <span class="text-muted">
+                Sin correo
+              </span>
+
+              {% endif %}
+
+            </td>
+
+
+            <!-- TELÉFONO -->
+
+            <td data-label="Teléfono">
+
+              {% if proveedor.telefono %}
+
+              <i class="fa-solid fa-phone me-1 text-muted"></i>
+
+              {{ proveedor.telefono }}
+
+              {% else %}
+
+              <span class="text-muted">
+                Sin teléfono
+              </span>
+
+              {% endif %}
+
+            </td>
+
+
+            <!-- DIRECCIÓN -->
+
+            <td data-label="Dirección">
+
+              {% if proveedor.direccion %}
+
+              <i class="fa-solid fa-location-dot me-1 text-muted"></i>
+
+              {{ proveedor.direccion|truncatewords:6 }}
+
+              {% else %}
+
+              <span class="text-muted">
+                Sin dirección
+              </span>
+
+              {% endif %}
+
+            </td>
+
+
+            <!-- ACCIONES -->
+
+            <td data-label="Acciones">
+
+              <div class="dc-table-actions">
+
+
+                <!-- EDITAR -->
+
+                <a href="{% url 'editar_proveedor' proveedor.pk %}" class="dc-action-btn dc-action-edit"
+                  title="Editar proveedor" aria-label="Editar proveedor">
+                  <i class="fa-regular fa-pen-to-square"></i>
+                </a>
+
+
+                <!-- ELIMINAR -->
+
+                <form method="post" action="{% url 'eliminar_proveedor' proveedor.pk %}">
+
                   {% csrf_token %}
-                  <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Deseas eliminar este proveedor?')"><i class="fa-solid fa-trash"></i> Eliminar</button>
+
+                  <button type="submit" class="dc-action-btn dc-action-delete" title="Eliminar proveedor"
+                    aria-label="Eliminar proveedor" onclick="return confirm('¿Deseas eliminar este proveedor?')">
+                    <i class="fa-regular fa-trash-can"></i>
+                  </button>
+
                 </form>
-              </td>
-            </tr>
+
+              </div>
+
+            </td>
+
+          </tr>
+
           {% endfor %}
+
         </tbody>
+
       </table>
+
     </div>
-  {% else %}
-    <div class="alert alert-info"> No hay proveedores registrados. <a href="{% url 'nuevo_proveedor' %}">Registra uno ahora</a>.
+
+
+    {% else %}
+
+    <!-- ======================================
+                 ESTADO VACÍO
+            ======================================= -->
+
+    <div class="dc-empty-state">
+
+      <div class="dc-empty-icon">
+        <i class="fa-solid fa-truck"></i>
+      </div>
+
+      <h3>
+        No hay proveedores registrados
+      </h3>
+
+      <p>
+        Registra un proveedor para comenzar
+        a gestionar las compras de la bodega.
+      </p>
+
+
+      <a href="{% url 'nuevo_proveedor' %}" class="dc-btn dc-btn-primary mt-3">
+        <i class="fa-solid fa-plus"></i>
+
+        Registrar proveedor
+      </a>
+
     </div>
+
+    {% endif %}
+
+  </div>
+
+
+  <!-- ==========================================
+         PAGINACIÓN
+    =========================================== -->
+
+  {% if page_obj.paginator.num_pages > 1 %}
+
+  <div class="dc-pagination-wrapper">
+
+
+    <!-- INFORMACIÓN -->
+
+    <div class="dc-pagination-info">
+
+      Página
+
+      <strong>
+        {{ page_obj.number }}
+      </strong>
+
+      de
+
+      <strong>
+        {{ page_obj.paginator.num_pages }}
+      </strong>
+
+    </div>
+
+
+    <!-- CONTROLES -->
+
+    <nav aria-label="Paginación">
+
+      <ul class="pagination dc-pagination">
+
+
+        <!-- ANTERIOR -->
+
+        {% if page_obj.has_previous %}
+
+        <li class="page-item">
+
+          <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Página anterior"
+            title="Página anterior">
+            <i class="fa-solid fa-chevron-left"></i>
+          </a>
+
+        </li>
+
+        {% endif %}
+
+
+        <!-- NÚMEROS -->
+
+        {% for num in page_obj.paginator.page_range %}
+
+        {% if num == page_obj.number %}
+
+        <li class="page-item active">
+
+          <span class="page-link">
+            {{ num }}
+          </span>
+
+        </li>
+
+
+        {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %} <li class="page-item">
+
+          <a class="page-link" href="?page={{ num }}">
+            {{ num }}
+          </a>
+
+          </li>
+
+          {% endif %}
+
+          {% endfor %}
+
+
+          <!-- SIGUIENTE -->
+
+          {% if page_obj.has_next %}
+
+          <li class="page-item">
+
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Página siguiente"
+              title="Página siguiente">
+              <i class="fa-solid fa-chevron-right"></i>
+            </a>
+
+          </li>
+
+          {% endif %}
+
+      </ul>
+
+    </nav>
+
+  </div>
+
   {% endif %}
+
 </div>
 
-{% if page_obj.paginator.num_pages > 1 %}
-<nav aria-label="Paginación" class="mt-4">
-  <ul class="pagination justify-content-center">
-    {% if page_obj.has_previous %}
-      <li class="page-item">
-        <a class="page-link" href="?q={{ query }}&tipo={{ tipo }}&page={{ page_obj.previous_page_number }}">Anterior</a>
-      </li>
-    {% else %}
-      <li class="page-item disabled"><span class="page-link">Anterior</span></li>
-    {% endif %}
-
-    {% for num in page_obj.paginator.page_range %}
-      {% if num == page_obj.number %}
-        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-      {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
-        <li class="page-item"><a class="page-link" href="?q={{ query }}&tipo={{ tipo }}&page={{ num }}">{{ num }}</a></li>
-      {% endif %}
-    {% endfor %}
-
-    {% if page_obj.has_next %}
-      <li class="page-item">
-        <a class="page-link" href="?q={{ query }}&tipo={{ tipo }}&page={{ page_obj.next_page_number }}">Siguiente</a>
-      </li>
-    {% else %}
-      <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
-    {% endif %}
-  </ul>
-</nav>
-
-{% endif %}
 {% endblock %}

@@ -3,256 +3,1028 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block dashboard_content %}
-<div class="container-fluid p-0">
-  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+
+<div class="dc-dashboard">
+
+  <!-- =========================================
+         ENCABEZADO
+    ========================================== -->
+  <div class="dc-dashboard-header">
+
     <div>
-      <h1 class="mb-1"><i class="fa-solid fa-chart-pie"></i> Resumen de balance</h1>
-      <p class="text-muted mb-0">Compras menos gastos en un rango de fechas.</p>
+      <span class="dc-dashboard-eyebrow">
+        <i class="fa-solid fa-chart-line"></i>
+        Panel de control
+      </span>
+
+      <h1>Resumen del negocio</h1>
+
+      <p>
+        Consulta compras, gastos, inventario y actividad
+        de Bodega Doña Catita.
+      </p>
     </div>
+
+    <div class="dc-dashboard-date">
+      <div class="dc-dashboard-date-icon">
+        <i class="fa-regular fa-calendar"></i>
+      </div>
+
+      <div>
+        <small>Hoy</small>
+        <strong>{% now "d/m/Y" %}</strong>
+      </div>
+    </div>
+
   </div>
 
-  <form method="get" class="row g-2 align-items-end mb-4">
-    <div class="col-md-3">
-      <label class="form-label">Desde</label>
-      <input type="date" name="start_date" class="form-control" value="{% if start_date %}{{ start_date|date:'Y-m-d' }}{% else %}{% now 'Y-m-d' %}{% endif %}">
-    </div>
-    <div class="col-md-3">
-      <label class="form-label">Hasta</label>
-      <input type="date" name="end_date" class="form-control" value="{% if end_date %}{{ end_date|date:'Y-m-d' }}{% else %}{% now 'Y-m-d' %}{% endif %}">
-    </div>
-    <div class="col-md-3">
-      <label class="form-label">Tipo pago</label>
-      <select name="tipo" class="form-select">
-        <option value="">Todos</option>
-        <option value="yape" {% if tipo == 'yape' %}selected{% endif %}>Yape</option>
-        <option value="efectivo" {% if tipo == 'efectivo' %}selected{% endif %}>Efectivo</option>
-        <option value="fiado" {% if tipo == 'fiado' %}selected{% endif %}>Fiado</option>
-      </select>
-    </div>
-    <div class="col-md-3">
-      <button class="btn btn-outline-primary"><i class="fas fa-filter"></i> Aplicar</button>
-      <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary"><i class="fas fa-trash"></i> Limpiar</a>
-    </div>
-  </form>
 
-  <div class="row g-3 mb-4">
-    <div class="col-md-4 producto-card">
-      <div class="card text-bg-success shadow-sm border-success">
-        <div class="card-body d-flex flex-column">
-          <h5 class="card-title"><i class="fa-solid fa-coins"></i> Compras</h5>
-          <p class="display-6 text-center">S/ {{ total_compras|floatformat:2 }}</p>
-          <a href="{% url 'resumen_compras' %}" class="btn btn-lg mt-auto ms-auto border-0 shadow-none"><i class="fas fa-eye"></i></a>
-        </div>
+  <!-- =========================================
+         FILTROS
+    ========================================== -->
+  <div class="dc-filter-card">
+
+    <div class="dc-filter-title">
+      <div>
+        <i class="fa-solid fa-sliders"></i>
       </div>
+
+      <span>
+        <strong>Filtrar información</strong>
+        <small>Selecciona un período y tipo de pago</small>
+      </span>
     </div>
-    <div class="col-md-4 producto-card">
-      <div class="card text-bg-danger shadow-sm border-danger">
-        <div class="card-body d-flex flex-column">
-          <h5 class="card-title"><i class="fa-solid fa-wallet"></i> Gastos</h5>
-          <p class="display-6 text-center">S/ {{ total_gastos|floatformat:2 }}</p>
-          <a href="{% url 'resumen_gastos' %}" class="btn-outline-danger btn btn-lg mt-auto ms-auto border-0 shadow-none"><i class="fas fa-eye"></i></a>
+
+    <form method="get" class="row g-3 align-items-end">
+
+      <div class="col-xl-3 col-md-6">
+
+        <label class="form-label">
+          Desde
+        </label>
+
+        <div class="dc-input-icon">
+          <i class="fa-regular fa-calendar"></i>
+
+          <input type="date" name="start_date" class="form-control"
+            value="{% if start_date %}{{ start_date|date:'Y-m-d' }}{% else %}{% now 'Y-m-d' %}{% endif %}">
         </div>
+
       </div>
-    </div>
-    <div class="col-md-4 producto-card">
-      <div class="card shadow-sm {% if balance >= 0 %}text-bg-primary{% else %}text-bg-warning{% endif %}">
-        <div class="card-body d-flex flex-column">
-          <h5 class="card-title"><i class="fa-brands fa-sellsy"></i> Balance</h5>
-          <p class="display-6 text-center">S/ {{ balance|floatformat:2 }}</p>
-          <a href="#" class="{% if balance >= 0 %}btn-outline-primary{% else %}btn-outline-warning{% endif %} btn btn-lg mt-auto ms-auto border-0 shadow-none"><i class="fas fa-eye"></i></a>
+
+
+      <div class="col-xl-3 col-md-6">
+
+        <label class="form-label">
+          Hasta
+        </label>
+
+        <div class="dc-input-icon">
+          <i class="fa-regular fa-calendar"></i>
+
+          <input type="date" name="end_date" class="form-control"
+            value="{% if end_date %}{{ end_date|date:'Y-m-d' }}{% else %}{% now 'Y-m-d' %}{% endif %}">
         </div>
+
       </div>
-    </div>
+
+
+    <div class="col-xl-3 col-md-6">
     
+        <label class="form-label">
+            Tipo de pago
+        </label>
+    
+        <select name="tipo" class="form-select">
+    
+            <option value="">
+                Todos los métodos
+            </option>
+    
+            <option value="yape" {% if tipo == 'yape' %}selected{% endif %}>
+                Yape
+            </option>
+    
+            <option value="efectivo" {% if tipo == 'efectivo' %}selected{% endif %}>
+                Efectivo
+            </option>
+    
+            <option value="fiado" {% if tipo == 'fiado' %}selected{% endif %}>
+                Fiado
+            </option>
+    
+        </select>
+    
+    </div>
+
+
+      <div class="col-xl-3 col-md-6">
+
+        <div class="dc-filter-actions">
+
+          <button type="submit" class="btn dc-btn-filter">
+            <i class="fa-solid fa-filter"></i>
+            Aplicar
+          </button>
+
+          <a href="{% url 'dashboard' %}" class="btn dc-btn-clear" title="Limpiar filtros">
+            <i class="fa-solid fa-rotate-left"></i>
+          </a>
+
+        </div>
+
+      </div>
+
+    </form>
+
   </div>
 
-  <div class="row g-3 mb-4">
-    <div class="col-md-3 producto-card">
-      <div class="card text-bg-info shadow-sm border-info">
-        <div class="card-body d-flex flex-column">
-          <h5 class="card-title"><i class="fa-solid fa-user-group"></i> Clientes</h5>
-          <p class="display-6 text-center">{{ total_clientes }}</p>
-          <a href="{% url 'lista_clientes' %}" class="btn-outline-info btn btn-lg mt-auto ms-auto border-0 shadow-none"><i class="fas fa-eye"></i></a>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3 producto-card">
-      <div class="card text-bg-warning shadow-sm border-warning">
-        <div class="card-body d-flex flex-column">
-          <h5 class="card-title"><i class="fa-solid fa-truck-moving"></i> Proveedores</h5>
-          <p class="display-6 text-center"> {{ total_proveedores}}</p>
-          <a href="{% url 'lista_proveedores' %}" class="btn-outline-warning btn btn-lg mt-auto ms-auto border-0 shadow-none"><i class="fas fa-eye"></i></a>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3 producto-card">
-      <div class="card text-bg-primary shadow-sm border-dark">
-        <div class="card-body d-flex flex-column">
-          <h5 class="card-title"><i class="fa-solid fa-box-open"></i> Productos</h5>
-          <p class="display-6 text-center"> {{ total_productos}}</p>
-          <a href="{% url 'lista_productos' %}" class="btn-outline-dark btn btn-lg mt-auto ms-auto border-0 shadow-none"><i class="fas fa-eye"></i></a>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3 producto-card">
-      <div class="card text-bg-secondary shadow-sm border-secondary">
-        <div class="card-body d-flex flex-column">
-          <h5 class="card-title"><i class="fa-solid fa-box-open"></i> Vencidos</h5>
-          <p class="display-6 text-center">{{ total_productos_vencidos }}</p>
-          <a href="{% url 'productos_vencer' %}" class="btn-outline-secondary btn btn-lg mt-auto ms-auto border-0 shadow-none"><i class="fas fa-eye"></i></a>
-        </div>
-      </div>
-    </div>
-  </div>
+<!-- =========================================
+     INDICADORES PRINCIPALES
+========================================== -->
 
-  <div class="row g-4">
-    <div class="col-lg-4">
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title"><i class="fa-solid fa-chart-pie"></i> Gráfica de balance</h5>
-          <div class="d-flex justify-content-center">
-            <canvas id="balanceChart" width="280" height="280"></canvas>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-lg-8">
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title"><i class="fa-solid fa-chart-bar"></i> Compras y Gastos por mes</h5>
-          <div class="d-flex justify-content-center">
-            <canvas id="monthlyChart" width="900" height="320"></canvas>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <br>
-  <div class="col-lg-6">
-      <div class="card shadow-sm">
-        <div class="card-header bg-dark text-white">
-          <h5 class="mb-0"><i class="fa-solid fa-coins"></i> Últimas compras</h5>
-        </div>
-        <div class="card-body p-0">
-          {% if compras %}
-            <ul class="list-group list-group-flush">
-              {% for compra in compras %}
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                  <span>
-                    {{ compra.codigo }}<br>
-                    <small class="text-muted">{{ compra.fecha|date:'d/m/Y' }}</small>
-                  </span>
-                  <strong>S/ {{ compra.total }}</strong>
-                </li>
-              {% endfor %}
-            </ul>
-          {% else %}
-            <div class="p-4">
-              <p class="mb-0">No hay compras en el rango seleccionado.</p>
+<div class="row g-4 mb-4">
+
+    <!-- COMPRAS -->
+    <div class="col-xl-4 col-md-6">
+
+        <a href="{% url 'resumen_compras' %}"
+           class="dc-stat-card dc-stat-success">
+
+            <div class="dc-stat-top">
+
+                <div class="dc-stat-icon">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                </div>
+
+                <span class="dc-stat-link">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </span>
+
             </div>
-          {% endif %}
+
+            <span class="dc-stat-label">
+                Compras
+            </span>
+
+            <strong class="dc-stat-value dc-counter"
+                    data-value="{{ total_compras|floatformat:2 }}">
+                S/ {{ total_compras|floatformat:2 }}
+            </strong>
+
+            <small>
+                Total del período seleccionado
+            </small>
+
+        </a>
+
+    </div>
+
+
+    <!-- GASTOS -->
+    <div class="col-xl-4 col-md-6">
+
+        <a href="{% url 'resumen_gastos' %}"
+           class="dc-stat-card dc-stat-danger">
+
+            <div class="dc-stat-top">
+
+                <div class="dc-stat-icon">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+
+                <span class="dc-stat-link">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </span>
+
+            </div>
+
+            <span class="dc-stat-label">
+                Gastos
+            </span>
+
+            <strong class="dc-stat-value dc-counter"
+                    data-value="{{ total_gastos|floatformat:2 }}">
+                S/ {{ total_gastos|floatformat:2 }}
+            </strong>
+
+            <small>
+                Total del período seleccionado
+            </small>
+
+        </a>
+
+    </div>
+
+
+    <!-- BALANCE -->
+    <div class="col-xl-4 col-md-12">
+
+        <div class="
+            dc-stat-card
+            {% if balance >= 0 %}
+                dc-stat-success
+            {% else %}
+                dc-stat-danger
+            {% endif %}
+        ">
+
+            <div class="dc-stat-top">
+
+                <div class="dc-stat-icon">
+                    {% if balance >= 0 %}
+                        <i class="fa-solid fa-arrow-trend-up"></i>
+                    {% else %}
+                        <i class="fa-solid fa-arrow-trend-down"></i>
+                    {% endif %}
+                </div>
+
+                <span class="
+                    dc-balance-status
+                    {% if balance >= 0 %}
+                        positive
+                    {% else %}
+                        negative
+                    {% endif %}
+                ">
+
+                    {% if balance >= 0 %}
+                        Positivo
+                    {% else %}
+                        Negativo
+                    {% endif %}
+
+                </span>
+
+            </div>
+
+            <span class="dc-stat-label">
+                Balance
+            </span>
+
+            <strong class="dc-stat-value">
+                S/ {{ balance|floatformat:2 }}
+            </strong>
+
+            <small>
+                {% if balance >= 0 %}
+                    Las compras superan los gastos
+                {% else %}
+                    Los gastos superan las compras
+                {% endif %}
+            </small>
+
         </div>
-      </div>
+
+    </div>
+
+</div>
+
+<div class="row g-3 mb-4">
+
+    <div class="col-xl-3 col-md-6">
+
+        <a href="{% url 'lista_clientes' %}"
+           class="dc-mini-stat">
+
+            <div class="dc-mini-icon dc-icon-blue">
+                <i class="fa-solid fa-users"></i>
+            </div>
+
+            <div>
+                <span>Clientes</span>
+                <strong>{{ total_clientes }}</strong>
+            </div>
+
+            <i class="fa-solid fa-chevron-right dc-mini-arrow"></i>
+
+        </a>
+
+    </div>
+
+
+    <div class="col-xl-3 col-md-6">
+
+        <a href="{% url 'lista_proveedores' %}"
+           class="dc-mini-stat">
+
+            <div class="dc-mini-icon dc-icon-orange">
+                <i class="fa-solid fa-truck"></i>
+            </div>
+
+            <div>
+                <span>Proveedores</span>
+                <strong>{{ total_proveedores }}</strong>
+            </div>
+
+            <i class="fa-solid fa-chevron-right dc-mini-arrow"></i>
+
+        </a>
+
+    </div>
+
+
+    <div class="col-xl-3 col-md-6">
+
+        <a href="{% url 'lista_productos' %}"
+           class="dc-mini-stat">
+
+            <div class="dc-mini-icon dc-icon-green">
+                <i class="fa-solid fa-boxes-stacked"></i>
+            </div>
+
+            <div>
+                <span>Productos</span>
+                <strong>{{ total_productos }}</strong>
+            </div>
+
+            <i class="fa-solid fa-chevron-right dc-mini-arrow"></i>
+
+        </a>
+
+    </div>
+
+
+    <div class="col-xl-3 col-md-6">
+
+        <a href="{% url 'productos_vencer' %}"
+           class="dc-mini-stat">
+
+            <div class="dc-mini-icon dc-icon-red">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+
+            <div>
+                <span>Vencidos</span>
+                <strong>{{ total_productos_vencidos }}</strong>
+            </div>
+
+            <i class="fa-solid fa-chevron-right dc-mini-arrow"></i>
+
+        </a>
+
+    </div>
+
+</div>
+
+<div class="dc-section-card mb-4">
+
+    <div class="dc-section-heading">
+
+        <div>
+            <h5>
+                <i class="fa-solid fa-bolt"></i>
+                Acciones rápidas
+            </h5>
+
+            <p>
+                Accede a las operaciones más frecuentes.
+            </p>
+        </div>
+
+    </div>
+
+    <div class="dc-quick-actions">
+
+        <a href="{% url 'carrito' %}"
+           class="dc-quick-action">
+            <i class="fa-solid fa-cart-plus"></i>
+            <span>Nueva compra</span>
+        </a>
+
+        <a href="{% url 'registros_productos' %}"
+           class="dc-quick-action">
+            <i class="fa-solid fa-box-open"></i>
+            <span>Nuevo producto</span>
+        </a>
+
+        <a href="{% url 'registro_cliente' %}"
+           class="dc-quick-action">
+            <i class="fa-solid fa-user-plus"></i>
+            <span>Nuevo cliente</span>
+        </a>
+
+        <a href="{% url 'registrar_gastos' %}"
+           class="dc-quick-action">
+            <i class="fa-solid fa-receipt"></i>
+            <span>Registrar gasto</span>
+        </a>
+
+    </div>
+
+</div>
+
+<div class="row g-4 mb-4">
+
+    <div class="col-xl-8">
+    
+        <div class="dc-section-card h-100">
+    
+            <div class="dc-section-heading">
+    
+                <div>
+                    <h5>
+                        <i class="fa-solid fa-chart-line"></i>
+                        Compras y Gastos
+                    </h5>
+    
+                    <p>
+                        Evolución mensual del movimiento del negocio.
+                    </p>
+                </div>
+    
+                <span class="dc-chart-badge">
+                    Últimos meses
+                </span>
+    
+            </div>
+    
+            <div class="dc-chart-container dc-chart-large">
+                <canvas id="monthlyChart"></canvas>
+            </div>
+    
+        </div>
+    
+    </div>
+
+
+    <div class="col-xl-4">
+
+        <div class="dc-section-card h-100">
+
+            <div class="dc-section-heading">
+
+                <div>
+                    <h5>
+                        <i class="fa-solid fa-chart-pie"></i>
+                        Distribución
+                    </h5>
+
+                    <p>
+                        Compras frente a gastos.
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="dc-chart-container dc-chart-donut">
+                <canvas id="balanceChart"></canvas>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="row">
+
+    <div class="col-12">
+
+        <div class="dc-section-card">
+
+            <div class="dc-section-heading">
+
+                <div>
+                    <h5>
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        Últimas compras
+                    </h5>
+
+                    <p>
+                        Movimientos recientes registrados.
+                    </p>
+                </div>
+
+                <a href="{% url 'resumen_compras' %}"
+                   class="dc-view-all">
+
+                    Ver todas
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </a>
+
+            </div>
+
+
+            {% if compras %}
+
+                <div class="dc-transactions">
+
+                    {% for compra in compras %}
+
+                        <div class="dc-transaction">
+
+                            <div class="dc-transaction-icon">
+                                <i class="fa-solid fa-bag-shopping"></i>
+                            </div>
+
+                            <div class="dc-transaction-info">
+
+                                <strong>
+                                    {{ compra.codigo }}
+                                </strong>
+
+                                <span>
+                                    <i class="fa-regular fa-calendar"></i>
+                                    {{ compra.fecha|date:'d/m/Y' }}
+                                </span>
+
+                            </div>
+
+                            <strong class="dc-transaction-amount">
+                                S/ {{ compra.total|floatformat:2 }}
+                            </strong>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <div class="dc-empty-state">
+
+                    <i class="fa-solid fa-receipt"></i>
+
+                    <h6>No hay movimientos</h6>
+
+                    <p>
+                        No existen compras para el período seleccionado.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
 
 </div>
 {% endblock %}
 
 {% block extra_js %}
-  {{ chart_data|json_script:"chart-data" }}
-  {{ monthly_chart_data|json_script:"monthly-chart-data" }}
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script>
+
+{{ chart_data|json_script:"chart-data" }}
+{{ monthly_chart_data|json_script:"monthly-chart-data" }}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<script>
     document.addEventListener('DOMContentLoaded', function () {
-      const chartDataEl = document.getElementById('chart-data');
-      if (chartDataEl) {
-        const chartData = JSON.parse(chartDataEl.textContent || '[]');
-        const canvas = document.getElementById('balanceChart');
-        if (canvas) {
-          const ctx = canvas.getContext('2d');
-          if (ctx) {
+
+        /* =====================================================
+           GRÁFICA DE BALANCE
+           Compras vs Gastos
+        ====================================================== */
+
+        const chartDataEl = document.getElementById('chart-data');
+        const balanceCanvas = document.getElementById('balanceChart');
+
+        if (chartDataEl && balanceCanvas) {
+
+            const chartData = JSON.parse(
+                chartDataEl.textContent || '[]'
+            );
+
             const labels = chartData.map(item => item.label);
-            const values = chartData.map(item => Number(item.total) || 0);
+
+            const values = chartData.map(
+                item => Number(item.total) || 0
+            );
+
+            const ctx = balanceCanvas.getContext('2d');
 
             new Chart(ctx, {
-              type: 'doughnut',
-              data: {
-                labels: labels,
-                datasets: [{
-                  data: values,
-                  backgroundColor: ['#189f04', '#dc3545']
-                }]
-              },
-              options: {
-                responsive: true,
-                plugins: {
-                  legend: { position: 'bottom' },
-                  tooltip: {
-                    callbacks: {
-                      label: function (context) {
-                        return `${context.label}: S/ ${context.parsed.toFixed(2)}`;
-                      }
-                    }
-                  }
-                }
-              }
-            });
-          }
-        }
-      }
 
-      const monthlyDataEl = document.getElementById('monthly-chart-data');
-      if (monthlyDataEl) {
-        const monthlyData = JSON.parse(monthlyDataEl.textContent || '{}');
-        const monthlyCanvas = document.getElementById('monthlyChart');
-        if (monthlyCanvas) {
-          const monthlyCtx = monthlyCanvas.getContext('2d');
-          if (monthlyCtx) {
-            new Chart(monthlyCtx, {
-              type: 'bar',
-              data: {
-                labels: monthlyData.labels || [],
-                datasets: [
-                  {
-                    label: 'Compras',
-                    data: monthlyData.compras || [],
-                    backgroundColor: '#189f04',
-                  },
-                  {
-                    label: 'Gastos',
-                    data: monthlyData.gastos || [],
-                    backgroundColor: '#dc3545',
-                  }
-                ]
-              },
-              options: {
-                responsive: true,
-                interaction: { mode: 'index', intersect: false },
-                scales: {
-                  x: {
-                    stacked: false,
-                    title: { display: true, text: 'Mes' }
-                  },
-                  y: {
-                    stacked: false,
-                    title: { display: true, text: 'Monto (S/)' },
-                    ticks: { precision: 0 }
-                  }
+                type: 'doughnut',
+
+                data: {
+
+                    labels: labels,
+
+                    datasets: [{
+                        data: values,
+
+                        backgroundColor: [
+                            '#07852F',
+                            '#E30613'
+                        ],
+
+                        borderWidth: 0,
+
+                        hoverOffset: 6
+                    }]
                 },
-                plugins: {
-                  legend: { position: 'bottom' },
-                  tooltip: {
-                    callbacks: {
-                      label: function (context) {
-                        return `${context.dataset.label}: S/ ${Number(context.parsed.y).toFixed(2)}`;
-                      }
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    cutout: '72%',
+
+                    plugins: {
+
+                        legend: {
+
+                            position: 'bottom',
+
+                            labels: {
+
+                                usePointStyle: true,
+
+                                pointStyle: 'circle',
+
+                                padding: 20,
+
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+
+                        tooltip: {
+
+                            padding: 12,
+
+                            cornerRadius: 10,
+
+                            callbacks: {
+
+                                label: function (context) {
+
+                                    return `${context.label}: S/ ${Number(
+                                        context.parsed
+                                    ).toFixed(2)}`;
+                                }
+                            }
+                        }
                     }
-                  }
                 }
-              }
             });
-          }
         }
-      }
+
+
+        /* =====================================================
+   GRÁFICA MENSUAL
+   Compras vs Gastos - Líneas
+====================================================== */
+
+        const monthlyDataEl =
+            document.getElementById('monthly-chart-data');
+
+        const monthlyCanvas =
+            document.getElementById('monthlyChart');
+
+        if (monthlyDataEl && monthlyCanvas) {
+
+            const monthlyData = JSON.parse(
+                monthlyDataEl.textContent || '{}'
+            );
+
+            const monthlyCtx =
+                monthlyCanvas.getContext('2d');
+
+
+            /* =================================================
+               DEGRADADO COMPRAS
+            ================================================= */
+
+            const comprasGradient =
+                monthlyCtx.createLinearGradient(
+                    0,
+                    0,
+                    0,
+                    330
+                );
+
+            comprasGradient.addColorStop(
+                0,
+                'rgba(7, 133, 47, 0.28)'
+            );
+
+            comprasGradient.addColorStop(
+                1,
+                'rgba(7, 133, 47, 0.01)'
+            );
+
+
+            /* =================================================
+               DEGRADADO GASTOS
+            ================================================= */
+
+            const gastosGradient =
+                monthlyCtx.createLinearGradient(
+                    0,
+                    0,
+                    0,
+                    330
+                );
+
+            gastosGradient.addColorStop(
+                0,
+                'rgba(227, 6, 19, 0.25)'
+            );
+
+            gastosGradient.addColorStop(
+                1,
+                'rgba(227, 6, 19, 0.01)'
+            );
+
+
+            /* =================================================
+               CREAR GRÁFICA
+            ================================================= */
+
+            new Chart(monthlyCtx, {
+
+                type: 'line',
+
+                data: {
+
+                    labels: monthlyData.labels || [],
+
+                    datasets: [
+
+                        /* COMPRAS */
+                        {
+                            label: 'Compras',
+
+                            data:
+                                monthlyData.compras || [],
+
+                            borderColor:
+                                '#07852F',
+
+                            backgroundColor:
+                                comprasGradient,
+
+                            borderWidth: 3,
+
+                            fill: true,
+
+                            tension: 0.4,
+
+                            pointRadius: 4,
+
+                            pointHoverRadius: 7,
+
+                            pointBackgroundColor:
+                                '#ffffff',
+
+                            pointBorderColor:
+                                '#07852F',
+
+                            pointBorderWidth: 3,
+
+                            pointHoverBackgroundColor:
+                                '#07852F',
+
+                            pointHoverBorderColor:
+                                '#ffffff',
+
+                            pointHoverBorderWidth: 3
+                        },
+
+
+                        /* GASTOS */
+                        {
+                            label: 'Gastos',
+
+                            data:
+                                monthlyData.gastos || [],
+
+                            borderColor:
+                                '#E30613',
+
+                            backgroundColor:
+                                gastosGradient,
+
+                            borderWidth: 3,
+
+                            fill: true,
+
+                            tension: 0.4,
+
+                            pointRadius: 4,
+
+                            pointHoverRadius: 7,
+
+                            pointBackgroundColor:
+                                '#ffffff',
+
+                            pointBorderColor:
+                                '#E30613',
+
+                            pointBorderWidth: 3,
+
+                            pointHoverBackgroundColor:
+                                '#E30613',
+
+                            pointHoverBorderColor:
+                                '#ffffff',
+
+                            pointHoverBorderWidth: 3
+                        }
+                    ]
+                },
+
+
+                /* =================================================
+                   OPCIONES
+                ================================================= */
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    interaction: {
+
+                        mode: 'index',
+
+                        intersect: false
+                    },
+
+
+                    /* =============================================
+                       ANIMACIÓN
+                    ============================================== */
+
+                    animation: {
+
+                        duration: 1200,
+
+                        easing: 'easeOutQuart'
+                    },
+
+
+                    /* =============================================
+                       EJES
+                    ============================================== */
+
+                    scales: {
+
+                        x: {
+
+                            grid: {
+                                display: false
+                            },
+
+                            border: {
+                                display: false
+                            },
+
+                            ticks: {
+
+                                color: '#7b8496',
+
+                                padding: 10,
+
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        },
+
+
+                        y: {
+
+                            beginAtZero: true,
+
+                            border: {
+                                display: false
+                            },
+
+                            grid: {
+
+                                color:
+                                    'rgba(0,0,0,.05)',
+
+                                drawTicks: false
+                            },
+
+                            ticks: {
+
+                                color:
+                                    '#7b8496',
+
+                                padding: 10,
+
+                                callback: function (value) {
+
+                                    return 'S/ ' +
+                                        Number(value)
+                                            .toLocaleString(
+                                                'es-PE'
+                                            );
+                                }
+                            }
+                        }
+                    },
+
+
+                    /* =============================================
+                       PLUGINS
+                    ============================================== */
+
+                    plugins: {
+
+                        legend: {
+
+                            position: 'top',
+
+                            align: 'end',
+
+                            labels: {
+
+                                usePointStyle: true,
+
+                                pointStyle: 'circle',
+
+                                boxWidth: 8,
+
+                                boxHeight: 8,
+
+                                padding: 20,
+
+                                color: '#596174',
+
+                                font: {
+
+                                    size: 12,
+
+                                    weight: '500'
+                                }
+                            }
+                        },
+
+
+                        /* =========================================
+                           TOOLTIP
+                        ========================================== */
+
+                        tooltip: {
+
+                            enabled: true,
+
+                            mode: 'index',
+
+                            intersect: false,
+
+                            backgroundColor:
+                                'rgba(6, 21, 45, 0.95)',
+
+                            titleColor:
+                                '#ffffff',
+
+                            bodyColor:
+                                '#ffffff',
+
+                            padding: 14,
+
+                            cornerRadius: 10,
+
+                            displayColors: true,
+
+                            usePointStyle: true,
+
+                            callbacks: {
+
+                                label: function (context) {
+
+                                    const value =
+                                        Number(
+                                            context.parsed.y
+                                        );
+
+                                    return (
+                                        context.dataset.label +
+                                        ': S/ ' +
+                                        value.toLocaleString(
+                                            'es-PE',
+                                            {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2
+                                            }
+                                        )
+                                    );
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
     });
-  </script>
+</script>
+
 {% endblock %}

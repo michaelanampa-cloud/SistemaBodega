@@ -1,100 +1,360 @@
 {% extends 'dashboard_base.html' %}
 
-{% block title %}Lista de Gastos{% endblock %}
+{% block title %}Gastos | Doña Catita{% endblock %}
 
 {% block content %}
-<div class="container">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1><i class="fas fa-list"></i> Gastos registrados</h1>
-    <a href="{% url 'registrar_gastos' %}" class="btn btn-outline-success"><i class="fas fa-plus"></i> Registrar nuevo gasto</a>
+
+<div class="dc-list-page">
+
+  <!-- CABECERA -->
+
+  <div class="dc-page-header">
+
+    <div class="dc-page-heading">
+
+      <div class="dc-page-heading-icon">
+        <i class="fa-solid fa-wallet"></i>
+      </div>
+
+      <div>
+        <h1>Gastos</h1>
+        <p>
+          Consulta y administra los gastos de la bodega.
+        </p>
+      </div>
+
+    </div>
+
+
+    <div class="dc-page-actions">
+
+      <a href="{% url 'registrar_gastos' %}" class="dc-btn dc-btn-success">
+        <i class="fa-solid fa-plus"></i>
+        Registrar gasto
+      </a>
+
+    </div>
+
   </div>
 
-  <form method="get" class="row g-3 mb-4">
-    <div class="col-md-3">
-      <label class="form-label">Proveedor</label>
-      <input type="text" name="proveedor" class="form-control" placeholder="Nombre del proveedor">
-    </div>
-    <div class="col-md-3">
-      <label class="form-label">Desde</label>
-      <input type="date" name="fecha_inicio" class="form-control" value="{{ fecha_inicio }}">
-    </div>
-    <div class="col-md-3">
-      <label class="form-label">Hasta</label>
-      <input type="date" name="fecha_fin" class="form-control" value="{{ fecha_fin }}">
-    </div>
-    <div class="col-md-3 d-flex align-items-end">
-      <div class="col-md-6">
-      <button class="btn btn-outline-primary w-100"><i class="fas fa-search"></i> Filtrar
-      </button>
+
+  <!-- FILTROS -->
+
+  <form method="get" class="dc-filter-card">
+
+    <div class="dc-filter-grid">
+
+      <div class="dc-filter-field">
+
+        <label for="proveedor">
+          Proveedor
+        </label>
+
+        <div class="dc-input-wrap">
+
+          <i class="fa-solid fa-truck"></i>
+
+          <input id="proveedor" type="text" name="proveedor" class="form-control" value="{{ request.GET.proveedor }}"
+            placeholder="Nombre del proveedor">
+
+        </div>
+
       </div>
-      <div class="col-md-6">
-      <a href="{% url 'lista_gastos' %}" class="btn btn-outline-secondary"><i class="fas fa-trash"></i> Limpiar</a>
+
+
+      <div class="dc-filter-field">
+
+        <label for="fechaInicio">
+          Desde
+        </label>
+
+        <input id="fechaInicio" type="date" name="fecha_inicio" class="form-control" value="{{ fecha_inicio }}">
+
       </div>
+
+
+      <div class="dc-filter-field">
+
+        <label for="fechaFin">
+          Hasta
+        </label>
+
+        <input id="fechaFin" type="date" name="fecha_fin" class="form-control" value="{{ fecha_fin }}">
+
+      </div>
+
+
+      <div class="dc-filter-actions">
+
+        <button type="submit" class="dc-filter-submit">
+          <i class="fa-solid fa-filter"></i>
+          Filtrar
+        </button>
+
+        <a href="{% url 'lista_gastos' %}" class="dc-filter-clear">
+          <i class="fa-solid fa-rotate-left"></i>
+          Limpiar
+        </a>
+
+      </div>
+
     </div>
+
   </form>
 
-  {% if gastos %}
-    <div class="table-responsive">
-      <table class="table table-hover table-striped table-bordered text-center">
-        <thead class="table-dark">
+
+  <!-- TABLA -->
+
+  <div class="dc-table-card">
+
+    <div class="dc-table-card-header">
+
+      <h2>
+        <i class="fa-solid fa-file-invoice-dollar"></i>
+        Historial de gastos
+      </h2>
+
+      {% if page_obj %}
+
+      <span class="dc-table-count">
+        {{ page_obj.paginator.count }} registros
+      </span>
+
+      {% endif %}
+
+    </div>
+
+
+    {% if gastos %}
+
+    <div class="dc-table-responsive">
+
+      <table class="dc-admin-table">
+
+        <thead>
+
           <tr>
             <th>Código</th>
             <th>Proveedor</th>
-            <th>Tipo</th>
+            <th>Método</th>
             <th>Total</th>
             <th>Fecha</th>
-            <th>Acciones</th>
+            <th class="text-center">Acciones</th>
           </tr>
+
         </thead>
+
+
         <tbody>
+
           {% for gasto in gastos %}
-            <tr>
-              <td>{{ gasto.codigo }}</td>
-              <td>{{ gasto.proveedor.nombre }}</td>
-              <td>{{ gasto.get_tipo_compra_display }}</td>
-              <td>S/ {{ gasto.total }}</td>
-              <td>{{ gasto.fecha|date:'d/m/Y H:i' }}</td>
-              <td>
-                <a href="{% url 'detalle_gasto' gasto.pk %}" class="btn btn-sm btn-success"><i class="fas fa-eye"></i> Ver detalle</a>
-              </td>
-            </tr>
+
+          <tr>
+
+            <td data-label="Código">
+
+              <span class="dc-code">
+                {{ gasto.codigo }}
+              </span>
+
+            </td>
+
+
+            <td data-label="Proveedor">
+
+              {% if gasto.proveedor %}
+
+              <span class="dc-record-title">
+                {{ gasto.proveedor.nombre }}
+              </span>
+
+              {% else %}
+
+              <span class="text-muted">
+                Sin proveedor
+              </span>
+
+              {% endif %}
+
+            </td>
+
+
+            <td data-label="Método">
+
+              {% if gasto.tipo_compra == 'yape' %}
+
+              <span class="dc-badge dc-badge-blue">
+                {{ gasto.get_tipo_compra_display }}
+              </span>
+
+              {% elif gasto.tipo_compra == 'efectivo' %}
+
+              <span class="dc-badge dc-badge-green">
+                {{ gasto.get_tipo_compra_display }}
+              </span>
+
+              {% elif gasto.tipo_compra == 'fiado' %}
+
+              <span class="dc-badge dc-badge-warning">
+                {{ gasto.get_tipo_compra_display }}
+              </span>
+
+              {% else %}
+
+              <span class="dc-badge dc-badge-neutral">
+                {{ gasto.get_tipo_compra_display }}
+              </span>
+
+              {% endif %}
+
+            </td>
+
+
+            <td data-label="Total">
+
+              <span class="dc-money">
+                S/ {{ gasto.total|floatformat:2 }}
+              </span>
+
+            </td>
+
+
+            <td data-label="Fecha">
+
+              <span class="dc-record-title">
+                {{ gasto.fecha|date:'d/m/Y' }}
+              </span>
+
+              <span class="dc-record-subtitle">
+                {{ gasto.fecha|date:'H:i' }}
+              </span>
+
+            </td>
+
+
+            <td data-label="Acciones">
+
+              <div class="dc-table-actions">
+
+                <a href="{% url 'detalle_gasto' gasto.pk %}" class="dc-action-btn dc-action-view" title="Ver detalle"
+                  aria-label="Ver detalle">
+                  <i class="fa-regular fa-eye"></i>
+                </a>
+
+              </div>
+
+            </td>
+
+          </tr>
+
           {% endfor %}
+
         </tbody>
+
       </table>
+
     </div>
-  {% else %}
-    <div class="alert alert-info">No hay gastos registrados aún.</div>
+
+    {% else %}
+
+    <div class="dc-empty-state">
+
+      <div class="dc-empty-icon">
+        <i class="fa-solid fa-file-invoice-dollar"></i>
+      </div>
+
+      <h3>No hay gastos registrados</h3>
+
+      <p>
+        No encontramos gastos con los filtros seleccionados.
+      </p>
+
+    </div>
+
+    {% endif %}
+
+  </div>
+
+
+  <!-- PAGINACIÓN -->
+
+  {% if page_obj.paginator.num_pages > 1 %}
+
+  <div class="dc-pagination-wrapper">
+
+    <span class="dc-pagination-info">
+
+      Página {{ page_obj.number }}
+      de {{ page_obj.paginator.num_pages }}
+
+    </span>
+
+
+    <nav aria-label="Paginación">
+
+      <ul class="pagination dc-pagination">
+
+        {% if page_obj.has_previous %}
+
+        <li class="page-item">
+
+          <a class="page-link"
+            href="?proveedor={{ request.GET.proveedor|urlencode }}&fecha_inicio={{ fecha_inicio }}&fecha_fin={{ fecha_fin }}&page={{ page_obj.previous_page_number }}">
+            <i class="fa-solid fa-chevron-left"></i>
+          </a>
+
+        </li>
+
+        {% endif %}
+
+
+        {% for num in page_obj.paginator.page_range %}
+
+        {% if num == page_obj.number %}
+
+        <li class="page-item active">
+
+          <span class="page-link">
+            {{ num }}
+          </span>
+
+        </li>
+
+        {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %} <li class="page-item">
+
+          <a class="page-link"
+            href="?proveedor={{ request.GET.proveedor|urlencode }}&fecha_inicio={{ fecha_inicio }}&fecha_fin={{ fecha_fin }}&page={{ num }}">
+            {{ num }}
+          </a>
+
+          </li>
+
+          {% endif %}
+
+          {% endfor %}
+
+
+          {% if page_obj.has_next %}
+
+          <li class="page-item">
+
+            <a class="page-link"
+              href="?proveedor={{ request.GET.proveedor|urlencode }}&fecha_inicio={{ fecha_inicio }}&fecha_fin={{ fecha_fin }}&page={{ page_obj.next_page_number }}">
+              <i class="fa-solid fa-chevron-right"></i>
+            </a>
+
+          </li>
+
+          {% endif %}
+
+      </ul>
+
+    </nav>
+
+  </div>
+
   {% endif %}
+
 </div>
-
-{% if page_obj.paginator.num_pages > 1 %}
-<nav aria-label="Paginación" class="mt-4">
-  <ul class="pagination justify-content-center">
-    {% if page_obj.has_previous %}
-      <li class="page-item">
-        <a class="page-link" href="?q={{ query }}&tipo={{ tipo }}&page={{ page_obj.previous_page_number }}">Anterior</a>
-      </li>
-    {% else %}
-      <li class="page-item disabled"><span class="page-link">Anterior</span></li>
-    {% endif %}
-
-    {% for num in page_obj.paginator.page_range %}
-      {% if num == page_obj.number %}
-        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-      {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
-        <li class="page-item"><a class="page-link" href="?q={{ query }}&tipo={{ tipo }}&page={{ num }}">{{ num }}</a></li>
-      {% endif %}
-    {% endfor %}
-
-    {% if page_obj.has_next %}
-      <li class="page-item">
-        <a class="page-link" href="?q={{ query }}&tipo={{ tipo }}&page={{ page_obj.next_page_number }}">Siguiente</a>
-      </li>
-    {% else %}
-      <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
-    {% endif %}
-  </ul>
-</nav>
-{% endif %}
 
 {% endblock %}
