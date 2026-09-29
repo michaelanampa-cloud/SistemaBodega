@@ -1,92 +1,1581 @@
 {% extends 'base_admin.html' %}
 {% load static %}
 
-{% block title %}Detalle Producto{% endblock %}
+{% block title %}Detalle de {{ producto.nombre }}{% endblock %}
 
 {% block content %}
-<div class="card mb-4">
-  <div class="row g-0">
-    <div class="col-md-4">
-      {% if producto.imagen %}
-        <img src="{% static 'img/productos/' %}{{ producto.imagen }}" class="img-fluid rounded-start" alt="{{ producto.nombre }}">
-      {% else %}
-        <img src="{% static 'img/logo.png' %}" class="img-fluid rounded-start" alt="Sin imagen disponible">
-      {% endif %}
-    </div>
-    <div class="col-md-8">
-      <div class="card-body">
-        <h3 class="card-title">{{ producto.nombre }}</h3>
-        <p><strong>Tipo:</strong> {{ producto.tipoProducto }}</p>
-        <p><strong>Precio:</strong>S/ {{ producto.precio }}</p>
-        <p><strong>Costo:</strong> S/ {{ producto.costo }}</p>
-        <p><strong>Stock:</strong> {{ producto.stock }} {{ producto.unidadMedida }}</p>
-        <p><strong>Última edición:</strong> {{ producto.updated_at|date:'d/m/Y H:i' }}</p>
-        <p><strong>Fecha de ultima compra:</strong> {{ producto.updated_at|date:'d/m/Y H:i' }}</p>
-        <p><strong>Vencimiento:</strong> {{ producto.fechaVencimiento|date:'d/m/Y' }}</p>
-        <p><strong>Ganancia por unidad:</strong> <span id="ganancia_unit" class="text-primary">S/ 0.00</span></p>
-        <p><strong>Porcentaje de Ganancia:</strong> <span id="ganancia_porcentaje" class="text-success"> 0.00 %</span></p>
-        <p><strong>Ganancia total:</strong> <span id="ganancia_total" class="text-success">S/ 0.00</span></p>
-        <div id="producto_data" data-precio="{{ producto.precio }}" data-costo="{{ producto.costo }}" style="display:none;"></div>
-        <p><strong>Detalle:</strong></p>
-        <p>{{ producto.detalle|linebreaks }}</p>
-        <div class="mt-3">
-          <a class="btn btn-outline-secondary" href="{% url 'lista_productos' %}"><i class="fa-solid fa-arrow-left"></i> Volver</a>
-          <a class="btn btn-outline-warning" href="{% url 'editar_producto' producto.pk %}"><i class="fa-regular fa-pen-to-square"></i> Editar</a>
-          <a class="btn btn-outline-danger" href="{% url 'eliminar_producto' producto.pk %}"><i class="fa-regular fa-rectangle-xmark"></i> Eliminar</a>
-        </div>
-        <div class="mt-3">
-          <form method="post" action="{% url 'agregar_carrito' producto.pk %}" class="row g-2 align-items-center">
-            {% csrf_token %}
-            <div class="col-auto">
-              <label for="cantidad" class="form-label">Cantidad</label>
-              <input type="number" id="cantidad" name="cantidad" min="1" max="{{ producto.stock }}" value="1" class="form-control" style="width: 100px;">
-            </div>
-            <div class="col-auto mt-4">
-              <button type="submit" class="btn btn-outline-success"><i class="fa-solid fa-cart-plus"></i> Agregar al carrito</button>
-            </div>
-          </form>
-        </div>
+
+<style>
+  /* =========================================================
+       DETALLE PRODUCTO - DOÑA CATITA
+       Todo está encapsulado con dc-product-detail
+    ========================================================= */
+
+  .dc-product-detail {
+    padding: 10px 0 30px;
+  }
+
+  /* ---------- Encabezado ---------- */
+
+  .dc-product-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 22px;
+  }
+
+  .dc-product-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #7a8494;
+    font-size: .85rem;
+    margin-bottom: 7px;
+  }
+
+  .dc-product-breadcrumb i {
+    color: #E30613;
+  }
+
+  .dc-product-header h1 {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #06152D;
+    line-height: 1.2;
+  }
+
+  .dc-product-header-subtitle {
+    color: #7a8494;
+    margin-top: 6px;
+    font-size: .9rem;
+  }
+
+  /* ---------- Contenedor principal ---------- */
+
+  .dc-product-main-card {
+    background: #fff;
+    border: 1px solid #e7ebf0;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(6, 21, 45, .07);
+  }
+
+  /* ---------- Imagen ---------- */
+
+  .dc-product-image-column {
+    background: linear-gradient(145deg, #f6f8fb, #eef2f6);
+    min-height: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 28px;
+  }
+
+  .dc-product-image-wrapper {
+    width: 100%;
+    max-width: 430px;
+    height: 440px;
+    border-radius: 18px;
+    background: #fff;
+    border: 1px solid #e4e8ee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 12px 30px rgba(6, 21, 45, .08);
+  }
+
+  .dc-product-image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 18px;
+    transition: transform .35s ease;
+  }
+
+  .dc-product-image-wrapper:hover img {
+    transform: scale(1.04);
+  }
+
+  .dc-no-image {
+    text-align: center;
+    color: #8b95a5;
+  }
+
+  .dc-no-image i {
+    font-size: 4rem;
+    margin-bottom: 12px;
+    color: #c8ced8;
+  }
+
+  .dc-no-image p {
+    margin: 0;
+    font-size: .9rem;
+  }
+
+  /* ---------- Información ---------- */
+
+  .dc-product-info {
+    padding: 30px 34px;
+  }
+
+  .dc-product-type {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: #eef7f1;
+    color: #07852F;
+    font-size: .78rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .dc-product-name {
+    font-size: 2rem;
+    line-height: 1.2;
+    font-weight: 700;
+    color: #06152D;
+    margin-bottom: 25px;
+  }
+
+  /* ---------- Precio ---------- */
+
+  .dc-price-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    background: linear-gradient(135deg, #06152D, #0A2348);
+    color: white;
+    padding: 18px 20px;
+    border-radius: 15px;
+    margin-bottom: 22px;
+  }
+
+  .dc-price-label {
+    color: rgba(255, 255, 255, .65);
+    font-size: .78rem;
+    margin-bottom: 3px;
+  }
+
+  .dc-price {
+    font-size: 1.7rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .dc-cost {
+    text-align: right;
+  }
+
+  .dc-cost-label {
+    color: rgba(255, 255, 255, .65);
+    font-size: .75rem;
+  }
+
+  .dc-cost-value {
+    font-size: .95rem;
+    font-weight: 600;
+  }
+
+  /* ---------- Información en tarjetas ---------- */
+
+  .dc-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+
+  .dc-info-item {
+    border: 1px solid #e9edf2;
+    border-radius: 13px;
+    padding: 14px;
+    background: #fff;
+    min-width: 0;
+  }
+
+  .dc-info-item-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #8791a1;
+    font-size: .72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .3px;
+    margin-bottom: 6px;
+  }
+
+  .dc-info-item-label i {
+    color: #073E78;
+  }
+
+  .dc-info-item-value {
+    color: #182335;
+    font-size: .93rem;
+    font-weight: 600;
+  }
+
+  .dc-stock-value {
+    color: #07852F;
+  }
+
+  .dc-stock-low {
+    color: #E30613;
+  }
+
+  /* ---------- Ganancias ---------- */
+
+  .dc-profit-card {
+    border: 1px solid #dceee3;
+    background: linear-gradient(135deg, #f5fcf7, #ffffff);
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 22px;
+  }
+
+  .dc-profit-title {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: #07852F;
+    font-weight: 700;
+    margin-bottom: 15px;
+  }
+
+  .dc-profit-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .dc-profit-item {
+    background: #fff;
+    border: 1px solid #e4eee7;
+    border-radius: 11px;
+    padding: 12px;
+  }
+
+  .dc-profit-label {
+    color: #7c8795;
+    font-size: .72rem;
+    margin-bottom: 5px;
+  }
+
+  .dc-profit-value {
+    color: #07852F;
+    font-weight: 700;
+    font-size: 1rem;
+  }
+
+  /* ---------- Detalle ---------- */
+
+  .dc-description {
+    margin-bottom: 23px;
+  }
+
+  .dc-section-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #06152D;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .dc-description-content {
+    color: #687386;
+    line-height: 1.65;
+    font-size: .9rem;
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 13px 15px;
+  }
+
+  /* ---------- Acciones ---------- */
+
+  .dc-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-bottom: 23px;
+  }
+
+  .dc-action {
+    border-radius: 9px;
+    font-size: .85rem;
+    font-weight: 500;
+    padding: 9px 14px;
+    transition: all .2s ease;
+  }
+
+  .dc-action:hover {
+    transform: translateY(-1px);
+  }
+
+  /* ---------- Carrito ---------- */
+
+  .dc-cart-box {
+    border-top: 1px solid #e9edf2;
+    padding-top: 20px;
+  }
+
+  .dc-cart-title {
+    color: #06152D;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .dc-cart-form {
+    display: flex;
+    align-items: end;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .dc-quantity-group label {
+    display: block;
+    color: #687386;
+    font-size: .78rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+  }
+
+  .dc-quantity-input {
+    width: 115px;
+    height: 43px;
+    border: 1px solid #d8dee7;
+    border-radius: 9px;
+    padding: 0 12px;
+    font-size: .95rem;
+  }
+
+  .dc-quantity-input:focus {
+    border-color: #07852F;
+    box-shadow: 0 0 0 3px rgba(7, 133, 47, .10);
+    outline: none;
+  }
+
+  .dc-cart-button {
+    height: 43px;
+    border-radius: 9px;
+    padding: 0 17px;
+    border: 1px solid #07852F;
+    background: #fff;
+    color: #07852F;
+    font-weight: 600;
+    transition: all .2s ease;
+  }
+
+  .dc-cart-button:hover {
+    background: #07852F;
+    color: #fff;
+    transform: translateY(-1px);
+  }
+
+  /* ---------- Responsive ---------- */
+
+  @media (max-width: 991.98px) {
+
+    .dc-product-image-column {
+      min-height: auto;
+      padding: 20px;
+    }
+
+    .dc-product-image-wrapper {
+      height: 360px;
+      max-width: 380px;
+    }
+
+    .dc-product-info {
+      padding: 25px;
+    }
+
+    .dc-product-name {
+      font-size: 1.7rem;
+    }
+  }
+
+  @media (max-width: 767.98px) {
+
+    .dc-product-header {
+      align-items: flex-start;
+    }
+
+    .dc-product-header h1 {
+      font-size: 1.4rem;
+    }
+
+    .dc-product-image-wrapper {
+      height: 300px;
+    }
+
+    .dc-product-info {
+      padding: 20px;
+    }
+
+    .dc-product-name {
+      font-size: 1.45rem;
+    }
+
+    .dc-info-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .dc-profit-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .dc-price-box {
+      align-items: flex-start;
+    }
+
+    .dc-cart-form {
+      align-items: stretch;
+    }
+
+    .dc-quantity-group {
+      width: 100%;
+    }
+
+    .dc-quantity-input {
+      width: 100%;
+    }
+
+    .dc-cart-button {
+      width: 100%;
+    }
+
+    .dc-actions {
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+
+    .dc-action {
+      width: 100%;
+    }
+  }
+
+  .dc-last-purchase-item {
+    position: relative;
+    background: linear-gradient(
+        135deg,
+        #f8fbff,
+        #ffffff
+    );
+}
+
+.dc-last-purchase-date {
+    color: #06152D;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.dc-last-purchase-provider {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #687386;
+    font-size: .82rem;
+    margin-bottom: 10px;
+}
+
+.dc-last-purchase-provider i {
+    color: #073E78;
+}
+
+.dc-last-purchase-cost {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 10px;
+    font-size: .82rem;
+}
+
+.dc-last-purchase-cost span {
+    color: #7c8795;
+}
+
+.dc-last-purchase-cost strong {
+    color: #07852F;
+    font-size: .95rem;
+}
+
+.dc-last-purchase-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 7px 10px;
+    border: 1px solid #073E78;
+    border-radius: 8px;
+    background: #fff;
+    color: #073E78;
+    text-decoration: none;
+    font-size: .78rem;
+    font-weight: 600;
+    transition: all .2s ease;
+}
+
+.dc-last-purchase-button:hover {
+    background: #073E78;
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.dc-no-purchase {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #8b95a5;
+    font-size: .82rem;
+}
+
+.dc-no-purchase i {
+    color: #b8c0cb;
+}
+
+/* =========================================================
+   HISTORIAL DE COMPRAS
+========================================================= */
+
+.dc-purchase-history {
+    margin-top: 24px;
+    border: 1px solid #e5eaf0;
+    border-radius: 16px;
+    background: #fff;
+    overflow: hidden;
+}
+
+.dc-purchase-history-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 18px 20px;
+    border-bottom: 1px solid #e9edf2;
+    background: #fafbfd;
+}
+
+.dc-purchase-history-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dc-purchase-history-icon {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+    background: #eef4fb;
+    color: #073E78;
+    font-size: 1rem;
+}
+
+.dc-purchase-history-title h3 {
+    margin: 0;
+    color: #06152D;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.dc-purchase-history-title p {
+    margin: 3px 0 0;
+    color: #8993a3;
+    font-size: .76rem;
+}
+
+.dc-purchase-history-count {
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: #eef7f1;
+    color: #07852F;
+    font-size: .72rem;
+    font-weight: 600;
+}
+
+
+/* ---------- Filas ---------- */
+
+.dc-purchase-history-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.dc-purchase-history-row {
+    display: grid;
+    grid-template-columns:
+        1.1fr
+        1.7fr
+        1fr
+        1.15fr
+        auto;
+
+    align-items: center;
+    gap: 18px;
+
+    padding: 17px 20px;
+
+    border-bottom: 1px solid #edf0f4;
+
+    transition: background .2s ease;
+}
+
+.dc-purchase-history-row:last-child {
+    border-bottom: none;
+}
+
+.dc-purchase-history-row:hover {
+    background: #fafcfe;
+}
+
+
+/* ---------- Fecha ---------- */
+
+.dc-history-date {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dc-history-date-icon {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 9px;
+
+    background: #f2f5f8;
+    color: #073E78;
+}
+
+.dc-history-date strong {
+    display: block;
+    color: #182335;
+    font-size: .82rem;
+}
+
+.dc-history-date small {
+    display: block;
+    margin-top: 2px;
+    color: #8993a3;
+    font-size: .7rem;
+}
+
+
+/* ---------- Datos ---------- */
+
+.dc-history-label {
+    display: block;
+    margin-bottom: 5px;
+
+    color: #9aa3b1;
+    font-size: .63rem;
+    font-weight: 700;
+
+    letter-spacing: .45px;
+}
+
+.dc-history-provider strong,
+.dc-history-quantity strong,
+.dc-history-cost strong {
+    color: #263246;
+    font-size: .82rem;
+}
+
+.dc-history-provider i {
+    color: #073E78;
+    margin-right: 5px;
+}
+
+.dc-history-cost strong {
+    color: #07852F;
+    font-size: .9rem;
+}
+
+
+/* ---------- Botón ---------- */
+
+.dc-history-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+
+    padding: 8px 12px;
+
+    border: 1px solid #d5dce5;
+    border-radius: 8px;
+
+    background: #fff;
+    color: #073E78;
+
+    text-decoration: none;
+
+    font-size: .75rem;
+    font-weight: 600;
+
+    white-space: nowrap;
+
+    transition: all .2s ease;
+}
+
+.dc-history-button:hover {
+    border-color: #073E78;
+    background: #073E78;
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+
+/* ---------- Sin historial ---------- */
+
+.dc-history-empty {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    padding: 25px 20px;
+
+    color: #7d8796;
+}
+
+.dc-history-empty-icon {
+    width: 44px;
+    height: 44px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 11px;
+
+    background: #f3f5f7;
+    color: #9ca5b2;
+}
+
+.dc-history-empty strong {
+    display: block;
+    color: #4c5768;
+    font-size: .85rem;
+}
+
+.dc-history-empty p {
+    margin: 3px 0 0;
+    color: #929ba8;
+    font-size: .75rem;
+}
+
+
+/* =========================================================
+   ÚLTIMA COMPRA
+========================================================= */
+
+.dc-last-purchase-item {
+    position: relative;
+    background: linear-gradient(
+        135deg,
+        #f8fbff,
+        #ffffff
+    );
+}
+
+.dc-last-purchase-date {
+    color: #06152D;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.dc-last-purchase-provider {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    color: #687386;
+    font-size: .82rem;
+
+    margin-bottom: 9px;
+}
+
+.dc-last-purchase-provider i {
+    color: #073E78;
+}
+
+.dc-last-purchase-details {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+
+    margin-bottom: 10px;
+
+    font-size: .78rem;
+}
+
+.dc-last-purchase-details span {
+    color: #687386;
+}
+
+.dc-last-purchase-details strong {
+    color: #07852F;
+    font-size: .92rem;
+}
+
+.dc-last-purchase-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+
+    width: 100%;
+    padding: 7px 10px;
+
+    border: 1px solid #073E78;
+    border-radius: 8px;
+
+    background: #fff;
+    color: #073E78;
+
+    text-decoration: none;
+
+    font-size: .76rem;
+    font-weight: 600;
+
+    transition: all .2s ease;
+}
+
+.dc-last-purchase-button:hover {
+    background: #073E78;
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    .dc-purchase-history-row {
+        grid-template-columns:
+            1fr
+            1fr
+            1fr
+            auto;
+    }
+
+    .dc-history-provider {
+        min-width: 0;
+    }
+
+    .dc-history-action {
+        grid-column: 4;
+        grid-row: 1 / span 2;
+    }
+}
+
+
+@media (max-width: 767.98px) {
+
+    .dc-purchase-history-header {
+        align-items: flex-start;
+    }
+
+    .dc-purchase-history-row {
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        padding: 15px;
+    }
+
+    .dc-history-date {
+        grid-column: 1 / -1;
+    }
+
+    .dc-history-provider {
+        grid-column: 1 / -1;
+    }
+
+    .dc-history-action {
+        grid-column: 1 / -1;
+    }
+
+    .dc-history-button {
+        width: 100%;
+    }
+}
+
+</style>
+
+<div class="container-fluid dc-product-detail">
+
+  <!-- =====================================================
+         ENCABEZADO
+    ====================================================== -->
+
+  <div class="dc-product-header">
+
+    <div>
+      <div class="dc-product-breadcrumb">
+        <i class="fa-solid fa-box"></i>
+        <span>Productos</span>
+        <i class="fa-solid fa-chevron-right"></i>
+        <span>Detalle</span>
+      </div>
+
+      <h1>Detalle del producto</h1>
+
+      <div class="dc-product-header-subtitle">
+        Información, stock, rentabilidad y acciones del producto.
       </div>
     </div>
+
   </div>
+
+
+  <!-- =====================================================
+         TARJETA PRINCIPAL
+    ====================================================== -->
+
+  <div class="dc-product-main-card">
+
+    <div class="row g-0">
+
+      <!-- ================= IMAGEN ================= -->
+
+      <div class="col-lg-5">
+
+        <div class="dc-product-image-column">
+
+          <div class="dc-product-image-wrapper">
+
+            {% if producto.imagen %}
+
+            <img src="{% static 'img/productos/' %}{{ producto.imagen }}" alt="{{ producto.nombre }}">
+
+            {% else %}
+
+            <div class="dc-no-image">
+
+              <i class="fa-regular fa-image d-block"></i>
+
+              <p>Sin imagen disponible</p>
+
+            </div>
+
+            {% endif %}
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ================= INFORMACIÓN ================= -->
+
+      <div class="col-lg-7">
+
+        <div class="dc-product-info">
+
+          <!-- Tipo -->
+
+          <div class="dc-product-type">
+
+            <i class="fa-solid fa-tag"></i>
+
+            {{ producto.tipoProducto }}
+
+          </div>
+
+
+          <!-- Nombre -->
+
+          <h2 class="dc-product-name">
+
+            {{ producto.nombre }}
+
+          </h2>
+
+
+          <!-- Precio -->
+
+          <div class="dc-price-box">
+
+            <div>
+
+              <div class="dc-price-label">
+                Precio de venta
+              </div>
+
+              <div class="dc-price">
+                S/ {{ producto.precio }}
+              </div>
+
+            </div>
+
+            <div class="dc-cost">
+
+              <div class="dc-cost-label">
+                Costo
+              </div>
+
+              <div class="dc-cost-value">
+                S/ {{ producto.costo }}
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- Información -->
+
+          <div class="dc-info-grid">
+
+            <div class="dc-info-item">
+
+              <div class="dc-info-item-label">
+                <i class="fa-solid fa-boxes-stacked"></i>
+                Stock
+              </div>
+
+              <div class="dc-info-item-value
+                                {% if producto.stock <= 0 %}
+                                    dc-stock-low
+                                {% else %}
+                                    dc-stock-value
+                                {% endif %}">
+                {{ producto.stock }}
+                {{ producto.unidadMedida }}
+              </div>
+
+            </div>
+
+
+            <div class="dc-info-item">
+
+              <div class="dc-info-item-label">
+                <i class="fa-regular fa-calendar-check"></i>
+                Última edición
+              </div>
+
+              <div class="dc-info-item-value">
+
+                {{ producto.updated_at|date:'d/m/Y H:i' }}
+
+              </div>
+
+            </div>
+
+            <div class="dc-info-item dc-last-purchase-item">
+            
+              <div class="dc-info-item-label">
+                <i class="fa-solid fa-cart-shopping"></i>
+                Última compra
+              </div>
+            
+              {% if ultima_compra %}
+            
+              <div class="dc-last-purchase-date">
+                {{ ultima_compra.gasto.fecha|date:'d/m/Y H:i' }}
+              </div>
+            
+              <div class="dc-last-purchase-provider">
+                <i class="fa-solid fa-store"></i>
+                {{ ultima_compra.gasto.proveedor.nombre }}
+              </div>
+            
+              <div class="dc-last-purchase-details">
+            
+                <span>
+                  {{ ultima_compra.cantidad }}
+                  {{ producto.unidadMedida }}
+                </span>
+            
+                <strong>
+                  S/ {{ ultima_compra.costo|floatformat:2 }}
+                </strong>
+            
+              </div>
+            
+              <a href="{% url 'detalle_gasto' ultima_compra.gasto.pk %}" class="dc-last-purchase-button">
+                <i class="fa-solid fa-eye"></i>
+                Ver gasto
+              </a>
+            
+              {% else %}
+            
+              <div class="dc-no-purchase">
+                <i class="fa-regular fa-circle-xmark"></i>
+                Sin compras registradas
+              </div>
+            
+              {% endif %}
+            
+            </div>
+
+            <div class="dc-info-item">
+
+              <div class="dc-info-item-label">
+                <i class="fa-regular fa-calendar-xmark"></i>
+                Vencimiento
+              </div>
+
+              <div class="dc-info-item-value">
+
+                {% if producto.fechaVencimiento %}
+                {{ producto.fechaVencimiento|date:'d/m/Y' }}
+                {% else %}
+                No registrado
+                {% endif %}
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- =====================================================
+                 HISTORIAL DE COMPRAS
+            ====================================================== -->
+            
+            <div class="dc-purchase-history">
+            
+              <div class="dc-purchase-history-header">
+            
+                <div>
+            
+                  <div class="dc-purchase-history-title">
+            
+                    <span class="dc-purchase-history-icon">
+                      <i class="fa-solid fa-clock-rotate-left"></i>
+                    </span>
+            
+                    <div>
+            
+                      <h3>
+                        Historial de compras
+                      </h3>
+            
+                      <p>
+                        Últimas 5 adquisiciones de este producto
+                      </p>
+            
+                    </div>
+            
+                  </div>
+            
+                </div>
+            
+                {% if historial_compras %}
+                <span class="dc-purchase-history-count">
+                  {{ historial_compras|length }} registros
+                </span>
+                {% endif %}
+            
+              </div>
+            
+            
+              {% if historial_compras %}
+            
+              <div class="dc-purchase-history-list">
+            
+                {% for item in historial_compras %}
+            
+                <div class="dc-purchase-history-row">
+            
+                  <!-- Fecha -->
+            
+                  <div class="dc-history-date">
+            
+                    <div class="dc-history-date-icon">
+                      <i class="fa-regular fa-calendar"></i>
+                    </div>
+            
+                    <div>
+            
+                      <strong>
+                        {{ item.gasto.fecha|date:'d/m/Y' }}
+                      </strong>
+            
+                      <small>
+                        {{ item.gasto.fecha|date:'H:i' }}
+                      </small>
+            
+                    </div>
+            
+                  </div>
+            
+            
+                  <!-- Proveedor -->
+            
+                  <div class="dc-history-provider">
+            
+                    <span class="dc-history-label">
+                      PROVEEDOR
+                    </span>
+            
+                    <strong>
+                      <i class="fa-solid fa-store"></i>
+                      {{ item.gasto.proveedor.nombre }}
+                    </strong>
+            
+                  </div>
+
+                  <!-- Costo -->
+
+                    <div class="dc-history-cost">
+
+                        <span class="dc-history-label">
+                            COSTO UNITARIO
+                        </span>
+
+                        <strong>
+                            S/ {{ item.costo|floatformat:2 }}
+                        </strong>
+
+                    </div>
+            
+                  <!-- Ver gasto -->
+            
+                  <div class="dc-history-action">
+            
+                    <a href="{% url 'detalle_gasto' item.gasto.pk %}" class="dc-history-button">
+            
+                      <i class="fa-solid fa-eye"></i>
+            
+                      <span>Ver gasto</span>
+            
+                    </a>
+            
+                  </div>
+            
+                </div>
+            
+                {% endfor %}
+            
+              </div>
+            
+              {% else %}
+            
+              <div class="dc-history-empty">
+            
+                <div class="dc-history-empty-icon">
+                  <i class="fa-solid fa-receipt"></i>
+                </div>
+            
+                <div>
+            
+                  <strong>
+                    No hay historial de compras
+                  </strong>
+            
+                  <p>
+                    Este producto todavía no tiene adquisiciones registradas.
+                  </p>
+            
+                </div>
+            
+              </div>
+            
+              {% endif %}
+            
+            </div>
+
+
+          <!-- ================= GANANCIAS ================= -->
+
+          <div class="dc-profit-card">
+
+            <div class="dc-profit-title">
+
+              <i class="fa-solid fa-chart-line"></i>
+
+              Rentabilidad del producto
+
+            </div>
+
+
+            <div class="dc-profit-grid">
+
+              <div class="dc-profit-item">
+
+                <div class="dc-profit-label">
+                  Ganancia por unidad
+                </div>
+
+                <div id="ganancia_unit" class="dc-profit-value">
+                  S/ 0.00
+                </div>
+
+              </div>
+
+
+              <div class="dc-profit-item">
+
+                <div class="dc-profit-label">
+                  Porcentaje de ganancia
+                </div>
+
+                <div id="ganancia_porcentaje" class="dc-profit-value">
+                  0.00 %
+                </div>
+
+              </div>
+
+
+              <div class="dc-profit-item">
+
+                <div class="dc-profit-label">
+                  Ganancia según cantidad
+                </div>
+
+                <div id="ganancia_total" class="dc-profit-value">
+                  S/ 0.00
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- Datos para JavaScript -->
+
+          <div id="producto_data" data-precio="{{ producto.precio }}" data-costo="{{ producto.costo }}"
+            style="display:none;"></div>
+
+
+          <!-- ================= DETALLE ================= -->
+
+          <div class="dc-description">
+
+            <div class="dc-section-label">
+
+              <i class="fa-solid fa-align-left"></i>
+
+              Detalle del producto
+
+            </div>
+
+            <div class="dc-description-content">
+
+              {% if producto.detalle %}
+
+              {{ producto.detalle|linebreaks }}
+
+              {% else %}
+
+              No se ha registrado una descripción para este producto.
+
+              {% endif %}
+
+            </div>
+
+          </div>
+
+
+          <!-- ================= ACCIONES ================= -->
+
+          <div class="dc-actions">
+
+            <a href="{% url 'lista_productos' %}" class="btn btn-outline-secondary dc-action">
+              <i class="fa-solid fa-arrow-left me-1"></i>
+              Volver
+            </a>
+
+
+            <a href="{% url 'editar_producto' producto.pk %}" class="btn btn-outline-warning dc-action">
+              <i class="fa-regular fa-pen-to-square me-1"></i>
+              Editar
+            </a>
+
+
+            <a href="{% url 'eliminar_producto' producto.pk %}" class="btn btn-outline-danger dc-action">
+              <i class="fa-regular fa-trash-can me-1"></i>
+              Eliminar
+            </a>
+
+          </div>
+
+
+          <!-- ================= CARRITO ================= -->
+
+          <div class="dc-cart-box">
+
+            <div class="dc-cart-title">
+
+              <i class="fa-solid fa-cart-plus me-1"></i>
+
+              Agregar al carrito
+
+            </div>
+
+
+            <form method="post" action="{% url 'agregar_carrito' producto.pk %}" class="dc-cart-form">
+
+              {% csrf_token %}
+
+              <div class="dc-quantity-group">
+
+                <label for="cantidad">
+                  Cantidad
+                </label>
+
+                <input type="number" id="cantidad" name="cantidad" min="0.01" max="{{ producto.stock }}"
+                  step="{% if producto.unidadMedida|lower == 'kilo' or producto.unidadMedida|lower == 'kg' or producto.unidadMedida|lower == 'metro' or producto.unidadMedida|lower == 'm' %}0.01{% else %}1{% endif %}"
+                  value="1" class="dc-quantity-input">
+
+              </div>
+
+
+              <button type="submit" class="dc-cart-button">
+
+                <i class="fa-solid fa-cart-plus me-1"></i>
+
+                Agregar al carrito
+
+              </button>
+
+            </form>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
 </div>
 
+
 <script>
-  (function(){
-    function parseNumber(str){
-      if (str === null || str === undefined) return 0;
-      // normalize comma decimal to dot
-      const s = String(str).replace(/\s/g, '').replace(',', '.');
-      const n = parseFloat(s);
-      return isNaN(n) ? 0 : n;
+
+  (function () {
+
+    function parseNumber(value) {
+
+      if (value === null || value === undefined) {
+        return 0;
+      }
+
+      const normalized = String(value)
+        .replace(/\s/g, '')
+        .replace(',', '.');
+
+      const number = parseFloat(normalized);
+
+      return isNaN(number) ? 0 : number;
     }
 
-    function updateGanancia(){
+
+    function updateGanancia() {
+
       const dataEl = document.getElementById('producto_data');
-      if (!dataEl) return;
+
+      if (!dataEl) {
+        return;
+      }
+
       const precio = parseNumber(dataEl.dataset.precio);
       const costo = parseNumber(dataEl.dataset.costo);
+
       const cantidadEl = document.getElementById('cantidad');
-      const cantidad = cantidadEl ? parseInt(cantidadEl.value, 10) || 0 : 0;
+
+      const cantidad = cantidadEl
+        ? parseNumber(cantidadEl.value)
+        : 0;
 
       const gananciaUnit = precio - costo;
-      const gananciaTotal = gananciaUnit * cantidad;
-      const gananciaPorcentaje = costo > 0 ? (gananciaUnit / costo) * 100 : 0;
 
-      const porcentajeEl = document.getElementById('ganancia_porcentaje');
-      const unitEl = document.getElementById('ganancia_unit');
-      const totalEl = document.getElementById('ganancia_total');
-      if (unitEl) unitEl.textContent = `S/ ${gananciaUnit.toFixed(2)}`;
-      if (totalEl) totalEl.textContent = `S/ ${gananciaTotal.toFixed(2)}`;
-      if (porcentajeEl) porcentajeEl.textContent = `${gananciaPorcentaje.toFixed(2)} %`;
+      const gananciaTotal = gananciaUnit * cantidad;
+
+      const gananciaPorcentaje = costo > 0
+        ? (gananciaUnit / costo) * 100
+        : 0;
+
+
+      const unitEl =
+        document.getElementById('ganancia_unit');
+
+      const totalEl =
+        document.getElementById('ganancia_total');
+
+      const porcentajeEl =
+        document.getElementById('ganancia_porcentaje');
+
+
+      if (unitEl) {
+
+        unitEl.textContent =
+          `S/ ${gananciaUnit.toFixed(2)}`;
+
+      }
+
+
+      if (totalEl) {
+
+        totalEl.textContent =
+          `S/ ${gananciaTotal.toFixed(2)}`;
+
+      }
+
+
+      if (porcentajeEl) {
+
+        porcentajeEl.textContent =
+          `${gananciaPorcentaje.toFixed(2)} %`;
+
+      }
+
     }
 
-    document.addEventListener('DOMContentLoaded', function(){
-      updateGanancia();
-      const cantidadEl = document.getElementById('cantidad');
-      if (cantidadEl) cantidadEl.addEventListener('input', updateGanancia);
-    });
+
+    document.addEventListener(
+      'DOMContentLoaded',
+      function () {
+
+        updateGanancia();
+
+        const cantidadEl =
+          document.getElementById('cantidad');
+
+        if (cantidadEl) {
+
+          cantidadEl.addEventListener(
+            'input',
+            updateGanancia
+          );
+
+        }
+
+      }
+    );
+
   })();
+
 </script>
 
 {% endblock %}

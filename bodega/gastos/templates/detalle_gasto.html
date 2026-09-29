@@ -3,498 +3,1732 @@
 {% block title %}Detalle de Gasto{% endblock %}
 
 {% block content %}
-<div class="container">
-  <h1 class="mb-4">Detalle de Gasto</h1>
 
-  <div class="card mb-4">
-    <div class="card-header bg-danger text-white">
-      <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Información del Gasto</h5>
-    </div>
-    <div class="card-body">
-      <div class="row">
-        <div class="col-md-6">
-          <p><strong>Código:</strong> {{ gasto.codigo }}</p>
-          <p><strong>Fecha:</strong> {{ gasto.fecha|date:'d/m/Y H:i' }}</p>
-          <p><strong>Proveedor:</strong> {{ gasto.proveedor.nombre }}</p>
-        </div>
-        <div class="col-md-6">
-          <p><strong>Tipo de Pago:</strong> {{ gasto.get_tipo_compra_display }}</p>
-          <p><strong>Total:</strong> S/ {{ gasto.total }}</p>
-          <p><strong>Percepción:</strong> S/ {{ gasto.percepcion }}</p>
-          <p><strong>Usuario:</strong>
-            {% if gasto.user %}
-              {{ gasto.user.username }}
-            {% else %}
-              Anónimo
-            {% endif %}
-          </p>
-        </div>
-      </div>
-      {% if gasto.descripcion %}
-        <div class="mt-3">
-          <p><strong>Descripción:</strong></p>
-          <p>{{ gasto.descripcion }}</p>
-        </div>
-      {% endif %}
-      {% if gasto.imagen %}
-        <div class="mt-3">
-          <p><strong>Imagen adjunta:</strong></p>
-          <button type="button"
-            class="image-button"
-            data-bs-toggle="modal"
-            data-bs-target="#imageModal"
-            data-image="{{ gasto.imagen.url }}"
-            >
-            <img src="{{ gasto.imagen.url }}" alt="Imagen gasto" style="max-width: 180px; height: auto;" class="img-thumbnail">
-          </button>
-        </div>
-      {% endif %}
-    </div>
+<style>
+  /* =========================================================
+   DETALLE DE GASTO
+========================================================= */
+
+  .dc-gasto-page {
+    max-width: 1450px;
+    margin: 0 auto;
+  }
+
+
+  /* =========================================================
+   ENCABEZADO
+========================================================= */
+
+  .dc-gasto-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    margin-bottom: 7px;
+
+    color: #738095;
+    font-size: .8rem;
+  }
+
+  .dc-gasto-breadcrumb i {
+    color: #E30613;
+  }
+
+  .dc-gasto-breadcrumb a {
+    color: #073E78;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .dc-gasto-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-bottom: 22px;
+  }
+
+  .dc-gasto-title {
+    margin: 0;
+
+    color: #06152D;
+
+    font-size: clamp(1.7rem, 3vw, 2.4rem);
+    font-weight: 700;
+    letter-spacing: -.7px;
+  }
+
+  .dc-gasto-subtitle {
+    margin: 5px 0 0;
+
+    color: #7b8798;
+    font-size: .88rem;
+  }
+
+  .dc-gasto-code {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    margin-top: 10px;
+    padding: 6px 11px;
+
+    border-radius: 8px;
+
+    background: #eef4fb;
+    color: #073E78;
+
+    font-size: .76rem;
+    font-weight: 700;
+  }
+
+  .dc-gasto-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    padding: 10px 15px;
+
+    border: 1px solid #d8dfe8;
+    border-radius: 9px;
+
+    background: #fff;
+    color: #344054;
+
+    text-decoration: none;
+
+    font-size: .8rem;
+    font-weight: 600;
+
+    transition: all .2s ease;
+  }
+
+  .dc-gasto-back:hover {
+    border-color: #073E78;
+    background: #073E78;
+    color: #fff;
+  }
+
+
+  /* =========================================================
+   TARJETA PRINCIPAL
+========================================================= */
+
+  .dc-gasto-main-card {
+    background: #fff;
+
+    border: 1px solid #e3e8ef;
+    border-radius: 18px;
+
+    box-shadow: 0 8px 30px rgba(6, 21, 45, .05);
+
+    overflow: hidden;
+  }
+
+
+  /* =========================================================
+   INFORMACIÓN
+========================================================= */
+
+  .dc-gasto-info {
+    display: grid;
+
+    grid-template-columns:
+      1.2fr 1fr;
+
+    gap: 0;
+
+    border-bottom: 1px solid #e8edf2;
+  }
+
+  .dc-gasto-info-left,
+  .dc-gasto-info-right {
+    padding: 24px;
+  }
+
+  .dc-gasto-info-left {
+    border-right: 1px solid #e8edf2;
+  }
+
+  .dc-section-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    margin-bottom: 17px;
+
+    color: #8a95a5;
+
+    font-size: .68rem;
+    font-weight: 700;
+
+    letter-spacing: .8px;
+    text-transform: uppercase;
+  }
+
+  .dc-section-label i {
+    color: #073E78;
+  }
+
+
+  /* Proveedor */
+
+  .dc-proveedor-box {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+  }
+
+  .dc-proveedor-icon {
+    width: 48px;
+    height: 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 12px;
+
+    background: #eef4fb;
+    color: #073E78;
+
+    font-size: 1.05rem;
+  }
+
+  .dc-proveedor-name {
+    color: #182335;
+
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  .dc-proveedor-label {
+    margin-bottom: 3px;
+
+    color: #9aa3b1;
+
+    font-size: .68rem;
+  }
+
+
+  /* Información */
+
+  .dc-gasto-data-grid {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 18px;
+  }
+
+  .dc-gasto-data-item {
+    min-width: 0;
+  }
+
+  .dc-gasto-data-label {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #9aa3b1;
+
+    font-size: .65rem;
+    font-weight: 700;
+
+    text-transform: uppercase;
+    letter-spacing: .4px;
+  }
+
+  .dc-gasto-data-value {
+    color: #253044;
+
+    font-size: .85rem;
+    font-weight: 600;
+  }
+
+  .dc-gasto-data-value i {
+    margin-right: 5px;
+    color: #073E78;
+  }
+
+
+  /* =========================================================
+   FORMA DE PAGO
+========================================================= */
+
+  .dc-payment-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: 6px 10px;
+
+    border-radius: 999px;
+
+    background: #eef7f1;
+    color: #07852F;
+
+    font-size: .72rem;
+    font-weight: 700;
+  }
+
+
+  /* =========================================================
+   DESCRIPCIÓN
+========================================================= */
+
+  .dc-gasto-description {
+    padding: 20px 24px;
+
+    background: #fafbfd;
+
+    border-bottom: 1px solid #e8edf2;
+  }
+
+  .dc-gasto-description-text {
+    margin: 0;
+
+    color: #596579;
+
+    font-size: .84rem;
+    line-height: 1.7;
+  }
+
+
+  /* =========================================================
+   PRODUCTOS
+========================================================= */
+
+  .dc-gasto-section {
+    padding: 24px;
+  }
+
+  .dc-gasto-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 16px;
+  }
+
+  .dc-gasto-section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .dc-gasto-section-icon {
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background: #eef7f1;
+    color: #07852F;
+  }
+
+  .dc-gasto-section-title h3 {
+    margin: 0;
+
+    color: #06152D;
+
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  .dc-gasto-section-title p {
+    margin: 3px 0 0;
+
+    color: #929baa;
+
+    font-size: .73rem;
+  }
+
+
+  /* =========================================================
+   TABLA
+========================================================= */
+
+  .dc-gasto-table-wrapper {
+    width: 100%;
+
+    overflow-x: auto;
+
+    border: 1px solid #e5eaf0;
+    border-radius: 12px;
+  }
+
+  .dc-gasto-table {
+    width: 100%;
+
+    margin: 0;
+
+    border-collapse: collapse;
+
+    min-width: 650px;
+  }
+
+  .dc-gasto-table thead th {
+    padding: 12px 15px;
+
+    background: #f8fafc;
+
+    border-bottom: 1px solid #e3e8ef;
+
+    color: #8993a3;
+
+    font-size: .65rem;
+    font-weight: 700;
+
+    text-transform: uppercase;
+    letter-spacing: .4px;
+  }
+
+  .dc-gasto-table tbody td {
+    padding: 14px 15px;
+
+    border-bottom: 1px solid #edf0f4;
+
+    color: #344054;
+
+    font-size: .82rem;
+    vertical-align: middle;
+  }
+
+  .dc-gasto-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .dc-gasto-table tbody tr:hover {
+    background: #fafcfe;
+  }
+
+  .dc-product-name {
+    color: #182335 !important;
+    font-weight: 700;
+  }
+
+  .dc-product-deleted {
+    color: #9aa3b1;
+    font-style: italic;
+  }
+
+  .dc-money {
+    color: #07852F !important;
+    font-weight: 700;
+  }
+
+  .dc-quantity {
+    font-weight: 600;
+  }
+
+
+  /* =========================================================
+   TOTALES
+========================================================= */
+
+  .dc-gasto-totals {
+    display: flex;
+    justify-content: flex-end;
+
+    padding: 20px 24px;
+
+    background: #fafbfd;
+
+    border-top: 1px solid #e5eaf0;
+  }
+
+  .dc-gasto-total-box {
+    width: min(100%, 360px);
+  }
+
+  .dc-total-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 7px 0;
+
+    color: #697586;
+
+    font-size: .82rem;
+  }
+
+  .dc-total-line strong {
+    color: #344054;
+  }
+
+  .dc-total-percepcion strong {
+    color: #d97706;
+  }
+
+  .dc-total-final {
+    margin-top: 8px;
+    padding-top: 13px;
+
+    border-top: 1px solid #dce2e9;
+  }
+
+  .dc-total-final span {
+    color: #06152D;
+
+    font-size: .9rem;
+    font-weight: 700;
+  }
+
+  .dc-total-final strong {
+    color: #07852F;
+
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+
+  /* =========================================================
+   BONIFICACIONES
+========================================================= */
+
+  .dc-bonificaciones {
+    margin: 0 24px 24px;
+
+    border: 1px solid #f1dfb1;
+    border-radius: 13px;
+
+    overflow: hidden;
+
+    background: #fffdf7;
+  }
+
+  .dc-bonificaciones-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 14px 16px;
+
+    background: #fff8e6;
+
+    border-bottom: 1px solid #f1dfb1;
+  }
+
+  .dc-bonificaciones-icon {
+    width: 34px;
+    height: 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 9px;
+
+    background: #fff0c2;
+    color: #b77900;
+  }
+
+  .dc-bonificaciones-header h3 {
+    margin: 0;
+
+    color: #654b08;
+
+    font-size: .9rem;
+    font-weight: 700;
+  }
+
+  .dc-bonificaciones-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .dc-bonificaciones-table th {
+    padding: 10px 16px;
+
+    color: #9b844e;
+
+    font-size: .63rem;
+    text-transform: uppercase;
+  }
+
+  .dc-bonificaciones-table td {
+    padding: 11px 16px;
+
+    border-top: 1px solid #f5e9ca;
+
+    color: #5f5337;
+
+    font-size: .8rem;
+  }
+
+
+  /* =========================================================
+   BOLETA
+========================================================= */
+
+  .dc-boleta-section {
+    padding: 24px;
+
+    border-top: 1px solid #e8edf2;
+  }
+
+  .dc-boleta-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+
+    padding: 18px;
+
+    border: 1px solid #e3e8ef;
+    border-radius: 13px;
+
+    background: #fafbfd;
+  }
+
+  .dc-boleta-preview {
+    width: 110px;
+    height: 130px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    padding: 5px;
+
+    border-radius: 9px;
+
+    background: #fff;
+
+    border: 1px solid #e1e6ed;
+
+    overflow: hidden;
+  }
+
+  .dc-boleta-preview img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    cursor: pointer;
+
+    transition: transform .2s ease;
+  }
+
+  .dc-boleta-preview:hover img {
+    transform: scale(1.04);
+  }
+
+  .dc-boleta-info h4 {
+    margin: 0 0 5px;
+
+    color: #182335;
+
+    font-size: .9rem;
+  }
+
+  .dc-boleta-info p {
+    margin: 0 0 12px;
+
+    color: #8a95a5;
+
+    font-size: .75rem;
+  }
+
+  .dc-boleta-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    padding: 8px 12px;
+
+    border: 1px solid #073E78;
+    border-radius: 8px;
+
+    background: #fff;
+
+    color: #073E78;
+
+    font-size: .75rem;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: all .2s ease;
+  }
+
+  .dc-boleta-button:hover {
+    background: #073E78;
+    color: #fff;
+  }
+
+
+  /* =========================================================
+   MODAL DE BOLETA
+========================================================= */
+
+  .boleta-modal {
+    background: #06152D;
+
+    border: none;
+    border-radius: 15px;
+
+    overflow: hidden;
+  }
+
+  .boleta-modal .modal-header {
+    border-bottom: 1px solid rgba(255, 255, 255, .1);
+
+    background: #06152D;
+
+    color: #fff;
+  }
+
+  .boleta-modal .modal-title {
+    font-size: .95rem;
+    font-weight: 600;
+  }
+
+  .boleta-modal .btn-close {
+    filter: invert(1);
+  }
+
+  .boleta-modal .modal-body {
+    background: #020b18;
+  }
+
+  .image-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+
+    gap: 7px;
+  }
+
+  .image-controls button {
+    width: 40px;
+    height: 40px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 8px;
+  }
+
+  .image-viewer {
+    width: 100%;
+    height: 70vh;
+
+    overflow: auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background:
+      radial-gradient(circle at center, #172337 0%, #020b18 70%);
+
+    cursor: grab;
+
+    touch-action: none;
+  }
+
+  .image-viewer.dragging {
+    cursor: grabbing;
+  }
+
+  .modal-boleta-image {
+    max-width: none;
+    max-height: none;
+
+    display: block;
+
+    transform-origin: center center;
+
+    user-select: none;
+    -webkit-user-drag: none;
+
+    transition: transform .12s ease;
+  }
+
+
+  /* =========================================================
+   RESPONSIVE
+========================================================= */
+
+  @media (max-width: 991.98px) {
+
+    .dc-gasto-info {
+      grid-template-columns: 1fr;
+    }
+
+    .dc-gasto-info-left {
+      border-right: none;
+      border-bottom: 1px solid #e8edf2;
+    }
+
+    .dc-gasto-header {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .dc-gasto-back {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+
+  @media (max-width: 767.98px) {
+
+    .dc-gasto-info-left,
+    .dc-gasto-info-right,
+    .dc-gasto-section,
+    .dc-boleta-section {
+      padding: 17px;
+    }
+
+    .dc-gasto-data-grid {
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    .dc-gasto-totals {
+      padding: 17px;
+    }
+
+    .dc-bonificaciones {
+      margin: 0 17px 17px;
+    }
+
+    .dc-boleta-card {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .dc-boleta-preview {
+      width: 100%;
+      height: 220px;
+    }
+
+    .dc-boleta-button {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .image-viewer {
+      height: 65vh;
+    }
+  }
+</style>
+
+
+<div class="dc-gasto-page">
+
+  <!-- =====================================================
+         ENCABEZADO
+    ====================================================== -->
+
+  <div class="dc-gasto-breadcrumb">
+    <a href="{% url 'lista_gastos' %}">
+      <i class="fa-solid fa-receipt"></i>
+      Gastos
+    </a>
+
+    <i class="fa-solid fa-chevron-right"></i>
+
+    <span>Detalle</span>
   </div>
 
-  {% if gasto.bonificaciones.exists %}
-    <div class="card mb-4">
-      <div class="card-header bg-warning text-dark">
-        <h5 class="mb-0"><i class="fas fa-gift"></i> Bonificaciones</h5>
+
+  <div class="dc-gasto-header">
+
+    <div>
+
+      <h1 class="dc-gasto-title">
+        Detalle del gasto
+      </h1>
+
+      <p class="dc-gasto-subtitle">
+        Información de la adquisición, productos y comprobante.
+      </p>
+
+      <span class="dc-gasto-code">
+        <i class="fa-solid fa-hashtag"></i>
+        {{ gasto.codigo }}
+      </span>
+
+    </div>
+
+
+    <a href="{% url 'lista_gastos' %}" class="dc-gasto-back">
+      <i class="fa-solid fa-arrow-left"></i>
+      Volver a gastos
+    </a>
+
+  </div>
+
+
+  <!-- =====================================================
+         TARJETA PRINCIPAL
+    ====================================================== -->
+
+  <div class="dc-gasto-main-card">
+
+
+    <!-- =================================================
+             INFORMACIÓN DEL GASTO
+        ================================================== -->
+
+    <div class="dc-gasto-info">
+
+
+      <!-- PROVEEDOR -->
+
+      <div class="dc-gasto-info-left">
+
+        <div class="dc-section-label">
+          <i class="fa-solid fa-store"></i>
+          Proveedor
+        </div>
+
+
+        <div class="dc-proveedor-box">
+
+          <div class="dc-proveedor-icon">
+            <i class="fa-solid fa-building"></i>
+          </div>
+
+          <div>
+
+            <div class="dc-proveedor-label">
+              Proveedor registrado
+            </div>
+
+            <div class="dc-proveedor-name">
+              {{ gasto.proveedor.nombre }}
+            </div>
+
+          </div>
+
+        </div>
+
       </div>
-      <div class="card-body p-0">
-        <table class="table table-bordered mb-0">
-          <thead class="table-light">
+
+
+      <!-- DATOS -->
+
+      <div class="dc-gasto-info-right">
+
+        <div class="dc-section-label">
+          <i class="fa-solid fa-circle-info"></i>
+          Información del gasto
+        </div>
+
+
+        <div class="dc-gasto-data-grid">
+
+
+          <div class="dc-gasto-data-item">
+
+            <span class="dc-gasto-data-label">
+              Fecha
+            </span>
+
+            <div class="dc-gasto-data-value">
+              <i class="fa-regular fa-calendar"></i>
+              {{ gasto.fecha|date:'d/m/Y H:i' }}
+            </div>
+
+          </div>
+
+
+          <div class="dc-gasto-data-item">
+
+            <span class="dc-gasto-data-label">
+              Tipo de pago
+            </span>
+
+            <div>
+
+              <span class="dc-payment-badge">
+
+                {% if gasto.tipo_compra == 'yape' %}
+                <i class="fa-solid fa-mobile-screen-button"></i>
+                {% elif gasto.tipo_compra == 'efectivo' %}
+                <i class="fa-solid fa-money-bill-wave"></i>
+                {% else %}
+                <i class="fa-solid fa-clock"></i>
+                {% endif %}
+
+                {{ gasto.get_tipo_compra_display }}
+
+              </span>
+
+            </div>
+
+          </div>
+
+
+          <div class="dc-gasto-data-item">
+
+            <span class="dc-gasto-data-label">
+              Registrado por
+            </span>
+
+            <div class="dc-gasto-data-value">
+
+              <i class="fa-solid fa-user"></i>
+
+              {% if gasto.user %}
+              {{ gasto.user.username }}
+              {% else %}
+              Anónimo
+              {% endif %}
+
+            </div>
+
+          </div>
+
+
+          <div class="dc-gasto-data-item">
+
+            <span class="dc-gasto-data-label">
+              Código
+            </span>
+
+            <div class="dc-gasto-data-value">
+              {{ gasto.codigo }}
+            </div>
+
+          </div>
+
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- =================================================
+             DESCRIPCIÓN
+        ================================================== -->
+
+    {% if gasto.descripcion %}
+
+    <div class="dc-gasto-description">
+
+      <div class="dc-section-label">
+        <i class="fa-regular fa-note-sticky"></i>
+        Descripción
+      </div>
+
+      <p class="dc-gasto-description-text">
+        {{ gasto.descripcion|linebreaksbr }}
+      </p>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- =================================================
+             PRODUCTOS
+        ================================================== -->
+
+    <div class="dc-gasto-section">
+
+      <div class="dc-gasto-section-header">
+
+        <div class="dc-gasto-section-title">
+
+          <span class="dc-gasto-section-icon">
+            <i class="fa-solid fa-box-open"></i>
+          </span>
+
+          <div>
+
+            <h3>
+              Productos adquiridos
+            </h3>
+
+            <p>
+              Productos incluidos en este gasto
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="dc-gasto-table-wrapper">
+
+        <table class="dc-gasto-table">
+
+          <thead>
+
             <tr>
               <th>Producto</th>
               <th>Cantidad</th>
+              <th>Costo unitario</th>
+              <th>Subtotal</th>
             </tr>
-          </thead>
-          <tbody>
-            {% for bono in gasto.bonificaciones.all %}
-              <tr>
-                <td>{% if bono.producto %}{{ bono.producto.nombre }}{% else %}<em>Producto eliminado</em>{% endif %}</td>
-                <td>{{ bono.cantidad }}</td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  {% endif %}
 
-  <div class="card mb-4">
-    <div class="card-header bg-success text-white">
-      <h5 class="mb-0"><i class="fas fa-box-open"></i> Productos</h5>
+          </thead>
+
+
+          <tbody>
+
+            {% for item in gasto.items.all %}
+
+            <tr>
+
+              <td class="dc-product-name">
+
+                {% if item.producto %}
+                {{ item.producto.nombre }}
+                {% else %}
+                <span class="dc-product-deleted">
+                  Producto eliminado
+                </span>
+                {% endif %}
+
+              </td>
+
+
+              <td class="dc-quantity">
+                {{ item.cantidad }}
+              </td>
+
+
+              <td>
+                S/ {{ item.costo|floatformat:2 }}
+              </td>
+
+
+              <td class="dc-money">
+                S/ {{ item.subtotal|floatformat:2 }}
+              </td>
+
+            </tr>
+
+
+            {% empty %}
+
+            <tr>
+
+              <td colspan="4" class="text-center">
+
+                No hay productos registrados para este gasto.
+
+              </td>
+
+            </tr>
+
+            {% endfor %}
+
+          </tbody>
+
+        </table>
+
+      </div>
+
     </div>
-    <div class="card-body p-0">
-      <table class="table table-bordered mb-0">
-        <thead class="table-light">
+
+
+    <!-- =================================================
+             TOTALES
+        ================================================== -->
+
+    <div class="dc-gasto-totals">
+
+      <div class="dc-gasto-total-box">
+
+        <div class="dc-total-line dc-total-percepcion">
+
+          <span>
+            Percepción
+          </span>
+
+          <strong>
+            S/ {{ gasto.percepcion|floatformat:2 }}
+          </strong>
+
+        </div>
+
+
+        <div class="dc-total-line dc-total-final">
+
+          <span>
+            TOTAL
+          </span>
+
+          <strong>
+            S/ {{ gasto.total|floatformat:2 }}
+          </strong>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- =================================================
+             BONIFICACIONES
+        ================================================== -->
+
+    {% if gasto.bonificaciones.exists %}
+
+    <div class="dc-bonificaciones">
+
+      <div class="dc-bonificaciones-header">
+
+        <span class="dc-bonificaciones-icon">
+          <i class="fa-solid fa-gift"></i>
+        </span>
+
+        <h3>
+          Bonificaciones recibidas
+        </h3>
+
+      </div>
+
+
+      <table class="dc-bonificaciones-table">
+
+        <thead>
+
           <tr>
             <th>Producto</th>
-            <th>Costo</th>
             <th>Cantidad</th>
-            <th>Subtotal</th>
           </tr>
+
         </thead>
+
+
         <tbody>
-          {% for item in gasto.items.all %}
-            <tr>
-              <td>{% if item.producto %}{{ item.producto.nombre }}{% else %}<em>Producto eliminado</em>{% endif %}</td>
-              <td>S/ {{ item.costo }}</td>
-              <td>{{ item.cantidad }}</td>
-              <td>S/ {{ item.subtotal }}</td>
-            </tr>
-          {% empty %}
-            <tr>
-              <td colspan="4" class="text-center">No hay productos registrados para este gasto.</td>
-            </tr>
+
+          {% for bono in gasto.bonificaciones.all %}
+
+          <tr>
+
+            <td>
+
+              {% if bono.producto %}
+              {{ bono.producto.nombre }}
+              {% else %}
+              <em>Producto eliminado</em>
+              {% endif %}
+
+            </td>
+
+            <td>
+              {{ bono.cantidad }}
+            </td>
+
+          </tr>
+
           {% endfor %}
+
         </tbody>
+
       </table>
+
     </div>
+
+    {% endif %}
+
+
+    <!-- =================================================
+             BOLETA
+        ================================================== -->
+
+    {% if gasto.imagen %}
+
+    <div class="dc-boleta-section">
+
+      <div class="dc-section-label">
+        <i class="fa-solid fa-receipt"></i>
+        Comprobante
+      </div>
+
+
+      <div class="dc-boleta-card">
+
+        <button type="button" class="image-button dc-boleta-preview" data-bs-toggle="modal" data-bs-target="#imageModal"
+          data-image="{{ gasto.imagen.url }}">
+
+          <img src="{{ gasto.imagen.url }}" alt="Boleta del gasto">
+
+        </button>
+
+
+        <div class="dc-boleta-info">
+
+          <h4>
+            Comprobante adjunto
+          </h4>
+
+          <p>
+            Puedes ampliar, rotar, voltear y desplazarte
+            por la imagen.
+          </p>
+
+
+          <button type="button" class="dc-boleta-button" data-bs-toggle="modal" data-bs-target="#imageModal">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            Ver comprobante
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    {% endif %}
+
+
   </div>
 
-  <a href="{% url 'lista_gastos' %}" class="btn btn-secondary"><i class="fas fa-arrow-rotate-left"></i> Volver a lista de gastos</a>
 </div>
 
-<!-- Modal Imagen boleta -->
 
-<div class="modal fade" id="imageModal" tabindex="-1">
+<!-- =========================================================
+     MODAL BOLETA
+========================================================= -->
+
+<div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+
   <div class="modal-dialog modal-dialog-centered modal-xl">
+
     <div class="modal-content boleta-modal">
+
+
       <div class="modal-header">
-        <h5 class="modal-title" id="modalName">
-          <i class="fa-solid fa-receipt"></i>Boleta
+
+        <h5 class="modal-title">
+
+          <i class="fa-solid fa-receipt me-2"></i>
+
+          Comprobante
+
         </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal">
-        </button>
+
+
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+
       </div>
-      <div class="modal-body text-center">
-        <!-- CONTROLES -->
+
+
+      <div class="modal-body">
+
+
         <div class="image-controls mb-3">
+
           <button type="button" class="btn btn-primary" id="zoomIn" title="Acercar">
             <i class="fa-solid fa-magnifying-glass-plus"></i>
           </button>
+
+
           <button type="button" class="btn btn-primary" id="zoomOut" title="Alejar">
             <i class="fa-solid fa-magnifying-glass-minus"></i>
           </button>
+
+
           <button type="button" class="btn btn-secondary" id="resetZoom" title="Restablecer">
             <i class="fa-solid fa-arrows-to-circle"></i>
           </button>
+
+
           <button type="button" class="btn btn-warning" id="flipHorizontal" title="Voltear horizontalmente">
             <i class="fa-solid fa-arrows-left-right"></i>
           </button>
+
+
           <button type="button" class="btn btn-warning" id="flipVertical" title="Voltear verticalmente">
             <i class="fa-solid fa-arrows-up-down"></i>
           </button>
+
+
           <button type="button" class="btn btn-dark" id="rotateImage" title="Rotar">
             <i class="fa-solid fa-rotate"></i>
           </button>
+
         </div>
-        <!-- VISOR -->
+
+
         <div id="imageViewer" class="image-viewer">
-          <img id="modalImage" class="modal-boleta-image" src="" alt="Imagen de boleta">
+
+          <img id="modalImage" class="modal-boleta-image" src="" alt="Imagen del comprobante">
+
         </div>
+
       </div>
+
     </div>
+
   </div>
+
 </div>
+
 
 <script>
 
   document.addEventListener("DOMContentLoaded", function () {
 
-    /* =========================================
-       ELEMENTOS
-       ========================================= */
     const images = document.querySelectorAll(".image-button");
+
     const modalImage = document.getElementById("modalImage");
     const imageViewer = document.getElementById("imageViewer");
+
     const zoomInBtn = document.getElementById("zoomIn");
     const zoomOutBtn = document.getElementById("zoomOut");
     const resetZoomBtn = document.getElementById("resetZoom");
-    const flipHorizontalBtn = document.getElementById("flipHorizontal");
-    const flipVerticalBtn = document.getElementById("flipVertical");
-    const rotateImageBtn = document.getElementById("rotateImage");
 
-    /* =========================================
-       VARIABLES DE IMAGEN
-       ========================================= */
+    const flipHorizontalBtn =
+      document.getElementById("flipHorizontal");
+
+    const flipVerticalBtn =
+      document.getElementById("flipVertical");
+
+    const rotateImageBtn =
+      document.getElementById("rotateImage");
+
+
     let imageZoom = 1;
     let flipX = 1;
     let flipY = 1;
     let rotation = 0;
 
-    /* =========================================
-       LIMITES DEL ZOOM
-       ========================================= */
+
     const MIN_ZOOM = 0.5;
     const MAX_ZOOM = 5;
     const ZOOM_STEP = 0.25;
 
-    /* =========================================
-       VARIABLES PARA PAN CON MOUSE
-       ========================================= */
-    let isDragging = false;
-    let startX = 0;
-    let startY = 0;
-    let scrollLeft = 0;
-    let scrollTop = 0;
-
-    /* =========================================
-       VARIABLES PARA TOUCH
-       ========================================= */
-    let touchMode = null;
-    let lastTouchX = 0;
-    let lastTouchY = 0;
-    let pinchStartDistance = 0;
-    let pinchStartZoom = 1;
-
-    /* =========================================
-       CALCULAR DISTANCIA ENTRE DOS DEDOS
-       ========================================= */
-    function getTouchDistance(touch1, touch2) {
-      const dx = touch2.clientX - touch1.clientX;
-      const dy = touch2.clientY - touch1.clientY;
-      return Math.sqrt(
-        dx * dx + dy * dy
-      );
-    }
-
-    /* =========================================
-       ACTUALIZAR TRANSFORMACIÓN
-       ========================================= */
 
     function updateImageTransform() {
-      modalImage.style.transform =
-        `
+
+      modalImage.style.transform = `
             scale(${imageZoom})
             scaleX(${flipX})
             scaleY(${flipY})
             rotate(${rotation}deg)
-            `;
+        `;
+
     }
 
-    /* =========================================
-       CAMBIAR ZOOM
-       ========================================= */
 
     function setZoom(newZoom) {
+
       imageZoom = Math.max(
         MIN_ZOOM,
         Math.min(MAX_ZOOM, newZoom)
       );
+
       updateImageTransform();
+
     }
 
-    /* =========================================
-       ABRIR IMAGEN
-       ========================================= */
 
-    images.forEach(function (img) {
-      img.addEventListener("click", function () {
-        modalImage.src = this.dataset.image;
-        imageZoom = 1;
-        flipX = 1;
-        flipY = 1;
-        rotation = 0;
-        imageViewer.scrollLeft = 0;
-        imageViewer.scrollTop = 0;
-        modalImage.style.transform = "none";
+    function resetImage() {
+
+      imageZoom = 1;
+      flipX = 1;
+      flipY = 1;
+      rotation = 0;
+
+      imageViewer.scrollLeft = 0;
+      imageViewer.scrollTop = 0;
+
+      updateImageTransform();
+
+    }
+
+
+    /* Abrir imagen */
+
+    images.forEach(function (button) {
+
+      button.addEventListener("click", function () {
+
+        const imageUrl = this.dataset.image;
+
+        if (!imageUrl) {
+          return;
+        }
+
+        modalImage.src = imageUrl;
+
+        resetImage();
+
       });
+
     });
 
-    /* =========================================
-       CUANDO TERMINA DE CARGAR LA IMAGEN
-       ========================================= */
 
-    modalImage.addEventListener(
-      "load",
-      function () {
-        imageZoom = 1;
-        flipX = 1;
-        flipY = 1;
-        rotation = 0;
-        imageViewer.scrollLeft = 0;
-        imageViewer.scrollTop = 0;
-        modalImage.style.transform = "none";
-      }
-    );
+    /* Zoom + */
 
-    /* =========================================
-       BOTÓN ZOOM +
-       ========================================= */
     if (zoomInBtn) {
-      zoomInBtn.addEventListener(
-        "click",
-        function () {
-          setZoom(
-            imageZoom + ZOOM_STEP
-          );
-        }
-      );
+
+      zoomInBtn.addEventListener("click", function () {
+
+        setZoom(imageZoom + ZOOM_STEP);
+
+      });
+
     }
 
-    /* =========================================
-       BOTÓN ZOOM -
-       ========================================= */
+
+    /* Zoom - */
 
     if (zoomOutBtn) {
-      zoomOutBtn.addEventListener(
-        "click",
-        function () {
-          setZoom(
-            imageZoom - ZOOM_STEP
-          );
-        }
-      );
+
+      zoomOutBtn.addEventListener("click", function () {
+
+        setZoom(imageZoom - ZOOM_STEP);
+
+      });
+
     }
 
-    /* =========================================
-       RESTABLECER
-       ========================================= */
+
+    /* Reset */
 
     if (resetZoomBtn) {
-      resetZoomBtn.addEventListener(
-        "click",
-        function () {
-          imageZoom = 1;
-          flipX = 1;
-          flipY = 1;
-          rotation = 0;
-          imageViewer.scrollLeft = 0;
-          imageViewer.scrollTop = 0;
-          updateImageTransform();
-        }
-      );
+
+      resetZoomBtn.addEventListener("click", resetImage);
+
     }
 
-    /* =========================================
-       VOLTEAR HORIZONTAL
-       ========================================= */
+
+    /* Voltear horizontal */
 
     if (flipHorizontalBtn) {
 
-      flipHorizontalBtn.addEventListener(
-        "click",
-        function () {
-          flipX *= -1;
-          updateImageTransform();
-        }
-      );
+      flipHorizontalBtn.addEventListener("click", function () {
+
+        flipX *= -1;
+
+        updateImageTransform();
+
+      });
+
     }
 
-    /* =========================================
-       VOLTEAR VERTICAL
-       ========================================= */
+
+    /* Voltear vertical */
 
     if (flipVerticalBtn) {
-      flipVerticalBtn.addEventListener(
-        "click",
-        function () {
-          flipY *= -1;
-          updateImageTransform();
-        }
-      );
+
+      flipVerticalBtn.addEventListener("click", function () {
+
+        flipY *= -1;
+
+        updateImageTransform();
+
+      });
+
     }
 
-    /* =========================================
-       ROTAR
-       ========================================= */
+
+    /* Rotar */
 
     if (rotateImageBtn) {
-      rotateImageBtn.addEventListener(
-        "click",
-        function () {
-          rotation += 90;
-          if (rotation >= 360) {
-            rotation = 0;
-          }
-          updateImageTransform();
+
+      rotateImageBtn.addEventListener("click", function () {
+
+        rotation += 90;
+
+        if (rotation >= 360) {
+          rotation = 0;
         }
-      );
+
+        updateImageTransform();
+
+      });
+
     }
 
-    /* =========================================
+
+    /* =====================================================
        PAN CON MOUSE
-       ========================================= */
+    ===================================================== */
 
-    imageViewer.addEventListener(
-      "mousedown",
-      function (e) {
+    let isDragging = false;
 
-        /*
-         * Solo botón izquierdo
-         */
-        if (e.button !== 0) {
-          return;
-        }
-        isDragging = true;
-        imageViewer.classList.add("dragging");
-        startX = e.pageX - imageViewer.offsetLeft;
-        startY = e.pageY - imageViewer.offsetTop;
-        scrollLeft = imageViewer.scrollLeft;
-        scrollTop = imageViewer.scrollTop;
+    let startX = 0;
+    let startY = 0;
 
+    let scrollLeft = 0;
+    let scrollTop = 0;
+
+
+    imageViewer.addEventListener("mousedown", function (e) {
+
+      if (e.button !== 0) {
+        return;
       }
-    );
 
-    imageViewer.addEventListener(
-      "mousemove",
-      function (e) {
-        if (!isDragging) {
-          return;
-        }
-        e.preventDefault();
-        const x = e.pageX - imageViewer.offsetLeft;
-        const y = e.pageY - imageViewer.offsetTop;
-        const walkX = (x - startX) * 1.5;
-        const walkY = (y - startY) * 1.5;
-        imageViewer.scrollLeft = scrollLeft - walkX;
-        imageViewer.scrollTop = scrollTop - walkY;
+      isDragging = true;
+
+      imageViewer.classList.add("dragging");
+
+      startX = e.pageX - imageViewer.offsetLeft;
+      startY = e.pageY - imageViewer.offsetTop;
+
+      scrollLeft = imageViewer.scrollLeft;
+      scrollTop = imageViewer.scrollTop;
+
+    });
+
+
+    imageViewer.addEventListener("mousemove", function (e) {
+
+      if (!isDragging) {
+        return;
       }
-    );
+
+      e.preventDefault();
+
+      const x = e.pageX - imageViewer.offsetLeft;
+      const y = e.pageY - imageViewer.offsetTop;
+
+      const walkX = (x - startX) * 1.5;
+      const walkY = (y - startY) * 1.5;
+
+      imageViewer.scrollLeft = scrollLeft - walkX;
+      imageViewer.scrollTop = scrollTop - walkY;
+
+    });
+
+
+    function stopDragging() {
+
+      isDragging = false;
+
+      imageViewer.classList.remove("dragging");
+
+    }
+
 
     imageViewer.addEventListener(
       "mouseup",
-      function () {
-        isDragging = false;
-        imageViewer.classList.remove(
-          "dragging"
-        );
-      }
+      stopDragging
     );
 
     imageViewer.addEventListener(
       "mouseleave",
-      function () {
-        isDragging = false;
-        imageViewer.classList.remove(
-          "dragging"
-        );
-      }
+      stopDragging
     );
 
 
-    /* =========================================
-       ZOOM CON RUEDA DEL MOUSE
-       ========================================= */
+    /* =====================================================
+       ZOOM CON RUEDA
+    ===================================================== */
 
     imageViewer.addEventListener(
       "wheel",
       function (e) {
-        /*
-         * Evitar que la página se desplace
-         */
 
         e.preventDefault();
 
-        /*
-         * Rueda hacia arriba = zoom +
-         *
-         * Rueda hacia abajo = zoom -
-         */
         if (e.deltaY < 0) {
-          setZoom(imageZoom + ZOOM_STEP);
+
+          setZoom(
+            imageZoom + ZOOM_STEP
+          );
+
         } else {
-          setZoom(imageZoom - ZOOM_STEP);
+
+          setZoom(
+            imageZoom - ZOOM_STEP
+          );
+
         }
+
       },
       {
         passive: false
       }
     );
 
-    /* =========================================
-       TOUCH START
-       ========================================= */
+
+    /* =====================================================
+       TOUCH / PINCH
+    ===================================================== */
+
+    let touchMode = null;
+
+    let lastTouchX = 0;
+    let lastTouchY = 0;
+
+    let pinchStartDistance = 0;
+    let pinchStartZoom = 1;
+
+
+    function getTouchDistance(touch1, touch2) {
+
+      const dx =
+        touch2.clientX - touch1.clientX;
+
+      const dy =
+        touch2.clientY - touch1.clientY;
+
+      return Math.sqrt(
+        dx * dx + dy * dy
+      );
+
+    }
+
 
     imageViewer.addEventListener(
       "touchstart",
       function (e) {
 
-        /*
-         * DOS DEDOS
-         * =========================
-         * Iniciar PINCH
-         */
         if (e.touches.length === 2) {
+
           touchMode = "pinch";
+
           pinchStartDistance =
             getTouchDistance(
               e.touches[0],
               e.touches[1]
             );
+
           pinchStartZoom = imageZoom;
+
           return;
+
         }
 
-        /*
-         * UN DEDO
-         * =========================
-         * Iniciar PAN
-         */
+
         if (e.touches.length === 1) {
+
           touchMode = "pan";
-          lastTouchX = e.touches[0].clientX;
-          lastTouchY = e.touches[0].clientY;
+
+          lastTouchX =
+            e.touches[0].clientX;
+
+          lastTouchY =
+            e.touches[0].clientY;
+
         }
+
       },
       {
         passive: true
@@ -502,98 +1736,108 @@
     );
 
 
-    /* =========================================
-       TOUCH MOVE
-       ========================================= */
-
     imageViewer.addEventListener(
       "touchmove",
       function (e) {
 
-        /*
-         * PINCH CON DOS DEDOS
-         */
         if (
           e.touches.length === 2 &&
           touchMode === "pinch"
         ) {
+
           e.preventDefault();
+
           const currentDistance =
             getTouchDistance(
               e.touches[0],
               e.touches[1]
             );
 
-          /*
-           * Relación entre la distancia
-           * inicial y la actual
-           */
-          const scale = currentDistance / pinchStartDistance;
-          const newZoom = pinchStartZoom * scale;
-          setZoom(newZoom);
+          const scale =
+            currentDistance /
+            pinchStartDistance;
+
+          setZoom(
+            pinchStartZoom * scale
+          );
+
           return;
+
         }
-        /*
-         * PAN CON UN DEDO
-         */
+
+
         if (
           e.touches.length === 1 &&
           touchMode === "pan"
         ) {
+
           e.preventDefault();
-          const currentX = e.touches[0].clientX;
-          const currentY = e.touches[0].clientY;
-          const deltaX = currentX - lastTouchX;
-          const deltaY = currentY - lastTouchY;
+
+          const currentX =
+            e.touches[0].clientX;
+
+          const currentY =
+            e.touches[0].clientY;
+
+          const deltaX =
+            currentX - lastTouchX;
+
+          const deltaY =
+            currentY - lastTouchY;
+
           imageViewer.scrollLeft -= deltaX;
           imageViewer.scrollTop -= deltaY;
+
           lastTouchX = currentX;
           lastTouchY = currentY;
+
         }
+
       },
       {
         passive: false
       }
     );
 
-    /* =========================================
-       TOUCH END
-       ========================================= */
 
     imageViewer.addEventListener(
       "touchend",
       function (e) {
-        /*
-         * Si queda un dedo,
-         * continuar con PAN
-         */
 
         if (e.touches.length === 1) {
+
           touchMode = "pan";
-          lastTouchX = e.touches[0].clientX;
-          lastTouchY = e.touches[0].clientY;
+
+          lastTouchX =
+            e.touches[0].clientX;
+
+          lastTouchY =
+            e.touches[0].clientY;
+
           return;
+
         }
 
-        /*
-         * Si ya no quedan dedos
-         */
+
         if (e.touches.length === 0) {
+
           touchMode = null;
+
         }
+
       }
     );
 
-    /* =========================================
-       CANCELAR TOUCH
-       ========================================= */
 
     imageViewer.addEventListener(
       "touchcancel",
       function () {
+
         touchMode = null;
+
       }
     );
+
   });
 
 </script>

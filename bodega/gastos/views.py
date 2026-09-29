@@ -227,26 +227,69 @@ def cotizacion(request):
     return render(request, 'cotizacion.html')
 
 
+from datetime import datetime
+
 @login_required
 def lista_gastos(request):
+
     gastos = Gasto.objects.select_related('proveedor').order_by('-fecha')
-    proveedor = request.GET.get('proveedor')
-    fecha_inicio = request.GET.get('fecha_inicio')
-    fecha_fin = request.GET.get('fecha_fin')
-    
+
+    proveedor = request.GET.get('proveedor', '').strip()
+    fecha_inicio_raw = request.GET.get('fecha_inicio', '').strip()
+    fecha_fin_raw = request.GET.get('fecha_fin', '').strip()
+
+    # Evitar que el texto "None" llegue a los filtros
+    if fecha_inicio_raw.lower() == 'none':
+        fecha_inicio_raw = ''
+
+    if fecha_fin_raw.lower() == 'none':
+        fecha_fin_raw = ''
+
+    fecha_inicio = fecha_inicio_raw
+    fecha_fin = fecha_fin_raw
+
+    # Filtro por proveedor
     if proveedor:
-        gastos = gastos.filter(proveedor__nombre__icontains=proveedor)
-    
+        gastos = gastos.filter(
+            proveedor__nombre__icontains=proveedor
+        )
+
+    # Filtro por fecha inicial
     if fecha_inicio:
-        gastos = gastos.filter(fecha__date__gte=fecha_inicio)
-    
+        try:
+            fecha_inicio_date = datetime.strptime(
+                fecha_inicio,
+                '%Y-%m-%d'
+            ).date()
+
+            gastos = gastos.filter(
+                fecha__date__gte=fecha_inicio_date
+            )
+
+        except ValueError:
+            fecha_inicio = ''
+
+    # Filtro por fecha final
     if fecha_fin:
-        gastos = gastos.filter(fecha__date__lte=fecha_fin)
-    
+        try:
+            fecha_fin_date = datetime.strptime(
+                fecha_fin,
+                '%Y-%m-%d'
+            ).date()
+
+            gastos = gastos.filter(
+                fecha__date__lte=fecha_fin_date
+            )
+
+        except ValueError:
+            fecha_fin = ''
+
+    # Paginación
     paginator = Paginator(gastos, 14)
+
     page = request.GET.get('page')
     page_obj = paginator.get_page(page)
-    
+
     return render(request, 'listaGastos.html', {
         'gastos': page_obj,
         'page_obj': page_obj,
@@ -254,9 +297,6 @@ def lista_gastos(request):
         'fecha_inicio': fecha_inicio,
         'fecha_fin': fecha_fin,
     })
-
-                
-
 
 @login_required
 def detalle_gasto(request, pk):

@@ -262,20 +262,58 @@ def registrar_compra(request):
 @login_required
 def lista_compras(request):
     compras = Compra.objects.select_related('cliente').order_by('-fecha')
-    cliente = request.GET.get('cliente')
-    fecha_inicio = request.GET.get('fecha_inicio')
-    fecha_fin = request.GET.get('fecha_fin')
+
+    cliente = request.GET.get('cliente', '').strip()
+    fecha_inicio_raw = request.GET.get('fecha_inicio', '').strip()
+    fecha_fin_raw = request.GET.get('fecha_fin', '').strip()
+
+    # Evitar que "None" llegue a los filtros de fecha
+    if fecha_inicio_raw.lower() == 'none':
+        fecha_inicio_raw = ''
+
+    if fecha_fin_raw.lower() == 'none':
+        fecha_fin_raw = ''
+
+    fecha_inicio = fecha_inicio_raw
+    fecha_fin = fecha_fin_raw
 
     if cliente:
-        compras = compras.filter(cliente__nombre__icontains=cliente)
+        compras = compras.filter(
+            cliente__nombre__icontains=cliente
+        )
 
     if fecha_inicio:
-        compras = compras.filter(fecha__date__gte=fecha_inicio)
+        try:
+            from datetime import datetime
+            fecha_inicio = datetime.strptime(
+                fecha_inicio,
+                '%Y-%m-%d'
+            ).date()
+
+            compras = compras.filter(
+                fecha__date__gte=fecha_inicio
+            )
+
+        except ValueError:
+            fecha_inicio = ''
 
     if fecha_fin:
-        compras = compras.filter(fecha__date__lte=fecha_fin)
+        try:
+            from datetime import datetime
+            fecha_fin = datetime.strptime(
+                fecha_fin,
+                '%Y-%m-%d'
+            ).date()
+
+            compras = compras.filter(
+                fecha__date__lte=fecha_fin
+            )
+
+        except ValueError:
+            fecha_fin = ''
 
     paginator = Paginator(compras, 14)
+
     page = request.GET.get('page')
     page_obj = paginator.get_page(page)
 

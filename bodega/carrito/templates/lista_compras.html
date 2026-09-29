@@ -63,24 +63,25 @@
 
 
       <div class="dc-filter-field">
-
+      
         <label for="fechaInicio">
           Desde
         </label>
-
-        <input id="fechaInicio" type="date" name="fecha_inicio" class="form-control" value="{{ fecha_inicio }}">
-
+      
+        <input id="fechaInicio" type="date" name="fecha_inicio" class="form-control"
+          value="{{ request.GET.fecha_inicio|default:'' }}">
+      
       </div>
-
-
+      
+      
       <div class="dc-filter-field">
-
+      
         <label for="fechaFin">
           Hasta
         </label>
-
-        <input id="fechaFin" type="date" name="fecha_fin" class="form-control" value="{{ fecha_fin }}">
-
+      
+        <input id="fechaFin" type="date" name="fecha_fin" class="form-control" value="{{ request.GET.fecha_fin|default:'' }}">
+      
       </div>
 
 
@@ -279,76 +280,85 @@
   <!-- PAGINACIÓN -->
 
   {% if page_obj.paginator.num_pages > 1 %}
-
+  
   <div class="dc-pagination-wrapper">
-
+  
     <span class="dc-pagination-info">
       Página {{ page_obj.number }}
       de {{ page_obj.paginator.num_pages }}
     </span>
-
-
+  
     <nav aria-label="Paginación">
-
+  
       <ul class="pagination dc-pagination">
-
+  
+        <!-- ANTERIOR -->
+  
         {% if page_obj.has_previous %}
-
+  
         <li class="page-item">
-
+  
           <a class="page-link"
-            href="?cliente={{ request.GET.cliente|urlencode }}&fecha_inicio={{ fecha_inicio }}&fecha_fin={{ fecha_fin }}&page={{ page_obj.previous_page_number }}">
+            href="?proveedor={{ request.GET.proveedor|default:''|urlencode }}&fecha_inicio={{ request.GET.fecha_inicio|default:''|urlencode }}&fecha_fin={{ request.GET.fecha_fin|default:''|urlencode }}&page={{ page_obj.previous_page_number }}"
+            aria-label="Página anterior">
             <i class="fa-solid fa-chevron-left"></i>
           </a>
-
+  
         </li>
-
+  
         {% endif %}
-
-
+  
+  
+        <!-- PÁGINAS -->
+  
         {% for num in page_obj.paginator.page_range %}
-
+  
         {% if num == page_obj.number %}
-
+  
         <li class="page-item active">
+  
           <span class="page-link">
             {{ num }}
           </span>
+  
         </li>
-
+  
         {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %} <li class="page-item">
-
+  
           <a class="page-link"
-            href="?cliente={{ request.GET.cliente|urlencode }}&fecha_inicio={{ fecha_inicio }}&fecha_fin={{ fecha_fin }}&page={{ num }}">
+            href="?proveedor={{ request.GET.proveedor|default:''|urlencode }}&fecha_inicio={{ request.GET.fecha_inicio|default:''|urlencode }}&fecha_fin={{ request.GET.fecha_fin|default:''|urlencode }}&page={{ num }}">
             {{ num }}
           </a>
-
+  
           </li>
-
+  
           {% endif %}
-
+  
           {% endfor %}
-
-
+  
+  
+          <!-- SIGUIENTE -->
+  
           {% if page_obj.has_next %}
-
+  
           <li class="page-item">
-
+  
             <a class="page-link"
-              href="?cliente={{ request.GET.cliente|urlencode }}&fecha_inicio={{ fecha_inicio }}&fecha_fin={{ fecha_fin }}&page={{ page_obj.next_page_number }}">
+              href="?proveedor={{ request.GET.proveedor|default:''|urlencode }}&fecha_inicio={{ request.GET.fecha_inicio|default:''|urlencode }}&fecha_fin={{ request.GET.fecha_fin|default:''|urlencode }}&page={{ page_obj.next_page_number }}"
+              aria-label="Página siguiente">
               <i class="fa-solid fa-chevron-right"></i>
             </a>
-
+  
           </li>
-
+  
           {% endif %}
-
+  
       </ul>
-
+  
     </nav>
-
+  
   </div>
-
+  
   {% endif %}
 
 </div>

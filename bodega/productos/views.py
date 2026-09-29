@@ -8,6 +8,7 @@ from django.utils import timezone
 
 from .models import Producto
 from .forms import ProductoForm
+from gastos.models import GastoItem
 
 from django.contrib.auth.decorators import login_required
 
@@ -245,9 +246,31 @@ def lista_productos(request):
 		'tipos_disponibles': tipos_disponibles,
 	})
 
+@login_required
 def detalle_producto(request, pk):
-	producto = get_object_or_404(Producto, pk=pk)
-	return render(request, 'productos/detalle_producto.html', {'producto': producto})
+
+    producto = get_object_or_404(Producto, pk=pk)
+
+    ultima_compra = (
+    GastoItem.objects
+    .filter(producto=producto)
+    .select_related('gasto', 'gasto__proveedor')
+    .order_by('-gasto__fecha')
+    .first()
+    )
+
+    historial_compras = (
+        GastoItem.objects
+        .filter(producto=producto)
+        .select_related('gasto', 'gasto__proveedor')
+        .order_by('-gasto__fecha')[:5]
+    )
+
+    return render(request, 'productos/detalle_producto.html', {
+        'producto': producto,
+        'ultima_compra': ultima_compra,
+        'historial_compras': historial_compras,
+    })
 
 def editar_producto(request, pk):
     producto = get_object_or_404(Producto, pk=pk)
