@@ -1,565 +1,1578 @@
 {% extends 'base_admin.html' %}
+{% load static %}
 
 {% block title %}Registrar Producto{% endblock %}
 
-{% block content %}
+{% block extra_head %}
+<style>
+  /* =========================================================
+   REGISTRAR PRODUCTO - BODEGA DOÑA CATITA
+   ========================================================= */
 
-<div class="row justify-content-center">
-  <div class="col-md-8">
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <h2 class="card-title mb-4 text-center">
-          <i class="fa-brands fa-product-hunt"></i>
-          Registrar Producto
-        </h2>
-        <form method="post" enctype="multipart/form-data" id="productoForm">
+  .product-register-page {
+    max-width: 1250px;
+    margin: 0 auto;
+  }
 
-          {% csrf_token %}
+  /* Encabezado */
+  .product-register-header {
+    margin-bottom: 24px;
+  }
 
-          {{ form.non_field_errors }}
+  .product-register-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #718096;
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
 
-          <!-- ===================================== -->
-          <!-- CAMPOS DEL PRODUCTO -->
-          <!-- ===================================== -->
+  .product-register-breadcrumb i {
+    color: #e30613;
+  }
 
-          {% for field in form %}
+  .product-register-title {
+    font-size: 30px;
+    font-weight: 700;
+    color: #06152D;
+    margin: 0;
+  }
 
-          {% if field.name != 'archivo_imagen' and field.name != 'nombre_imagen' %}
+  .product-register-subtitle {
+    margin: 5px 0 0;
+    color: #718096;
+    font-size: 14px;
+  }
 
-          <div class="mb-3">
-            {{ field.label_tag }}
+  /* Contenedor principal */
+  .product-form-card {
+    background: #ffffff;
+    border: 1px solid #e7edf4;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(6, 21, 45, 0.07);
+  }
 
-            {{ field }}
+  .product-form-header {
+    padding: 22px 28px;
+    border-bottom: 1px solid #edf1f5;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
 
-            {% if field.help_text %}
-            <small class="form-text text-muted">
-              {{ field.help_text }}
-            </small>
-            {% endif %}
+  .product-form-header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
 
-            {% if field.errors %}
-            <div class="text-danger small mt-1">
-              {{ field.errors }}
-            </div>
-            {% endif %}
-          </div>
+  .product-form-header-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eaf7ef;
+    color: #07852f;
+    font-size: 21px;
+  }
 
-          {% endif %}
+  .product-form-header h2 {
+    margin: 0;
+    font-size: 19px;
+    font-weight: 700;
+    color: #06152D;
+  }
 
-          {% endfor %}
+  .product-form-header p {
+    margin: 3px 0 0;
+    color: #7b8794;
+    font-size: 13px;
+  }
 
-          <!-- ===================================== -->
-          <!-- FOTO DEL PRODUCTO -->
-          <!-- ===================================== -->
+  /* Cuerpo */
+  .product-form-body {
+    padding: 28px;
+  }
 
-          <div class="mb-3">
-            <label class="form-label fw-bold">
-              <i class="fas fa-camera"></i>
-              Foto del producto
-            </label>
+  /* Secciones */
+  .form-section {
+    margin-bottom: 30px;
+  }
 
-            <!-- BOTONES DE IMAGEN -->
-            <div class="d-flex flex-wrap gap-2 mb-3">
-              <!-- TOMAR FOTO -->
-              <button type="button" class="btn btn-primary" id="btnTomarFoto">
-                <i class="fas fa-camera"></i>
-                Tomar foto
-              </button>
+  .form-section:last-child {
+    margin-bottom: 0;
+  }
 
-              <!-- SELECCIONAR FOTO -->
-              <button type="button" class="btn btn-outline-primary" id="btnSeleccionarFoto">
-                <i class="fas fa-image"></i>
-                Seleccionar imagen
-              </button>
-            </div>
+  .form-section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+    padding-bottom: 11px;
+    border-bottom: 1px solid #edf1f5;
+  }
 
-            <!-- INPUT REAL -->
-            <input type="file" name="archivo_imagen" id="id_archivo_imagen" accept="image/*" class="d-none">
-            <small class="text-muted">
-              Puedes tomar una fotografía con la cámara
-              o seleccionar una imagen de tu dispositivo.
-            </small>
-          </div>
+  .form-section-title .section-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f0f5fb;
+    color: #073e78;
+  }
 
-          <!-- ===================================== -->
-          <!-- PREVISUALIZACIÓN -->
-          <!-- ===================================== -->
-          <div id="previewContainer" class="mb-4" style="display:none;">
-            <div class="card border">
-              <div class="card-header d-flex justify-content-between align-items-center">
-                <strong>
-                  <i class="fas fa-eye"></i>
-                  Previsualización
-                </strong>
-                <button type="button" class="btn btn-sm btn-outline-danger" id="btnEliminarImagen">
-                  <i class="fas fa-trash"></i>
-                  Quitar
-                </button>
-              </div>
-              <div class="card-body text-center">
-                <img id="previewImage" src="" alt="Vista previa del producto" class="img-fluid rounded" style="
-                                        max-width:100%;
-                                        max-height:350px;
-                                        object-fit:contain;
-                                    ">
-                <div id="imageInfo" class="small text-muted mt-3"></div>
-              </div>
-            </div>
-          </div>
+  .form-section-title h3 {
+    margin: 0;
+    color: #06152D;
+    font-size: 16px;
+    font-weight: 700;
+  }
 
-          <!-- ===================================== -->
-          <!-- NOMBRE DE LA IMAGEN -->
-          <!-- ===================================== -->
-          <div id="nombreImagenContainer" class="mb-4" style="display:none;">
-            <label for="id_nombre_imagen" class="form-label fw-bold">
-              <i class="fas fa-file-image"></i>
-              Nombre de la imagen
-            </label>
+  .form-section-title span {
+    margin-left: auto;
+    color: #9aa5b1;
+    font-size: 12px;
+  }
 
-            {{ form.nombre_imagen }}
+  /* Campos */
+  .product-field {
+    margin-bottom: 18px;
+  }
 
-            <small class="text-muted">
-              Puedes modificar el nombre.
-              No escribas la extensión .jpg.
-            </small>
+  .product-field label {
+    display: block;
+    margin-bottom: 7px;
+    color: #25364d;
+    font-size: 13px;
+    font-weight: 600;
+  }
 
-            {% if form.nombre_imagen.errors %}
+  .product-field label i {
+    color: #07852f;
+    margin-right: 5px;
+  }
 
-            <div class="text-danger small">
-              {{ form.nombre_imagen.errors }}
-            </div>
+  .product-field input,
+  .product-field select,
+  .product-field textarea {
+    width: 100%;
+    border: 1px solid #dce3eb;
+    border-radius: 11px;
+    padding: 11px 13px;
+    color: #1f2937;
+    background: #ffffff;
+    font-size: 14px;
+    transition: all .2s ease;
+  }
 
-            {% endif %}
-          </div>
+  .product-field input,
+  .product-field select {
+    min-height: 45px;
+  }
 
-          <!-- ===================================== -->
-          <!-- BOTONES -->
-          <!-- ===================================== -->
-          <div class="mt-3">
-            <button class="btn btn-success" type="submit"><i class="fas fa-save"></i> Guardar</button>
-            <a class="btn btn-secondary" href="{% url 'lista_productos' %}"><i class="fas fa-arrow-left"></i> Volver</a>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
+  .product-field textarea {
+    min-height: 115px;
+    resize: vertical;
+  }
 
-<!-- ========================================== -->
-<!-- MODAL DE CONFIRMACIÓN -->
-<!-- ========================================== -->
+  .product-field input:focus,
+  .product-field select:focus,
+  .product-field textarea:focus {
+    border-color: #07852f;
+    box-shadow: 0 0 0 3px rgba(7, 133, 47, .10);
+    outline: none;
+  }
 
-<div class="modal fade" id="confirmarGastoModal" tabindex="-1" aria-labelledby="confirmarGastoLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title" id="confirmarGastoLabel">
-          Confirmar registro
-        </h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        ¿Estás seguro de registrar este producto?
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary" id="btnConfirmarRegistro">
-          Sí, registrar
-        </button>
-        <button type="button" class="btn btn-danger" data-bs-dismiss="modal"> Cancelar</button>
-      </div>
-    </div>
-  </div>
-</div>
+  .product-field .form-text,
+  .product-field small {
+    display: block;
+    margin-top: 6px;
+    color: #8a96a3 !important;
+    font-size: 12px;
+  }
 
-<script>
+  /* Errores */
+  .product-field .text-danger,
+  .field-error {
+    margin-top: 6px;
+    font-size: 12px;
+    color: #e30613 !important;
+  }
 
-  document.addEventListener('DOMContentLoaded', function () {
-    /*
-    ==================================================
-    ELEMENTOS
-    ==================================================
-    */
-    const form = document.getElementById('productoForm');
-    const inputImagen = document.getElementById('id_archivo_imagen');
-    const btnTomarFoto = document.getElementById('btnTomarFoto');
-    const btnSeleccionarFoto = document.getElementById('btnSeleccionarFoto');
-    const btnEliminarImagen = document.getElementById('btnEliminarImagen');
-    const previewContainer = document.getElementById('previewContainer');
-    const previewImage = document.getElementById('previewImage');
-    const imageInfo = document.getElementById('imageInfo');
-    const nombreContainer = document.getElementById('nombreImagenContainer');
-    const nombreImagen = document.getElementById('id_nombre_imagen');
+  .product-field input.is-invalid,
+  .product-field select.is-invalid,
+  .product-field textarea.is-invalid {
+    border-color: #e30613;
+  }
 
-    /*
-    ==================================================
-    SELECCIONAR IMAGEN
-    ==================================================
-    */
-    btnSeleccionarFoto.addEventListener(
-      'click',
-      function () {
-        /*
-        Abrir selector normal
-        */
-        inputImagen.removeAttribute('capture');
-        inputImagen.click();
-      }
-    );
+  /* Tarjeta de precio */
+  .price-panel {
+    border: 1px solid #dcefe2;
+    background: linear-gradient(135deg, #f5fbf7 0%, #ffffff 100%);
+    border-radius: 16px;
+    padding: 18px;
+    margin-top: 3px;
+  }
 
-    /*
-    ==================================================
-    TOMAR FOTO
-    ==================================================
-    */
-    btnTomarFoto.addEventListener(
-      'click',
-      function () {
-        /*
-        En dispositivos móviles,
-        capture="environment" solicita
-        utilizar la cámara trasera.
-        */
-        inputImagen.setAttribute(
-          'capture',
-          'environment'
-        );
-        inputImagen.click();
-      }
-    );
+  .price-panel-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #07852f;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 14px;
+  }
 
-    /*
-    ==================================================
-    CUANDO SE SELECCIONA LA IMAGEN
-    ==================================================
-    */
-    inputImagen.addEventListener(
-      'change',
-      function () {
-        const archivo =
-          this.files[0];
+  .price-panel-title i {
+    font-size: 16px;
+  }
 
-        /*
-        Si no hay archivo
-        */
-        if (!archivo) {
-          ocultarImagen();
-          return;
-        }
+  .ganancia-box {
+    margin-top: 12px;
+    padding: 14px;
+    border-radius: 12px;
+    background: #ffffff;
+    border: 1px solid #dcefe2;
+    display: none;
+  }
 
-        /*
-        ==========================================
-        VALIDAR QUE SEA UNA IMAGEN
-        ==========================================
-        */
-        if (!archivo.type.startsWith('image/')) {
-          alert(
-            'El archivo seleccionado no es una imagen.'
-          );
-          this.value = '';
-          ocultarImagen();
-          return;
-        }
+  .ganancia-box.active {
+    display: block;
+  }
 
-        /*
-        ==========================================
-        MOSTRAR PREVISUALIZACIÓN
-        ==========================================
-        */
-        const reader =
-          new FileReader();
-        reader.onload =
-          function (e) {
-            previewImage.src =
-              e.target.result;
-            previewContainer.style.display =
-              'block';
-          };
+  .ganancia-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 5px 0;
+    font-size: 13px;
+  }
 
-        reader.readAsDataURL(archivo);
+  .ganancia-row:not(:last-child) {
+    border-bottom: 1px dashed #e7ecef;
+  }
 
-        /*
-        ==========================================
-        INFORMACIÓN
-        ==========================================
-        */
-        const tamanoMB =
-          (
-            archivo.size /
-            (1024 * 1024)
-          ).toFixed(2);
+  .ganancia-label {
+    color: #667085;
+  }
 
-        imageInfo.innerHTML =
-          '<i class="fas fa-file-image"></i> ' +
-          archivo.name +
-          '<br>' +
-          '<i class="fas fa-weight-hanging"></i> ' +
-          tamanoMB +
-          ' MB';
+  .ganancia-value {
+    color: #07852f;
+    font-weight: 700;
+  }
 
-        /*
-        ==========================================
-        MOSTRAR NOMBRE
-        ==========================================
-        */
-        nombreContainer.style.display =
-          'block';
+  .ganancia-value.negative {
+    color: #e30613;
+  }
 
-        /*
-        ==========================================
-        COLOCAR NOMBRE AUTOMÁTICO
-        ==========================================
-        */
-        let nombre = archivo.name;
-        const posicion = nombre.lastIndexOf('.');
+  /* Imagen */
+  .image-upload-panel {
+    border: 1px dashed #cbd6e2;
+    border-radius: 16px;
+    background: #f8fafc;
+    padding: 22px;
+  }
 
-        if (posicion > 0) {
-          nombre =
-            nombre.substring(
-              0,
-              posicion
-            );
-        }
-        nombreImagen.value =
-          nombre;
-      }
-    );
+  .image-upload-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
 
-    /*
-    ==================================================
-    QUITAR IMAGEN
-    ==================================================
-    */
-    btnEliminarImagen.addEventListener(
-      'click',
-      function () {
-        inputImagen.value = '';
-        ocultarImagen();
-      }
-    );
+  .btn-image-camera,
+  .btn-image-select {
+    min-height: 44px;
+    border-radius: 11px;
+    padding: 9px 16px;
+    font-size: 13px;
+    font-weight: 600;
+  }
 
-    /*
-    ==================================================
-    FUNCIÓN OCULTAR IMAGEN
-    ==================================================
-    */
-    function ocultarImagen() {
-      previewContainer.style.display ='none';
-      nombreContainer.style.display = 'none';
-      previewImage.src = '';
-      imageInfo.innerHTML = '';
-      nombreImagen.value = '';
-      inputImagen.value = '';
+  .btn-image-camera {
+    background: #073e78;
+    border-color: #073e78;
+    color: white;
+  }
+
+  .btn-image-camera:hover {
+    background: #06152D;
+    border-color: #06152D;
+    color: white;
+  }
+
+  .btn-image-select {
+    background: white;
+    border: 1px solid #073e78;
+    color: #073e78;
+  }
+
+  .btn-image-select:hover {
+    background: #073e78;
+    color: white;
+  }
+
+  /* Preview */
+  .preview-card {
+    display: none;
+    margin-top: 18px;
+    background: white;
+    border: 1px solid #e0e7ef;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .preview-card.active {
+    display: block;
+  }
+
+  .preview-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid #edf1f5;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .preview-header strong {
+    color: #25364d;
+    font-size: 13px;
+  }
+
+  .preview-body {
+    padding: 18px;
+    text-align: center;
+  }
+
+  .preview-image-wrapper {
+    min-height: 240px;
+    border-radius: 12px;
+    background: #f4f6f8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .preview-image-wrapper img {
+    max-width: 100%;
+    max-height: 350px;
+    object-fit: contain;
+    border-radius: 10px;
+  }
+
+  .image-info {
+    margin-top: 12px;
+    color: #7b8794;
+    font-size: 12px;
+    line-height: 1.7;
+  }
+
+  /* Nombre de imagen */
+  .image-name-panel {
+    display: none;
+    margin-top: 18px;
+    padding: 16px;
+    background: white;
+    border: 1px solid #e0e7ef;
+    border-radius: 14px;
+  }
+
+  .image-name-panel.active {
+    display: block;
+  }
+
+  /* Nota */
+  .form-tip {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 12px 14px;
+    border-radius: 11px;
+    background: #f5f8fc;
+    color: #65748b;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  .form-tip i {
+    color: #073e78;
+    margin-top: 2px;
+  }
+
+  /* Botones finales */
+  .form-actions {
+    margin-top: 30px;
+    padding-top: 22px;
+    border-top: 1px solid #edf1f5;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .form-actions-left,
+  .form-actions-right {
+    display: flex;
+    gap: 10px;
+  }
+
+  .btn-product-save,
+  .btn-product-cancel {
+    min-height: 45px;
+    border-radius: 11px;
+    padding: 10px 19px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .btn-product-save {
+    background: #07852f;
+    border-color: #07852f;
+    color: white;
+  }
+
+  .btn-product-save:hover {
+    background: #056d26;
+    border-color: #056d26;
+    color: white;
+    transform: translateY(-1px);
+  }
+
+  .btn-product-cancel {
+    background: white;
+    border: 1px solid #cbd5df;
+    color: #526174;
+  }
+
+  .btn-product-cancel:hover {
+    background: #f7f9fb;
+  }
+
+  /* Modal */
+  .product-confirm-icon {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: #eaf7ef;
+    color: #07852f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 25px;
+    margin: 0 auto 15px;
+  }
+
+  .product-confirm-title {
+    color: #06152D;
+    font-weight: 700;
+  }
+
+  .product-confirm-text {
+    color: #718096;
+    font-size: 14px;
+  }
+
+  /* Responsive */
+  @media (max-width: 767.98px) {
+    .product-register-title {
+      font-size: 24px;
     }
 
-    /*
-    ==================================================
-    CONFIRMACIÓN DEL FORMULARIO
-    ==================================================
-    */
-    form.addEventListener(
-      'submit',
-      function (event) {
-        event.preventDefault();
-        const modalElement =
-          document.getElementById(
-            'confirmarGastoModal'
-          );
-        const modal =
-          new bootstrap.Modal(
-            modalElement
-          );
-        modal.show();
-      }
-    );
+    .product-form-header {
+      padding: 18px;
+    }
 
-    /*
-    ==================================================
-    CONFIRMAR REGISTRO
-    ==================================================
-    */
-    const btnConfirmar =
-      document.getElementById(
-        'btnConfirmarRegistro'
-      );
-    btnConfirmar.addEventListener(
-      'click',
-      function () {
+    .product-form-body {
+      padding: 18px;
+    }
 
-        /*
-        IMPORTANTE:
-        submit() envía también request.FILES
-        porque el formulario tiene
-        enctype="multipart/form-data".
-        */
-        form.submit();
-      }
-    );
-  });
+    .product-form-header-icon {
+      width: 42px;
+      height: 42px;
+    }
 
-  document.addEventListener('DOMContentLoaded', function () {
+    .form-actions {
+      flex-direction: column-reverse;
+      align-items: stretch;
+    }
 
-      const costoInput = document.getElementById('id_costo');
-      const precioInput = document.getElementById('id_precio');
+    .form-actions-left,
+    .form-actions-right {
+      width: 100%;
+    }
 
-      if (!costoInput || !precioInput) {
-        return;
-      }
+    .form-actions-left a,
+    .form-actions-right button {
+      width: 100%;
+    }
 
-      // ==========================================
-      // CREAR CUADRO DE INFORMACIÓN
-      // ==========================================
+    .image-upload-buttons {
+      flex-direction: column;
+    }
 
-      const infoGanancia = document.createElement('div');
-
-      infoGanancia.className = 'alert alert-info mt-2 py-2';
-      infoGanancia.style.display = 'none';
-
-      // Lo mostramos debajo del campo Precio
-      precioInput.parentNode.appendChild(infoGanancia);
+    .btn-image-camera,
+    .btn-image-select {
+      width: 100%;
+    }
+  }
+</style>
+{% endblock %}
 
 
-      // ==========================================
-      // CONVERTIR VALOR A NÚMERO
-      // ==========================================
+{% block content %}
 
-      function obtenerNumero(valor) {
+<div class="product-register-page">
 
-        const numero = parseFloat(
-          String(valor)
-            .trim()
-            .replace(',', '.')
-        );
+  <!-- =====================================================
+         ENCABEZADO
+         ===================================================== -->
+  <div class="product-register-header">
 
-        return isNaN(numero) ? 0 : numero;
-      }
+    <div class="product-register-breadcrumb">
+      <i class="fa-solid fa-box"></i>
+      <span>Productos</span>
+      <i class="fa-solid fa-chevron-right"></i>
+      <span>Registrar</span>
+    </div>
+
+    <h1 class="product-register-title">
+      Registrar producto
+    </h1>
+
+    <p class="product-register-subtitle">
+      Agrega un nuevo producto al inventario de Bodega Doña Catita.
+    </p>
+
+  </div>
 
 
-      // ==========================================
-      // MOSTRAR GANANCIA REAL
-      // ==========================================
+  <!-- =====================================================
+         FORMULARIO
+         ===================================================== -->
+  <div class="product-form-card">
 
-      function mostrarGanancia() {
+    <!-- CABECERA -->
+    <div class="product-form-header">
 
-        const costo = obtenerNumero(costoInput.value);
-        const precio = obtenerNumero(precioInput.value);
+      <div class="product-form-header-left">
 
-        if (costo <= 0 || precio <= 0) {
+        <div class="product-form-header-icon">
+          <i class="fa-solid fa-box-open"></i>
+        </div>
 
-          infoGanancia.style.display = 'none';
-          return;
+        <div>
+          <h2>Información del producto</h2>
+          <p>Completa los datos principales, precio, stock e imagen.</p>
+        </div>
+
+      </div>
+
+      <div class="d-none d-md-block">
+        <span class="badge rounded-pill bg-light text-secondary px-3 py-2">
+          <i class="fa-solid fa-circle-info me-1"></i>
+          Campos con validación
+        </span>
+      </div>
+
+    </div>
+
+
+    <div class="product-form-body">
+
+      <form method="post" enctype="multipart/form-data" id="productoForm">
+
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <!-- =====================================================
+             TARJETA 1: DATOS DEL PRODUCTO
+        ====================================================== -->
+        <div class="dc-form-card mb-4">
+
+          <div class="dc-form-card-header">
+
+            <div class="dc-form-card-icon dc-icon-blue">
+              <i class="fa-solid fa-box-open"></i>
+            </div>
+
+            <div>
+              <h4 class="dc-form-card-title">
+                Datos del producto
+              </h4>
+
+              <p class="dc-form-card-subtitle">
+                Información básica del producto
+              </p>
+            </div>
+
+          </div>
+
+
+          <div class="dc-form-card-body">
+
+            <div class="row">
+
+              <!-- NOMBRE -->
+              {% if form.nombre %}
+              <div class="col-md-6 mb-3">
+
+                <label for="{{ form.nombre.id_for_label }}" class="dc-form-label">
+
+                  {{ form.nombre.label }}
+
+                  {% if form.nombre.field.required %}
+                  <span class="text-danger">*</span>
+                  {% endif %}
+
+                </label>
+
+                {{ form.nombre }}
+
+                {% if form.nombre.help_text %}
+                <div class="dc-form-help">
+                  {{ form.nombre.help_text }}
+                </div>
+                {% endif %}
+
+                {% if form.nombre.errors %}
+                <div class="dc-form-error">
+                  {{ form.nombre.errors }}
+                </div>
+                {% endif %}
+
+              </div>
+              {% endif %}
+
+
+              <!-- TIPO DE PRODUCTO -->
+              {% if form.tipoProducto %}
+              <div class="col-md-6 mb-3">
+
+                <label for="{{ form.tipoProducto.id_for_label }}" class="dc-form-label">
+
+                  {{ form.tipoProducto.label }}
+
+                  {% if form.tipoProducto.field.required %}
+                  <span class="text-danger">*</span>
+                  {% endif %}
+
+                </label>
+
+                {{ form.tipoProducto }}
+
+                {% if form.tipoProducto.help_text %}
+                <div class="dc-form-help">
+                  {{ form.tipoProducto.help_text }}
+                </div>
+                {% endif %}
+
+                {% if form.tipoProducto.errors %}
+                <div class="dc-form-error">
+                  {{ form.tipoProducto.errors }}
+                </div>
+                {% endif %}
+
+              </div>
+              {% endif %}
+
+
+              <!-- UNIDAD DE MEDIDA -->
+              {% if form.unidadMedida %}
+              <div class="col-md-6 mb-3">
+
+                <label for="{{ form.unidadMedida.id_for_label }}" class="dc-form-label">
+
+                  {{ form.unidadMedida.label }}
+
+                  {% if form.unidadMedida.field.required %}
+                  <span class="text-danger">*</span>
+                  {% endif %}
+
+                </label>
+
+                {{ form.unidadMedida }}
+
+                {% if form.unidadMedida.help_text %}
+                <div class="dc-form-help">
+                  {{ form.unidadMedida.help_text }}
+                </div>
+                {% endif %}
+
+                {% if form.unidadMedida.errors %}
+                <div class="dc-form-error">
+                  {{ form.unidadMedida.errors }}
+                </div>
+                {% endif %}
+
+              </div>
+              {% endif %}
+
+
+              <!-- FECHA DE VENCIMIENTO -->
+              {% if form.fechaVencimiento %}
+              <div class="col-md-6 mb-3">
+
+                <label for="{{ form.fechaVencimiento.id_for_label }}" class="dc-form-label">
+
+                  {{ form.fechaVencimiento.label }}
+
+                  {% if form.fechaVencimiento.field.required %}
+                  <span class="text-danger">*</span>
+                  {% endif %}
+
+                </label>
+
+                {{ form.fechaVencimiento }}
+
+                {% if form.fechaVencimiento.help_text %}
+                <div class="dc-form-help">
+                  {{ form.fechaVencimiento.help_text }}
+                </div>
+                {% endif %}
+
+                {% if form.fechaVencimiento.errors %}
+                <div class="dc-form-error">
+                  {{ form.fechaVencimiento.errors }}
+                </div>
+                {% endif %}
+
+              </div>
+              {% endif %}
+
+
+              <!-- DETALLE -->
+              {% if form.detalle %}
+              <div class="col-12 mb-3">
+
+                <label for="{{ form.detalle.id_for_label }}" class="dc-form-label">
+
+                  {{ form.detalle.label }}
+
+                  {% if form.detalle.field.required %}
+                  <span class="text-danger">*</span>
+                  {% endif %}
+
+                </label>
+
+                {{ form.detalle }}
+
+                {% if form.detalle.help_text %}
+                <div class="dc-form-help">
+                  {{ form.detalle.help_text }}
+                </div>
+                {% endif %}
+
+                {% if form.detalle.errors %}
+                <div class="dc-form-error">
+                  {{ form.detalle.errors }}
+                </div>
+                {% endif %}
+
+              </div>
+              {% endif %}
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             TARJETA 2: PRECIO Y STOCK
+        ====================================================== -->
+        <div class="dc-form-card mb-4">
+
+          <div class="dc-form-card-header">
+
+            <div class="dc-form-card-icon dc-icon-green">
+              <i class="fa-solid fa-chart-line"></i>
+            </div>
+
+            <div>
+              <h4 class="dc-form-card-title">
+                Precio y stock
+              </h4>
+
+              <p class="dc-form-card-subtitle">
+                Costos, precio de venta y cantidad disponible
+              </p>
+            </div>
+
+          </div>
+
+
+          <div class="dc-form-card-body">
+
+            <div class="row">
+
+              <!-- COSTO -->
+              {% if form.costo %}
+              <div class="col-md-4 mb-3">
+
+                <label for="{{ form.costo.id_for_label }}" class="dc-form-label">
+
+                  <i class="fa-solid fa-coins"></i>
+                  {{ form.costo.label }}
+
+                  {% if form.costo.field.required %}
+                  <span class="text-danger">*</span>
+                  {% endif %}
+
+                </label>
+
+                <div class="dc-input-money">
+
+                  <span class="dc-input-prefix">
+                    S/
+                  </span>
+
+                  {{ form.costo }}
+
+                </div>
+
+                {% if form.costo.help_text %}
+                <div class="dc-form-help">
+                  {{ form.costo.help_text }}
+                </div>
+                {% endif %}
+
+                {% if form.costo.errors %}
+                <div class="dc-form-error">
+                  {{ form.costo.errors }}
+                </div>
+                {% endif %}
+
+              </div>
+              {% endif %}
+
+
+              <!-- PRECIO -->
+              {% if form.precio %}
+              <div class="col-md-4 mb-3">
+
+                <label for="{{ form.precio.id_for_label }}" class="dc-form-label">
+
+                  <i class="fa-solid fa-tag"></i>
+                  {{ form.precio.label }}
+
+                  {% if form.precio.field.required %}
+                  <span class="text-danger">*</span>
+                  {% endif %}
+
+                </label>
+
+                <div class="dc-input-money">
+
+                  <span class="dc-input-prefix">
+                    S/
+                  </span>
+
+                  {{ form.precio }}
+
+                </div>
+
+                {% if form.precio.help_text %}
+                <div class="dc-form-help">
+                  {{ form.precio.help_text }}
+                </div>
+                {% endif %}
+
+                {% if form.precio.errors %}
+                <div class="dc-form-error">
+                  {{ form.precio.errors }}
+                </div>
+                {% endif %}
+
+              </div>
+              {% endif %}
+
+
+              <!-- STOCK -->
+              {% if form.stock %}
+              <div class="col-md-4 mb-3">
+
+                <label for="{{ form.stock.id_for_label }}" class="dc-form-label">
+
+                  <i class="fa-solid fa-boxes-stacked"></i>
+                  {{ form.stock.label }}
+
+                  {% if form.stock.field.required %}
+                  <span class="text-danger">*</span>
+                  {% endif %}
+
+                </label>
+
+                {{ form.stock }}
+
+                {% if form.stock.help_text %}
+                <div class="dc-form-help">
+                  {{ form.stock.help_text }}
+                </div>
+                {% endif %}
+
+                {% if form.stock.errors %}
+                <div class="dc-form-error">
+                  {{ form.stock.errors }}
+                </div>
+                {% endif %}
+
+              </div>
+              {% endif %}
+
+              <!-- RENTABILIDAD -->
+              <div class="dc-profit-box mt-4" id="rentabilidadBox">
+                <div class="dc-profit-header">
+                  <div>
+                    <h6 class="mb-1">
+                      <i class="fas fa-chart-line me-2"></i>
+                      Rentabilidad estimada
+                    </h6>
+                    <small>Calculada automáticamente según costo y precio de venta</small>
+                  </div>
+                  <span class="dc-profit-badge" id="gananciaPorcentaje">
+                    0%
+                  </span>
+                </div>
+              
+                <div class="row g-3 mt-1">
+              
+                  <div class="col-md-4">
+                    <div class="dc-profit-item">
+                      <span class="dc-profit-label">
+                        <i class="fas fa-coins"></i>
+                        Costo
+                      </span>
+                      <strong id="rentabilidadCosto">
+                        S/ 0.00
+                      </strong>
+                    </div>
+                  </div>
+              
+                  <div class="col-md-4">
+                    <div class="dc-profit-item">
+                      <span class="dc-profit-label">
+                        <i class="fas fa-tag"></i>
+                        Precio de venta
+                      </span>
+                      <strong id="rentabilidadPrecio">
+                        S/ 0.00
+                      </strong>
+                    </div>
+                  </div>
+              
+                  <div class="col-md-4">
+                    <div class="dc-profit-item dc-profit-highlight">
+                      <span class="dc-profit-label">
+                        <i class="fas fa-chart-line"></i>
+                        Ganancia
+                      </span>
+                      <strong id="rentabilidadGanancia">
+                        S/ 0.00
+                      </strong>
+                    </div>
+                  </div>
+              
+                </div>
+              </div>
+
+            </div>
+
+
+            <!-- INFORMACIÓN DE GANANCIA -->
+            <div id="gananciaPreview" class="dc-profit-box" style="display:none;">
+
+              <div class="dc-profit-item">
+
+                <span class="dc-profit-icon">
+                  <i class="fa-solid fa-money-bill-trend-up"></i>
+                </span>
+
+                <div>
+                  <small>Ganancia estimada</small>
+
+                  <strong id="gananciaValor">
+                    S/ 0.00
+                  </strong>
+                </div>
+
+              </div>
+
+
+              <div class="dc-profit-item">
+
+                <span class="dc-profit-icon">
+                  <i class="fa-solid fa-percent"></i>
+                </span>
+
+                <div>
+                  <small>Porcentaje de ganancia</small>
+
+                  <strong id="gananciaPorcentaje">
+                    0.00 %
+                  </strong>
+                </div>
+
+              </div>
+
+
+              <div class="dc-profit-item">
+
+                <span class="dc-profit-icon">
+                  <i class="fa-solid fa-tag"></i>
+                </span>
+
+                <div>
+                  <small>Precio de venta</small>
+
+                  <strong id="precioVentaPreview">
+                    S/ 0.00
+                  </strong>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- =====================================================
+                         TARJETA 3: IMAGEN DEL PRODUCTO
+                    ====================================================== -->
+        <div class="dc-form-card">
+        
+          <div class="dc-form-card-header">
+        
+            <div class="dc-form-card-icon dc-icon-red">
+              <i class="fas fa-image"></i>
+            </div>
+        
+            <div>
+              <h5 class="dc-form-card-title">
+                Imagen del producto
+              </h5>
+        
+              <p class="dc-form-card-subtitle">
+                Agrega una foto del producto para identificarlo fácilmente.
+              </p>
+            </div>
+        
+          </div>
+        
+          <div class="dc-form-card-body">
+        
+            <div class="dc-image-actions">
+        
+              <button type="button" class="dc-image-btn dc-image-btn-camera" id="btnTomarFoto">
+        
+                <i class="fas fa-camera me-2"></i>
+                Tomar foto
+              </button>
+        
+              <button type="button" class="dc-image-btn dc-image-btn-file" id="btnSeleccionarFoto">
+        
+                <i class="fas fa-folder-open me-2"></i>
+                Seleccionar imagen
+              </button>
+        
+            </div>
+        
+            <!-- Input real -->
+            {{ form.archivo_imagen }}
+        
+            <div class="dc-image-help">
+              <i class="fas fa-info-circle me-1"></i>
+              Puedes tomar una foto con la cámara o seleccionar una imagen.
+            </div>
+        
+        
+            <!-- PREVISUALIZACIÓN -->
+            <div id="previewContainer" class="dc-image-preview d-none">
+        
+              <div class="dc-image-preview-header">
+        
+                <div>
+                  <i class="fas fa-eye me-2"></i>
+                  Vista previa
+                </div>
+        
+                <button type="button" class="btn btn-sm btn-outline-danger" id="btnEliminarImagen">
+        
+                  <i class="fas fa-trash"></i>
+                </button>
+        
+              </div>
+        
+              <div class="dc-image-preview-body">
+        
+                <div class="dc-preview-image-wrapper">
+        
+                  <img id="previewImage" class="dc-preview-image" src="" alt="Vista previa del producto">
+        
+                </div>
+        
+                <div id="imageInfo" class="dc-image-info">
+                  <i class="fas fa-file-image me-2"></i>
+                  <span>Sin imagen seleccionada</span>
+                </div>
+        
+              </div>
+        
+            </div>
+        
+        
+            <!-- NOMBRE DE LA IMAGEN -->
+            <div id="nombreImagenContainer" class="mt-3">
+        
+              <label class="dc-form-label">
+                <i class="fas fa-file-image me-1"></i>
+                Nombre de la imagen
+              </label>
+        
+              {{ form.nombre_imagen }}
+        
+              <small class="dc-form-help">
+                El nombre se completará automáticamente al seleccionar una imagen.
+              </small>
+        
+            </div>
+        
+          </div>
+        
+        </div>
+
+
+        <!-- =====================================================
+         BOTONES FINALES
+    ====================================================== -->
+        <div class="dc-form-footer">
+
+          <a href="{% url 'lista_productos' %}" class="dc-form-cancel">
+
+            <i class="fa-solid fa-arrow-left"></i>
+            Volver
+
+          </a>
+
+          <button type="submit" class="dc-form-submit">
+
+            <i class="fa-solid fa-floppy-disk"></i>
+            Guardar producto
+
+          </button>
+
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- ============================================================
+     MODAL CONFIRMACIÓN
+     ============================================================ -->
+<div class="modal fade" id="confirmarGastoModal" tabindex="-1" aria-labelledby="confirmarGastoLabel" aria-hidden="true">
+
+  <div class="modal-dialog modal-dialog-centered">
+
+    <div class="modal-content dc-confirm-modal">
+
+      <div class="modal-header">
+
+        <div class="dc-confirm-icon">
+          <i class="fa-solid fa-box"></i>
+        </div>
+
+        <div>
+          <h5 class="modal-title" id="confirmarGastoLabel">
+            Confirmar registro
+          </h5>
+
+          <small>
+            Nuevo producto
+          </small>
+        </div>
+
+        <button type="button" class="btn-close" data-bs-dismiss="modal">
+        </button>
+
+      </div>
+
+      <div class="modal-body">
+
+        <p class="mb-0">
+          ¿Estás seguro de registrar este producto?
+        </p>
+
+      </div>
+
+      <div class="modal-footer">
+
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+
+          Cancelar
+
+        </button>
+
+        <button type="button" class="dc-confirm-btn" id="btnConfirmarRegistro">
+
+          <i class="fa-solid fa-check"></i>
+          Sí, registrar
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    /* =====================================================
+       IMAGEN DEL PRODUCTO
+    ===================================================== */
+
+    const btnTomarFoto = document.getElementById("btnTomarFoto");
+    const btnSeleccionarFoto = document.getElementById("btnSeleccionarFoto");
+
+    const inputImagen = document.getElementById("id_archivo_imagen");
+
+    const previewContainer = document.getElementById("previewContainer");
+    const previewImage = document.getElementById("previewImage");
+
+    const imageInfo = document.getElementById("imageInfo");
+
+    const btnEliminarImagen =
+        document.getElementById("btnEliminarImagen");
+
+    const nombreImagen =
+        document.getElementById("id_nombre_imagen");
+
+
+    /* -----------------------------------------
+       SELECCIONAR IMAGEN
+    ----------------------------------------- */
+
+    if (btnSeleccionarFoto && inputImagen) {
+
+        btnSeleccionarFoto.addEventListener("click", function () {
+
+            inputImagen.removeAttribute("capture");
+
+            inputImagen.click();
+
+        });
+
+    }
+
+
+    /* -----------------------------------------
+       TOMAR FOTO CON CÁMARA
+    ----------------------------------------- */
+
+    if (btnTomarFoto && inputImagen) {
+
+        btnTomarFoto.addEventListener("click", function () {
+
+            inputImagen.setAttribute("accept", "image/*");
+            inputImagen.setAttribute("capture", "environment");
+
+            inputImagen.click();
+
+        });
+
+    }
+
+
+    /* -----------------------------------------
+       CUANDO SE SELECCIONA UNA IMAGEN
+    ----------------------------------------- */
+
+    if (inputImagen) {
+
+        inputImagen.addEventListener("change", function () {
+
+            const archivo = this.files[0];
+
+            if (!archivo) {
+                return;
+            }
+
+
+            /* Validar que sea imagen */
+
+            if (!archivo.type.startsWith("image/")) {
+
+                Swal.fire({
+                    icon: "error",
+                    title: "Archivo no válido",
+                    text: "Selecciona una imagen."
+                });
+
+                this.value = "";
+
+                return;
+            }
+
+
+            /* -----------------------------------------
+               MOSTRAR PREVISUALIZACIÓN
+            ----------------------------------------- */
+
+            const reader = new FileReader();
+
+            reader.onload = function (event) {
+
+                previewImage.src = event.target.result;
+
+                previewContainer.classList.remove("d-none");
+
+            };
+
+            reader.readAsDataURL(archivo);
+
+
+            /* -----------------------------------------
+               INFORMACIÓN DEL ARCHIVO
+            ----------------------------------------- */
+
+            const nombreArchivo = archivo.name;
+
+            const tamanoMB =
+                (archivo.size / (1024 * 1024)).toFixed(2);
+
+
+            if (imageInfo) {
+
+                imageInfo.innerHTML = `
+                    <i class="fas fa-file-image me-2"></i>
+                    <span>
+                        ${nombreArchivo}
+                        <small class="text-muted ms-2">
+                            (${tamanoMB} MB)
+                        </small>
+                    </span>
+                `;
+
+            }
+
+
+            /* -----------------------------------------
+               AUTOCOMPLETAR NOMBRE
+            ----------------------------------------- */
+
+            if (nombreImagen) {
+
+                const nombreSinExtension =
+                    nombreArchivo
+                    .replace(/\.[^/.]+$/, "");
+
+                nombreImagen.value =
+                    nombreSinExtension;
+
+            }
+
+        });
+
+    }
+
+
+    /* -----------------------------------------
+       ELIMINAR IMAGEN
+    ----------------------------------------- */
+
+    if (btnEliminarImagen) {
+
+        btnEliminarImagen.addEventListener("click", function () {
+
+            if (inputImagen) {
+                inputImagen.value = "";
+            }
+
+            if (previewImage) {
+                previewImage.src = "";
+            }
+
+            if (previewContainer) {
+                previewContainer.classList.add("d-none");
+            }
+
+            if (imageInfo) {
+
+                imageInfo.innerHTML = `
+                    <i class="fas fa-file-image me-2"></i>
+                    <span>Sin imagen seleccionada</span>
+                `;
+
+            }
+
+            if (nombreImagen) {
+                nombreImagen.value = "";
+            }
+
+        });
+
+    }
+
+
+    /* =====================================================
+       RENTABILIDAD
+    ===================================================== */
+
+    const inputCosto = document.getElementById("id_costo");
+    const inputPrecio = document.getElementById("id_precio");
+
+    const rentabilidadCosto =
+        document.getElementById("rentabilidadCosto");
+
+    const rentabilidadPrecio =
+        document.getElementById("rentabilidadPrecio");
+
+    const rentabilidadGanancia =
+        document.getElementById("rentabilidadGanancia");
+
+    const gananciaPorcentaje =
+        document.getElementById("gananciaPorcentaje");
+
+
+    function numero(valor) {
+
+        if (!valor) {
+            return 0;
         }
 
+        return parseFloat(
+            String(valor).replace(",", ".")
+        ) || 0;
 
-        // Ganancia en soles
+    }
+
+
+    function actualizarRentabilidad() {
+
+        if (!inputCosto || !inputPrecio) {
+            return;
+        }
+
+        const costo = numero(inputCosto.value);
+        const precio = numero(inputPrecio.value);
+
         const ganancia = precio - costo;
 
+        let porcentaje = 0;
 
-        // Porcentaje real de ganancia
-        const porcentajeGanancia =
-          (ganancia / costo) * 100;
-
-
-        infoGanancia.innerHTML = `
-            <div>
-                <i class="fa-solid fa-money-bill-trend-up"></i>
-
-                <strong>Ganancia estimada:</strong>
-
-                S/ ${ganancia.toFixed(2)}
-            </div>
-
-            <div class="mt-1">
-
-                <i class="fa-solid fa-percent"></i>
-
-                <strong>Porcentaje de ganancia:</strong>
-
-                ${porcentajeGanancia.toFixed(2)} %
-            </div>
-
-            <div class="mt-1">
-
-                <i class="fa-solid fa-tag"></i>
-
-                <strong>Precio de venta:</strong>
-
-                S/ ${precio.toFixed(2)}
-            </div>
-        `;
-
-        infoGanancia.style.display = 'block';
-      }
-
-
-      // ==========================================
-      // CALCULAR PRECIO SUGERIDO
-      // ==========================================
-
-      function calcularPrecioSugerido() {
-
-        const costo = obtenerNumero(costoInput.value);
-
-        if (costo <= 0) {
-
-          precioInput.value = '';
-          infoGanancia.style.display = 'none';
-
-          return;
+        if (costo > 0) {
+            porcentaje =
+                (ganancia / costo) * 100;
         }
 
 
-        // Ganancia sugerida 15%
-        const porcentajeSugerido = 15;
+        /* Valores de la tarjeta */
 
-        const gananciaSugerida =
-          costo * (porcentajeSugerido / 100);
+        if (rentabilidadCosto) {
 
-        const precioSugerido =
-          costo + gananciaSugerida;
+            rentabilidadCosto.textContent =
+                "S/ " + costo.toFixed(2);
 
-
-        // Colocar precio sugerido
-        precioInput.value =
-          precioSugerido.toFixed(2);
+        }
 
 
-        // Mostrar ganancia
-        mostrarGanancia();
-      }
+        if (rentabilidadPrecio) {
+
+            rentabilidadPrecio.textContent =
+                "S/ " + precio.toFixed(2);
+
+        }
 
 
-      // ==========================================
-      // AL CAMBIAR EL COSTO
-      // ==========================================
+        if (rentabilidadGanancia) {
 
-      costoInput.addEventListener(
-        'input',
-        calcularPrecioSugerido
-      );
+            rentabilidadGanancia.textContent =
+                "S/ " + ganancia.toFixed(2);
+
+        }
 
 
-      // ==========================================
-      // AL CAMBIAR MANUALMENTE EL PRECIO
-      // ==========================================
+        if (gananciaPorcentaje) {
 
-      precioInput.addEventListener(
-        'input',
-        mostrarGanancia
-      );
+            gananciaPorcentaje.textContent =
+                porcentaje.toFixed(1) + "%";
+
+        }
+
+    }
 
 
-      // ==========================================
-      // CALCULAR AL CARGAR LA PÁGINA
-      // ==========================================
+    /* -----------------------------------------
+       COSTO → PRECIO AUTOMÁTICO +15%
+    ----------------------------------------- */
 
-      if (
-        obtenerNumero(costoInput.value) > 0 &&
-        obtenerNumero(precioInput.value) > 0
-      ) {
-        mostrarGanancia();
-      }
+    if (inputCosto) {
 
-    });
+        inputCosto.addEventListener("input", function () {
+
+            const costo = numero(this.value);
+
+            if (costo > 0 && inputPrecio) {
+
+                const precioSugerido =
+                    costo * 1.15;
+
+                inputPrecio.value =
+                    precioSugerido.toFixed(2);
+
+            }
+
+            actualizarRentabilidad();
+
+        });
+
+    }
+
+
+    /* -----------------------------------------
+       SI EL USUARIO MODIFICA EL PRECIO
+    ----------------------------------------- */
+
+    if (inputPrecio) {
+
+        inputPrecio.addEventListener("input", function () {
+
+            actualizarRentabilidad();
+
+        });
+
+    }
+
+
+    /* -----------------------------------------
+       CALCULAR AL CARGAR
+    ----------------------------------------- */
+
+    actualizarRentabilidad();
+
+});
 </script>
 
 {% endblock %}

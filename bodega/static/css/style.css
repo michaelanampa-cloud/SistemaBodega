@@ -4203,3 +4203,574 @@ body {
         flex-direction: column;
     }
 }
+
+/* =========================================================
+   FORMULARIO REGISTRAR PRODUCTO
+   BODEGA DOÑA CATITA
+========================================================= */
+
+.dc-product-form-page {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+
+/* =========================================================
+   TARJETAS
+========================================================= */
+
+.dc-form-card {
+    background: #ffffff;
+    border: 1px solid #e5eaf0;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(6, 21, 45, 0.06);
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.dc-form-card:hover {
+    box-shadow: 0 12px 32px rgba(6, 21, 45, 0.09);
+}
+
+
+/* =========================================================
+   CABECERA DE TARJETA
+========================================================= */
+
+.dc-form-card-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 20px 24px;
+    border-bottom: 1px solid #edf0f4;
+    background: #fbfcfe;
+}
+
+.dc-form-card-icon {
+    width: 46px;
+    height: 46px;
+    min-width: 46px;
+    border-radius: 13px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 19px;
+}
+
+.dc-icon-blue {
+    background: #eaf3ff;
+    color: #0d5ba8;
+}
+
+.dc-icon-green {
+    background: #eaf8ef;
+    color: #07852f;
+}
+
+.dc-icon-red {
+    background: #fff0f1;
+    color: #e30613;
+}
+
+.dc-form-card-title {
+    margin: 0;
+    color: #06152d;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.dc-form-card-subtitle {
+    margin: 3px 0 0;
+    color: #8290a3;
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   CUERPO
+========================================================= */
+
+.dc-form-card-body {
+    padding: 24px;
+}
+
+
+/* =========================================================
+   LABELS
+========================================================= */
+
+.dc-form-label {
+    display: block;
+    margin-bottom: 8px;
+
+    color: #172b4d;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.dc-form-label i {
+    margin-right: 5px;
+    color: #0d5ba8;
+}
+
+
+/* =========================================================
+   INPUTS
+========================================================= */
+
+.dc-form-card-body .form-control,
+.dc-form-card-body .form-select,
+.dc-form-card-body textarea {
+    min-height: 46px;
+
+    border: 1px solid #dce3eb;
+    border-radius: 11px;
+
+    padding: 10px 13px;
+
+    color: #172b4d;
+    background: #ffffff;
+
+    transition: all .2s ease;
+}
+
+.dc-form-card-body textarea {
+    min-height: 110px;
+    resize: vertical;
+}
+
+.dc-form-card-body .form-control:focus,
+.dc-form-card-body .form-select:focus,
+.dc-form-card-body textarea:focus {
+    border-color: #0d5ba8;
+    box-shadow: 0 0 0 3px rgba(13, 91, 168, 0.10);
+}
+
+.dc-form-help {
+    margin-top: 6px;
+    color: #8a97a8;
+    font-size: 12px;
+}
+
+.dc-form-error {
+    margin-top: 6px;
+    color: #e30613;
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   INPUT PRECIO / COSTO
+========================================================= */
+
+.dc-input-money {
+    position: relative;
+}
+
+.dc-input-prefix {
+    position: absolute;
+    left: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+
+    color: #66758a;
+    font-weight: 600;
+    z-index: 2;
+}
+
+.dc-input-money .form-control {
+    padding-left: 38px;
+}
+
+
+/* =========================================================
+   GANANCIA
+========================================================= */
+
+.dc-profit-box {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+
+    margin-top: 10px;
+    padding: 15px;
+
+    background: #f6fbf8;
+    border: 1px solid #dcefe3;
+    border-radius: 14px;
+}
+
+.dc-profit-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dc-profit-icon {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background: #e5f6eb;
+    color: #07852f;
+}
+
+.dc-profit-item small {
+    display: block;
+    color: #81909f;
+    font-size: 11px;
+}
+
+.dc-profit-item strong {
+    display: block;
+    margin-top: 2px;
+    color: #07852f;
+    font-size: 15px;
+}
+
+
+/* =========================================================
+   BOTONES DE IMAGEN
+========================================================= */
+
+.dc-image-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.dc-image-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    padding: 16px;
+
+    border-radius: 14px;
+
+    background: #ffffff;
+
+    text-align: left;
+
+    transition: all .2s ease;
+}
+
+.dc-image-btn > i {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+
+    font-size: 18px;
+}
+
+.dc-image-btn span {
+    display: flex;
+    flex-direction: column;
+}
+
+.dc-image-btn strong {
+    font-size: 14px;
+}
+
+.dc-image-btn small {
+    margin-top: 3px;
+    color: #8794a5;
+    font-size: 12px;
+}
+
+.dc-image-btn-camera {
+    border: 1px solid #dbe8f8;
+    color: #0d5ba8;
+}
+
+.dc-image-btn-camera > i {
+    background: #eaf3ff;
+}
+
+.dc-image-btn-camera:hover {
+    background: #f5f9ff;
+    border-color: #0d5ba8;
+    transform: translateY(-2px);
+}
+
+.dc-image-btn-file {
+    border: 1px solid #dcefe3;
+    color: #07852f;
+}
+
+.dc-image-btn-file > i {
+    background: #eaf8ef;
+}
+
+.dc-image-btn-file:hover {
+    background: #f5fbf7;
+    border-color: #07852f;
+    transform: translateY(-2px);
+}
+
+
+/* =========================================================
+   AYUDA IMAGEN
+========================================================= */
+
+.dc-image-help {
+    margin-top: 14px;
+    padding: 11px 14px;
+
+    border-radius: 10px;
+
+    background: #f7f9fc;
+    color: #7d8a9b;
+
+    font-size: 12px;
+}
+
+.dc-image-help i {
+    margin-right: 5px;
+    color: #0d5ba8;
+}
+
+
+/* =========================================================
+   PREVISUALIZACIÓN
+========================================================= */
+
+.dc-image-preview {
+    overflow: hidden;
+
+    border: 1px solid #e1e6ed;
+    border-radius: 15px;
+
+    background: #fafbfd;
+}
+
+.dc-image-preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 13px 16px;
+
+    border-bottom: 1px solid #e5e9ef;
+    background: #ffffff;
+}
+
+.dc-image-preview-header strong {
+    margin-left: 6px;
+    color: #172b4d;
+    font-size: 14px;
+}
+
+.dc-image-preview-header > div i {
+    color: #0d5ba8;
+}
+
+.dc-image-preview-body {
+    padding: 20px;
+    text-align: center;
+}
+
+.dc-preview-image-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 250px;
+
+    padding: 15px;
+
+    border-radius: 12px;
+
+    background: #f1f4f8;
+}
+
+.dc-preview-image {
+    display: block;
+
+    max-width: 100%;
+    max-height: 350px;
+
+    object-fit: contain;
+
+    border-radius: 10px;
+}
+
+.dc-image-info {
+    margin-top: 12px;
+
+    color: #77869a;
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+
+/* =========================================================
+   FOOTER DEL FORMULARIO
+========================================================= */
+
+.dc-form-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+
+    padding: 4px 0 30px;
+}
+
+.dc-form-cancel,
+.dc-form-submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    min-height: 46px;
+    padding: 0 20px;
+
+    border-radius: 11px;
+
+    text-decoration: none;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    transition: all .2s ease;
+}
+
+.dc-form-cancel {
+    border: 1px solid #d7dee7;
+    background: #ffffff;
+    color: #5f6f82;
+}
+
+.dc-form-cancel:hover {
+    background: #f5f7fa;
+    color: #172b4d;
+}
+
+.dc-form-submit {
+    border: 0;
+    background: #07852f;
+    color: #ffffff;
+}
+
+.dc-form-submit:hover {
+    background: #066f27;
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(7, 133, 47, .20);
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.dc-confirm-modal {
+    border: 0;
+    border-radius: 18px;
+    overflow: hidden;
+}
+
+.dc-confirm-modal .modal-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    border-bottom: 1px solid #edf0f4;
+    background: #ffffff;
+    color: #06152d;
+}
+
+.dc-confirm-modal .modal-header small {
+    display: block;
+    color: #8996a7;
+    font-size: 12px;
+}
+
+.dc-confirm-icon {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 11px;
+
+    background: #eaf3ff;
+    color: #0d5ba8;
+}
+
+.dc-confirm-modal .modal-body {
+    padding: 25px;
+    color: #526175;
+}
+
+.dc-confirm-modal .modal-footer {
+    border-top: 1px solid #edf0f4;
+}
+
+.dc-confirm-btn {
+    min-height: 40px;
+    padding: 0 17px;
+
+    border: 0;
+    border-radius: 9px;
+
+    background: #07852f;
+    color: #ffffff;
+
+    font-weight: 600;
+}
+
+.dc-confirm-btn:hover {
+    background: #066f27;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 767.98px) {
+
+    .dc-form-card-body {
+        padding: 18px;
+    }
+
+    .dc-form-card-header {
+        padding: 17px 18px;
+    }
+
+    .dc-image-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .dc-profit-box {
+        grid-template-columns: 1fr;
+    }
+
+    .dc-form-footer {
+        flex-direction: column-reverse;
+    }
+
+    .dc-form-cancel,
+    .dc-form-submit {
+        width: 100%;
+    }
+}
+
