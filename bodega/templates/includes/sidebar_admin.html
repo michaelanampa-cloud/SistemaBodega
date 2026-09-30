@@ -122,7 +122,7 @@
         ====================================== -->
 
         <div class="dc-nav-group
-            {% if current_url == 'lista_productos' or current_url == 'registros_productos' or current_url == 'productos_vencer' or current_url == 'productos_stock' %}
+            {% if current_url == 'lista_productos' or current_url == 'registros_productos' or current_url == 'productos_vencer' or current_url == 'productos_stock' or current_url == 'ofertas_productos' %}
                 open
             {% endif %}">
 
@@ -192,6 +192,17 @@
                     <span></span>
 
                     Poco stock
+
+                </a>
+
+                <a href="{% url 'ofertas_productos' %}" class="
+                    {% if current_url == 'ofertas_productos' %}
+                        active
+                    {% endif %}">
+
+                    <span></span>
+
+                    Productos en ofertas
 
                 </a>
 

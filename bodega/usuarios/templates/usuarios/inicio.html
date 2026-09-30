@@ -423,6 +423,75 @@
 
 </section>
 
+<!-- =========================
+     OFERTAS
+========================= -->
+<section class="dc-section dc-products dc-offers" id="ofertas">
+
+    <div class="container">
+
+        <div class="text-center mb-5" data-aos="fade-up">
+            <span class="dc-section-label">Ofertas del día</span>
+            <h2 class="dc-section-title">
+                Ahorra con nuestros
+                <span>productos en oferta.</span>
+            </h2>
+            <p class="dc-section-description">
+                Descuentos especiales seleccionados para que encuentres lo que buscas con mejor precio.
+            </p>
+        </div>
+
+        {% if productos_oferta %}
+        <div class="row g-4">
+            {% for producto in productos_oferta %}
+            <div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-delay="{{ forloop.counter|add:'100' }}">
+                <div class="dc-product-card dc-offer-card">
+                    <div class="dc-tag-offer">-10%</div>
+
+                    {% if producto.imagen %}
+                    <div class="dc-product-image">
+                        <img src="/static/img/productos/{{ producto.imagen }}" alt="{{ producto.nombre }}" class="img-fluid">
+                    </div>
+                    {% else %}
+                    <div class="dc-product-image dc-product-empty">
+                        <i class="fa-solid fa-box-open"></i>
+                    </div>
+                    {% endif %}
+
+                    <div class="dc-product-content">
+                        <span class="dc-product-category">{{ producto.tipoProducto }}</span>
+                        <h5>{{ producto.nombre }}</h5>
+
+                        <div class="dc-product-pricing">
+                            <span class="dc-product-old-price">S/ {{ producto.precio|floatformat:2 }}</span>
+                            <strong class="dc-product-offer-price">S/ {{ producto.precio_descuento|floatformat:2 }}</strong>
+                        </div>
+
+                        <div class="dc-product-meta">
+                            <small>Descuento: S/ {{ producto.descuento_valor|floatformat:2 }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+            <p class="mb-0">No hay productos en oferta por el momento.</p>
+        </div>
+        {% endif %}
+
+        <div class="text-center mt-5" data-aos="fade-up" data-aos-delay="200">
+            <a href="{% url 'catalogo' %}" class="btn dc-btn-primary">
+                Ver más promociones
+                <i class="fa-solid fa-arrow-right ms-2"></i>
+            </a>
+        </div>
+
+    </div>
+
+</section>
+
 
 <!-- =========================
      CTA

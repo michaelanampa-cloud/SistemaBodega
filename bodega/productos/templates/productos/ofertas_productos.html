@@ -1,0 +1,99 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}Ofertas | Doña Catita{% endblock %}
+
+{% block content %}
+<div class="dc-list-page">
+  <div class="dc-page-header">
+    <div class="dc-page-heading">
+      <div class="dc-page-heading-icon">
+        <i class="fa-solid fa-tags"></i>
+      </div>
+      <div>
+        <h1>Productos en ofertas</h1>
+        <p>Listado de productos con descuento del 10%.</p>
+      </div>
+    </div>
+
+    <div class="dc-page-actions">
+      <a href="{% url 'lista_productos' %}" class="dc-btn dc-btn-secondary">
+        <i class="fa-solid fa-arrow-left"></i>
+        Volver a productos
+      </a>
+    </div>
+  </div>
+
+  <div class="dc-table-card">
+    <div class="dc-table-card-header">
+      <h2><i class="fa-solid fa-tag"></i> Ofertas activas</h2>
+      <span class="dc-table-count">{{ productos|length }} productos</span>
+    </div>
+
+    {% if productos %}
+    <div class="dc-table-responsive">
+      <table class="dc-admin-table">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Tipo</th>
+            <th>Precio</th>
+            <th>Descuento</th>
+            <th>Precio con descuento</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for producto in productos %}
+          <tr>
+            <td data-label="Producto">
+              <span class="dc-record-title">{{ producto.nombre }}</span>
+              {% if producto.unidadMedida %}
+              <span class="dc-record-subtitle">{{ producto.unidadMedida }}</span>
+              {% endif %}
+            </td>
+            <td data-label="Tipo">
+              <span class="dc-badge dc-badge-blue">{{ producto.tipoProducto }}</span>
+            </td>
+            <td data-label="Precio">
+              <span class="dc-money">S/ {{ producto.precio|floatformat:2 }}</span>
+            </td>
+            <td data-label="Descuento">
+              <span class="dc-badge dc-badge-warning">10%</span>
+              <div class="dc-record-subtitle">S/ {{ producto.descuento_valor|floatformat:2 }}</div>
+            </td>
+            <td data-label="Precio con descuento">
+              <span class="dc-money dc-text-success">S/ {{ producto.precio_descuento|floatformat:2 }}</span>
+            </td>
+            <td data-label="Acciones">
+              <div class="dc-table-actions">
+                <a href="{% url 'detalle_producto' producto.pk %}" class="dc-action-btn dc-action-view" title="Ver producto" aria-label="Ver producto">
+                  <i class="fa-regular fa-eye"></i>
+                </a>
+                <a href="{% url 'editar_producto' producto.pk %}" class="dc-action-btn dc-action-edit" title="Editar producto" aria-label="Editar producto">
+                  <i class="fa-regular fa-pen-to-square"></i>
+                </a>
+                <form method="post" action="{% url 'toggle_oferta_producto' producto.pk %}">
+                  {% csrf_token %}
+                  <button type="submit" class="dc-action-btn dc-action-offer-active" title="Quitar de ofertas" aria-label="Quitar de ofertas">
+                    <i class="fa-solid fa-tag"></i>
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="dc-empty-state">
+      <div class="dc-empty-icon">
+        <i class="fa-solid fa-tags"></i>
+      </div>
+      <h3>No hay productos en oferta</h3>
+      <p>Activa algunas ofertas desde la lista de productos.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

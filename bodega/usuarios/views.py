@@ -7,6 +7,8 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
 
+from productos.models import Producto
+
 # Envío de correo
 from django.core.mail import send_mail
 from django.conf import settings
@@ -97,11 +99,15 @@ def inicio_view(request):
 	"""Página de inicio con mensaje de bienvenida. Si el usuario está autenticado,
 	se muestra saludo personalizado; el menú en `base.html` controla la visibilidad.
 	"""
+	productos_oferta = Producto.objects.filter(en_oferta=True).order_by('-created_at')[:8]
 	if request.user.is_authenticated:
 		mensaje = f"Bienvenido, {request.user.username}!"
 	else:
 		mensaje = "Bienvenido a Bodega. Por favor, inicia sesión para ver todas las opciones."
-	return render(request, 'usuarios/inicio.html', {'mensaje': mensaje})
+	return render(request, 'usuarios/inicio.html', {
+		'mensaje': mensaje,
+		'productos_oferta': productos_oferta,
+	})
 
 
 def contacto_view(request):

@@ -132,9 +132,33 @@
         Inventario
       </h2>
 
-      <span class="dc-table-count">
-        {{ page_obj.paginator.count }} productos
-      </span>
+      <div class="dc-table-actions">
+        <a href="{% url 'productos_seleccionados' %}" class="dc-btn dc-btn-secondary">
+          <i class="fa-solid fa-list-check"></i>
+          Selección ({{ total_seleccionados|default:0 }})
+        </a>
+        <form method="post" action="{% url 'guardar_seleccion_productos' %}" class="dc-inline-form" id="formLimpiarSeleccion">
+          {% csrf_token %}
+          <input type="hidden" name="accion" value="limpiar">
+          <button type="submit" class="dc-btn dc-btn-outline-danger">
+            <i class="fa-solid fa-broom"></i>
+            Limpiar selección
+          </button>
+        </form>
+        <form method="post" action="{% url 'imprimir_etiquetas_productos' %}" id="formEtiquetasMasivas">
+          {% csrf_token %}
+          {% for producto in productos_seleccionados %}
+          <input type="hidden" name="producto_ids" value="{{ producto.pk }}">
+          {% endfor %}
+          <button type="submit" class="dc-btn dc-btn-primary">
+            <i class="fa-solid fa-print"></i>
+            Imprimir etiquetas
+          </button>
+        </form>
+        <span class="dc-table-count">
+          {{ page_obj.paginator.count }} productos
+        </span>
+      </div>
 
     </div>
 
@@ -148,6 +172,9 @@
         <thead>
 
           <tr>
+            <th class="text-center" style="width: 40px;">
+              <input type="checkbox" id="seleccionarTodoProductos" aria-label="Seleccionar todos">
+            </th>
             <th>Producto</th>
             <th>Tipo</th>
             <th>Precio</th>
@@ -163,6 +190,10 @@
           {% for p in page_obj.object_list %}
 
           <tr>
+
+            <td data-label="Seleccionar" class="text-center">
+              <input type="checkbox" name="producto_ids" value="{{ p.pk }}" class="check-producto-etiqueta" form="formEtiquetasMasivas" data-producto-id="{{ p.pk }}" {% if p.pk in productos_seleccionados_ids %}checked{% endif %}>
+            </td>
 
             <td data-label="Producto">
 
@@ -263,6 +294,17 @@
 
                 {% endif %}
 
+
+                <form method="post" action="{% url 'toggle_oferta_producto' p.pk %}">
+
+                  {% csrf_token %}
+
+                  <button type="submit" class="dc-action-btn {% if p.en_oferta %}dc-action-offer-active{% else %}dc-action-offer{% endif %}" title="{% if p.en_oferta %}Quitar de ofertas{% else %}Agregar a ofertas{% endif %}"
+                    aria-label="{% if p.en_oferta %}Quitar de ofertas{% else %}Agregar a ofertas{% endif %}">
+                    <i class="fa-solid fa-tag"></i>
+                  </button>
+
+                </form>
 
                 <form method="post" action="{% url 'agregar_carrito' p.pk %}">
 
@@ -395,5 +437,71 @@
   {% endif %}
 
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const selectAll = document.getElementById('seleccionarTodoProductos');
+    const checkboxes = document.querySelectorAll('.check-producto-etiqueta');
+    const detalleSeleccion = document.querySelector('.dc-btn.dc-btn-secondary');
+    const botonLimpiar = document.querySelector('#formLimpiarSeleccion button[type="submit"]');
+
+    function actualizarSeleccion(productoId, accion) {
+      const formData = new FormData();
+      formData.append('producto_id', productoId);
+      formData.append('accion', accion);
+      formData.append('ajax', '1');
+
+      fetch('{% url "guardar_seleccion_productos" %}', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || '',
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+      .then(function (response) {
+        if (!response.ok) {
+          throw new Error('Error');
+        }
+        return response.json();
+      })
+      .then(function (data) {
+        if (detalleSeleccion) {
+          detalleSeleccion.innerHTML = '<i class="fa-solid fa-list-check"></i> Selección (' + data.total + ')';
+        }
+        if (botonLimpiar && data.total === 0) {
+          botonLimpiar.disabled = true;
+        } else if (botonLimpiar) {
+          botonLimpiar.disabled = false;
+        }
+      })
+      .catch(function () {
+        if (productoId) {
+          const checkbox = document.querySelector('.check-producto-etiqueta[data-producto-id="' + productoId + '"]');
+          if (checkbox) {
+            checkbox.checked = !checkbox.checked;
+          }
+        }
+      });
+    }
+
+    if (selectAll) {
+      selectAll.addEventListener('change', function () {
+        checkboxes.forEach(function (checkbox) {
+          const accion = checkbox.checked ? 'agregar' : 'quitar';
+          checkbox.checked = selectAll.checked;
+          actualizarSeleccion(checkbox.dataset.productoId, accion);
+        });
+      });
+    }
+
+    checkboxes.forEach(function (checkbox) {
+      checkbox.addEventListener('change', function () {
+        const accion = checkbox.checked ? 'agregar' : 'quitar';
+        actualizarSeleccion(checkbox.dataset.productoId, accion);
+      });
+    });
+  });
+</script>
 
 {% endblock %}

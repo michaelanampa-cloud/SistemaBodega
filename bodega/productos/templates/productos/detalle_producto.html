@@ -1151,6 +1151,22 @@
 
             </div>
 
+            <div class="dc-info-item" style="grid-column: 1 / -1;">
+              <div class="dc-info-item-label">
+                <i class="fa-solid fa-barcode"></i>
+                Código de barras
+              </div>
+
+              {% if producto.codigo_barras_imagen %}
+              <div style="display:flex; flex-direction:column; gap:10px; align-items:flex-start;">
+                <img src="{% static producto.codigo_barras_imagen %}" alt="Código de barras de {{ producto.nombre }}" style="max-width: 100%; height: 110px; background: white; border: 1px solid #e5e7eb; border-radius: 10px; padding: 8px;">
+                <div class="dc-info-item-value" style="letter-spacing: 1px;">{{ producto.codigo_barras }}</div>
+              </div>
+              {% else %}
+              <div class="dc-info-item-value">{{ producto.codigo_barras|default:'Sin código generado' }}</div>
+              {% endif %}
+            </div>
+
           </div>
 
           <!-- =====================================================
@@ -1409,6 +1425,10 @@
               Editar
             </a>
 
+            <a href="{% url 'imprimir_etiqueta_producto' producto.pk %}" class="btn btn-outline-primary dc-action" target="_blank">
+              <i class="fa-solid fa-print me-1"></i>
+              Imprimir etiqueta
+            </a>
 
             <a href="{% url 'eliminar_producto' producto.pk %}" class="btn btn-outline-danger dc-action">
               <i class="fa-regular fa-trash-can me-1"></i>

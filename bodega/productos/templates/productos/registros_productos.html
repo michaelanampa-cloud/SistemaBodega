@@ -410,6 +410,42 @@
     margin-top: 2px;
   }
 
+  .barcode-preview-box {
+    margin-top: 18px;
+    border: 1px solid #e3eaf2;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #ffffff 0%, #f7fafc 100%);
+    padding: 18px;
+  }
+
+  .barcode-preview-label {
+    font-size: 12px;
+    color: #6b7280;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 10px;
+  }
+
+  .barcode-preview-canvas {
+    width: 100%;
+    max-width: 420px;
+    height: 110px;
+    border-radius: 10px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    padding: 10px;
+    display: block;
+  }
+
+  .barcode-preview-number {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #1f2937;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
   /* Botones finales */
   .form-actions {
     margin-top: 30px;
@@ -776,6 +812,32 @@
                 {% if form.detalle.errors %}
                 <div class="dc-form-error">
                   {{ form.detalle.errors }}
+                </div>
+                {% endif %}
+
+              </div>
+              {% endif %}
+
+              <!-- CÓDIGO DE BARRAS -->
+              {% if form.codigo_barras %}
+              <div class="col-12 mb-3">
+
+                <label for="{{ form.codigo_barras.id_for_label }}" class="dc-form-label">
+                  <i class="fa-solid fa-barcode"></i>
+                  {{ form.codigo_barras.label }}
+                </label>
+
+                {{ form.codigo_barras }}
+
+                <div class="barcode-preview-box">
+                  <div class="barcode-preview-label">Vista previa del código de barras</div>
+                  <canvas id="barcodePreviewCanvas" class="barcode-preview-canvas" width="420" height="110"></canvas>
+                  <div id="barcodePreviewText" class="barcode-preview-number">0000000000000</div>
+                </div>
+
+                {% if form.codigo_barras.errors %}
+                <div class="dc-form-error">
+                  {{ form.codigo_barras.errors }}
                 </div>
                 {% endif %}
 
@@ -1442,6 +1504,64 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const inputCosto = document.getElementById("id_costo");
     const inputPrecio = document.getElementById("id_precio");
+    const inputCodigo = document.getElementById("id_codigo_barras");
+    const inputNombre = document.getElementById("id_nombre");
+    const barcodeCanvas = document.getElementById("barcodePreviewCanvas");
+    const barcodeText = document.getElementById("barcodePreviewText");
+
+    function generarCodigoDesdeNombre() {
+        const nombre = (inputNombre ? inputNombre.value : '').trim() || 'producto';
+        const base = nombre.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10) || 'PRODUCTO';
+        const timestamp = Date.now().toString().slice(-6);
+        let digits = '';
+        for (let i = 0; i < base.length; i++) {
+            digits += base.charCodeAt(i).toString().slice(-1);
+        }
+        const value = (digits + timestamp).replace(/\D/g, '').slice(0, 12);
+        const finalValue = (value + '0').slice(0, 13);
+        return finalValue.padStart(13, '0');
+    }
+
+    function renderizarCodigoBarra(valor) {
+        if (!barcodeCanvas || !barcodeText) return;
+        const ctx = barcodeCanvas.getContext('2d');
+        const width = barcodeCanvas.width;
+        const height = barcodeCanvas.height;
+        ctx.clearRect(0, 0, width, height);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, width, height);
+
+        const digits = (valor || '0000000000000').split('');
+        const leftMargin = 18;
+        const barHeight = 72;
+        const barWidthBase = 2;
+        const barGap = 1;
+        let x = leftMargin;
+
+        for (let i = 0; i < digits.length; i++) {
+            const digit = Number(digits[i]) || 0;
+            const black = i % 2 === 0;
+            const thickness = barWidthBase + (digit % 3) * 2 + (i % 5 === 0 ? 1 : 0);
+            ctx.fillStyle = black ? '#111827' : '#ffffff';
+            ctx.fillRect(x, 10, thickness, barHeight);
+            x += thickness + barGap;
+        }
+
+        ctx.fillStyle = '#111827';
+        ctx.font = 'bold 12px sans-serif';
+        ctx.fillText(valor, 18, 98);
+        barcodeText.textContent = valor;
+    }
+
+    if (inputNombre && inputCodigo) {
+        const actualizarCodigoPreview = function () {
+            const valor = generarCodigoDesdeNombre();
+            inputCodigo.value = valor;
+            renderizarCodigoBarra(valor);
+        };
+        inputNombre.addEventListener('input', actualizarCodigoPreview);
+        setTimeout(actualizarCodigoPreview, 50);
+    }
 
     const rentabilidadCosto =
         document.getElementById("rentabilidadCosto");

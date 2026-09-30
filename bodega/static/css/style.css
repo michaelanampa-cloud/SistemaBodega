@@ -1480,6 +1480,137 @@ body {
 
 
 /* ==========================================================
+   OFERTAS
+========================================================== */
+
+.dc-offers {
+    position: relative;
+    background:
+        linear-gradient(180deg,
+            rgba(12, 20, 31, 1) 0%,
+            rgba(14, 31, 48, 1) 100%);
+}
+
+.dc-offers::before {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    background:
+        radial-gradient(circle at top left,
+            rgba(227, 6, 19, .10),
+            transparent 38%),
+        radial-gradient(circle at bottom right,
+            rgba(7, 133, 47, .12),
+            transparent 40%);
+
+    pointer-events: none;
+}
+
+.dc-offer-card {
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+    border: 1px solid rgba(227, 6, 19, .25);
+    border-radius: 22px;
+    background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(13,91,168,.08));
+    box-shadow: 0 18px 45px rgba(0, 0, 0, .18);
+    transition: transform .35s ease, border-color .35s ease, box-shadow .35s ease;
+}
+
+.dc-offer-card:hover {
+    transform: translateY(-12px);
+    border-color: rgba(7, 133, 47, .45);
+    box-shadow: 0 26px 60px rgba(0, 0, 0, .24);
+}
+
+.dc-tag-offer {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 2;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #e30613, #ff5a5f);
+    color: white;
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .8px;
+    text-transform: uppercase;
+    box-shadow: 0 10px 22px rgba(227, 6, 19, .35);
+}
+
+.dc-product-image {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 220px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, .03);
+    border-bottom: 1px solid var(--dc-border);
+}
+
+.dc-product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.dc-product-empty {
+    background: linear-gradient(135deg, rgba(13,91,168,.18), rgba(227,6,19,.10));
+    color: var(--dc-primary);
+    font-size: 3rem;
+}
+
+.dc-product-content {
+    padding: 22px 18px 20px;
+}
+
+.dc-product-category {
+    display: inline-block;
+    margin-bottom: 10px;
+    color: var(--dc-primary);
+    font-size: .76rem;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+}
+
+.dc-product-content h5 {
+    margin-bottom: 12px;
+    color: white;
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.dc-product-pricing {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 10px;
+}
+
+.dc-product-old-price {
+    color: rgba(255,255,255,.55);
+    font-size: .85rem;
+    text-decoration: line-through;
+}
+
+.dc-product-offer-price {
+    color: #20C657;
+    font-size: 1.35rem;
+    font-weight: 800;
+}
+
+.dc-product-meta {
+    color: rgba(255,255,255,.7);
+    font-size: .82rem;
+}
+
+/* ==========================================================
    CTA
 ========================================================== */
 

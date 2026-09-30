@@ -68,6 +68,7 @@ class ProductoForm(forms.ModelForm):
             'unidadMedida',
             'fechaVencimiento',
             'detalle',
+            'codigo_barras',
             'archivo_imagen',
             'nombre_imagen',
         ]
@@ -120,5 +121,11 @@ class ProductoForm(forms.ModelForm):
                 'class': 'form-control',
                 'rows': 3,
                 'placeholder': 'Detalle del producto',
+            }),
+
+            'codigo_barras': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Se genera automáticamente',
+                'readonly': True,
             }),
         }
