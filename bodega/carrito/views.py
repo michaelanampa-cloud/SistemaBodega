@@ -91,9 +91,15 @@ def carrito_view(request):
 
     for producto_id, cantidad in carrito.items():
         producto = get_object_or_404(Producto, pk=int(producto_id))
-        cantidad = Decimal(str(cantidad))  # Convert to Decimal to avoid type mismatch
-        subtotal = producto.precio * cantidad
-        items.append({'producto': producto, 'cantidad': cantidad, 'subtotal': subtotal})
+        cantidad = Decimal(str(cantidad))
+        precio_unitario = producto.precio_descuento if producto.en_oferta else producto.precio
+        subtotal = precio_unitario * cantidad
+        items.append({
+            'producto': producto,
+            'cantidad': cantidad,
+            'precio_unitario': precio_unitario,
+            'subtotal': subtotal,
+        })
         total += subtotal
 
     return render(request, 'carrito.html', {'items': items, 'total': total})
@@ -151,13 +157,19 @@ def registrar_compra(request):
 
     for producto_id, cantidad in carrito.items():
         producto = get_object_or_404(Producto, pk=int(producto_id))
-        cantidad = Decimal(str(cantidad))  # Convert to Decimal to avoid type mismatch
+        cantidad = Decimal(str(cantidad))
         prod_stock = Decimal(str(producto.stock))
         if cantidad > prod_stock:
             messages.error(request, f"No hay suficiente stock para {producto.nombre}.")
             return redirect('carrito')
-        subtotal = producto.precio * cantidad
-        items.append({'producto': producto, 'cantidad': cantidad, 'subtotal': subtotal})
+        precio_unitario = producto.precio_descuento if producto.en_oferta else producto.precio
+        subtotal = precio_unitario * cantidad
+        items.append({
+            'producto': producto,
+            'cantidad': cantidad,
+            'precio_unitario': precio_unitario,
+            'subtotal': subtotal,
+        })
         total += subtotal
 
     if request.method == 'POST':
@@ -234,7 +246,7 @@ def registrar_compra(request):
                 compra=compra,
                 producto=producto,
                 cantidad=item['cantidad'],
-                precio=producto.precio,
+                precio=item['precio_unitario'],
                 subtotal=item['subtotal'],
             )
             if producto.unidadMedida and producto.unidadMedida.lower() in ('kilo', 'kg'):

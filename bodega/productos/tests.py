@@ -1,7 +1,10 @@
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
 from .models import Producto
+
+User = get_user_model()
 
 
 class ProductoBarcodeTests(TestCase):
@@ -108,3 +111,27 @@ class ProductoBarcodeTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, producto.nombre)
         self.assertContains(response, '1,25')
+
+    def test_carrito_aplica_descuento_en_productos_en_oferta(self):
+        user = User.objects.create_user(username='carrito_user', password='12345')
+        producto = Producto.objects.create(
+            nombre='Aceite Premium',
+            precio=20.00,
+            costo=12.00,
+            stock=10,
+            tipoProducto='Abarrotes',
+            unidadMedida='Unidad',
+            detalle='Aceite de oliva',
+            en_oferta=True,
+            descuento_oferta=10.00,
+        )
+
+        self.client.force_login(user)
+        session = self.client.session
+        session['carrito'] = {str(producto.pk): '2'}
+        session.save()
+
+        response = self.client.get(reverse('carrito'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'S/ 18,00')
+        self.assertContains(response, 'S/ 36,00')

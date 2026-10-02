@@ -25,7 +25,7 @@
 <div class="catalog-search" data-aos="fade-down">
   <form method="get">
     <div class="row g-3">
-      <div class="col-lg-6">
+      <div class="col-lg-5">
         <input type="text" name="q" class="form-control" value="{{ query }}" placeholder="Buscar producto...">
       </div>
       <div class="col-lg-3">
@@ -36,25 +36,17 @@
           {% endfor %}
           </select>
       </div>
-      <div class="col-lg-3">
+      <div class="col-lg-2">
         <button class="btn catalog-btn w-100"><i class="fas fa-search"></i>
-          Buscar producto
+          Buscar
         </button>
       </div>
-      <!--
-      <div class="category-filter">
-        <a href="?q={{ query }}" class="{% if not tipo %}active{% endif %}">
-          Todos
-        </a>
-
-        {% for tipo_item in tipos_disponibles %}
-
-        <a href="?q={{ query }}&tipo={{ tipo_item }}" class="{% if tipo_item == tipo %}active{% endif %}">
-        {{ tipo_item }}
-        </a>
-        {% endfor %}
-
-      </div> -->
+      <div class="col-lg-2 d-flex align-items-center justify-content-center">
+        <button type="submit" name="ofertas" value="{% if solo_ofertas %}0{% else %}1{% endif %}" class="btn {% if solo_ofertas %}btn-danger{% else %}btn-outline-light{% endif %} catalog-btn-offers w-100" title="{% if solo_ofertas %}Mostrar todos{% else %}Solo ofertas{% endif %}">
+          <i class="fa-solid fa-tags me-2"></i>
+          {% if solo_ofertas %}Todos{% else %}Ofertas{% endif %}
+        </button>
+      </div>
     </div>
   </form>
 </div>
@@ -73,14 +65,15 @@
             data-bs-target="#imageModal"
             data-image="{% if producto.imagen %}{% static 'img/productos/' %}{{ producto.imagen }}{% else %}{% static 'img/logo.png' %}{% endif %}"
             data-name="{{ producto.nombre }}"
-            data-price="S/ {{ producto.precio }}">
+            data-price="{% if producto.en_oferta %}S/ {{ producto.precio_descuento|floatformat:2 }}{% else %}S/ {{ producto.precio|floatformat:2 }}{% endif %}">
           {% if producto.imagen %}
             <img src="{% static 'img/productos/' %}{{ producto.imagen }}" alt="{{ producto.nombre }}">
           {% else %}
             <img src="{% static 'img/logo.png' %}" alt="Sin imagen">
           {% endif %}
           </button>
-          <span class="product-badge"> {{ producto.tipoProducto }}
+          <span class="product-badge {% if producto.en_oferta %}product-badge-offer{% endif %}">
+            {% if producto.en_oferta %}Oferta -10%{% else %}{{ producto.tipoProducto }}{% endif %}
           </span>
         </div>
         <div class="product-body">
@@ -90,9 +83,17 @@
           </p>
           <div class="product-footer">
             <div class="col-md-6">
-              <span class="price">
-                S/ {{ producto.precio }}
-              </span>
+              {% if producto.en_oferta %}
+                <div class="product-price-stack">
+                  <span class="price-original">S/ {{ producto.precio|floatformat:2 }}</span>
+                  <span class="price price-offer">S/ {{ producto.precio_descuento|floatformat:2 }}</span>
+                  <small class="product-save">Ahorra S/ {{ producto.descuento_valor|floatformat:2 }}</small>
+                </div>
+              {% else %}
+                <span class="price">
+                  S/ {{ producto.precio|floatformat:2 }}
+                </span>
+              {% endif %}
             </div>
             <div class="col-md-4">
               {% if producto.stock <= 0 %}
@@ -155,7 +156,7 @@
   <ul class="pagination justify-content-center">
  {% if page_obj.has_previous %}
     <li class="page-item">
-      <a class="page-link" href="?q={{ query }}&tipo={{ tipo }}&page={{ page_obj.previous_page_number }}">
+      <a class="page-link" href="?q={{ query }}&tipo={{ tipo }}&ofertas={{ solo_ofertas|yesno:'1,0' }}&page={{ page_obj.previous_page_number }}">
         Anterior
       </a>
     </li>
@@ -174,7 +175,7 @@
     </li>
     {% elif num >= page_obj.number|add:'-3' and num <= page_obj.number|add:'3' %}
     <li class="page-item">
-      <a class="page-link" href="?q={{ query }}&tipo={{ tipo }}&page={{ num }}">
+      <a class="page-link" href="?q={{ query }}&tipo={{ tipo }}&ofertas={{ solo_ofertas|yesno:'1,0' }}&page={{ num }}">
         {{ num }}
       </a>
     </li>
@@ -182,7 +183,7 @@
     {% endfor %}
     {% if page_obj.has_next %}
     <li class="page-item">
-      <a class="page-link" href="?q={{ query }}&tipo={{ tipo }}&page={{ page_obj.next_page_number }}">
+      <a class="page-link" href="?q={{ query }}&tipo={{ tipo }}&ofertas={{ solo_ofertas|yesno:'1,0' }}&page={{ page_obj.next_page_number }}">
         Siguiente
       </a>
     </li>

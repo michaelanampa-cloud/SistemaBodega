@@ -32,8 +32,16 @@
           <tr>
             <td>{{ item.producto.nombre }}
               {% if item.producto.unidadMedida %}<br><small class="text-muted">({{ item.producto.unidadMedida }})</small>{% endif %}
+              {% if item.producto.en_oferta %}<br><small class="text-success fw-bold">En oferta -10%</small>{% endif %}
             </td>
-            <td>S/ {{ item.producto.precio }}</td>
+            <td>
+              {% if item.producto.en_oferta %}
+                <span class="text-decoration-line-through text-muted">S/ {{ item.producto.precio|floatformat:2 }}</span><br>
+                <span class="fw-bold text-success">S/ {{ item.precio_unitario|floatformat:2 }}</span>
+              {% else %}
+                S/ {{ item.producto.precio|floatformat:2 }}
+              {% endif %}
+            </td>
             <td>
               {% if item.producto.unidadMedida|lower == "kilo" or item.producto.unidadMedida|lower == "kg" %}
                 <input type="number" step="0.01" min="0.01" max="{{ item.producto.stock }}" name="cantidad_{{ item.producto.pk }}" value="{{ item.cantidad }}" class="form-control" style="width: 100px;" required>
@@ -52,7 +60,7 @@
                 {% endif %}
               </div>
             </td>
-            <td>S/ {{ item.subtotal }}</td>
+            <td>S/ {{ item.subtotal|floatformat:2 }}</td>
             <td>
                 <button type="button" class="btn btn-sm btn-danger btn-eliminar" data-url="{% url 'eliminar_carrito' item.producto.pk %}" data-nombre="{{ item.producto.nombre }}"><i class="fas fa-trash"></i>Eliminar</button>
               </td>
@@ -67,7 +75,7 @@
           <a class="btn btn-outline-dark" href="{% url 'lista_productos' %}"><i class="fas fa-shopping-cart"></i> Seguir comprando</a>
         </div>
         <div class="text-end">
-          <h4>Total: S/ {{ total }}</h4>
+          <h4>Total: S/ {{ total|floatformat:2 }}</h4>
         </div>
       </div>
     </form>
