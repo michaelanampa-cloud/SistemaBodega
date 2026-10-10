@@ -612,7 +612,7 @@ body {
     background:
         rgba(227, 6, 19, .09);
 
-    color: #FFFFFF;
+    color: #0B187D;
 
     font-size: 14px;
 
@@ -3744,6 +3744,11 @@ body {
         minmax(220px, 1.5fr) minmax(180px, 1fr) auto;
 }
 
+.dc-filter-grid.dc-filter-grid-4 {
+    grid-template-columns:
+        minmax(220px, 1.5fr) minmax(180px, 1fr) minmax(170px, 1fr) auto;
+}
+
 .dc-filter-field label {
     display: block;
 
@@ -4069,6 +4074,11 @@ body {
 .dc-badge-blue {
     background: rgba(7, 62, 120, .08);
     color: #073E78;
+}
+
+.dc-badge-secondary {
+    background: rgba(126, 72, 200, .10);
+    color: #5D2FA3;
 }
 
 
@@ -4522,7 +4532,7 @@ body {
 
 .dc-profit-box {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    /* grid-template-columns: repeat(3, 1fr); */
     gap: 12px;
 
     margin-top: 10px;

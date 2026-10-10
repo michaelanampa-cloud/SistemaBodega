@@ -583,7 +583,7 @@
     </div>
 
     <h1 class="product-register-title">
-      Registrar producto
+      REGISTRAR PRODUCTO
     </h1>
 
     <p class="product-register-subtitle">
@@ -654,7 +654,6 @@
 
           </div>
 
-
           <div class="dc-form-card-body">
 
             <div class="row">
@@ -722,6 +721,36 @@
               </div>
               {% endif %}
 
+              <!-- ZONA -->
+              {% if form.zona %}
+              <div class="col-md-6 mb-3">
+
+                <label for="{{ form.zona.id_for_label }}" class="dc-form-label">
+
+                  {{ form.zona.label }}
+
+                  {% if form.zona.field.required %}
+                  <span class="text-danger">*</span>
+                  {% endif %}
+
+                </label>
+
+                {{ form.zona }}
+
+                {% if form.zona.help_text %}
+                <div class="dc-form-help">
+                  {{ form.zona.help_text }}
+                </div>
+                {% endif %}
+
+                {% if form.zona.errors %}
+                <div class="dc-form-error">
+                  {{ form.zona.errors }}
+                </div>
+                {% endif %}
+
+              </div>
+              {% endif %}
 
               <!-- UNIDAD DE MEDIDA -->
               {% if form.unidadMedida %}
@@ -1506,8 +1535,15 @@ document.addEventListener("DOMContentLoaded", function () {
     const inputPrecio = document.getElementById("id_precio");
     const inputCodigo = document.getElementById("id_codigo_barras");
     const inputNombre = document.getElementById("id_nombre");
+    const inputDetalle = document.getElementById("id_detalle");
     const barcodeCanvas = document.getElementById("barcodePreviewCanvas");
     const barcodeText = document.getElementById("barcodePreviewText");
+
+    if (inputNombre && inputDetalle) {
+        inputNombre.addEventListener('input', function () {
+            inputDetalle.value = inputNombre.value;
+        });
+    }
 
     function generarCodigoDesdeNombre() {
         const nombre = (inputNombre ? inputNombre.value : '').trim() || 'producto';
@@ -1670,29 +1706,81 @@ document.addEventListener("DOMContentLoaded", function () {
 
     }
 
-
-    /* -----------------------------------------
-       SI EL USUARIO MODIFICA EL PRECIO
-    ----------------------------------------- */
-
     if (inputPrecio) {
-
-        inputPrecio.addEventListener("input", function () {
-
-            actualizarRentabilidad();
-
-        });
-
+        inputPrecio.addEventListener("input", actualizarRentabilidad);
     }
 
+    const fechaVencimientoInput = document.getElementById('id_fechaVencimiento');
+    const tipoProductoInput = document.getElementById('id_tipoProducto');
+    const zonaInput = document.getElementById('id_zona');
 
-    /* -----------------------------------------
-       CALCULAR AL CARGAR
-    ----------------------------------------- */
+    function formatearFecha(fecha) {
+        const pad = (valor) => String(valor).padStart(2, '0');
+        return `${fecha.getFullYear()}-${pad(fecha.getMonth() + 1)}-${pad(fecha.getDate())}`;
+    }
 
-    actualizarRentabilidad();
+    function getZonaPorTipo(tipo) {
+        const mapa = {
+            Cerveza: 'zona1',
+            Abarrotes: 'zona2',
+            Limpieza: 'zona2',
+            Gaseosa: 'zona3',
+            Aguas: 'zona3',
+            Utiles: 'zona4',
+            Ropa: 'zona5',
+            Bolsas: 'zona5',
+            Galleta: 'zona6',
+            Verduras_Frutas: 'zona7',
+            Snack: 'zona8',
+            Helado: 'EqFrio1',
+            Bebidas: 'EqFrio2',
+        };
+        return mapa[tipo] || 'zona1';
+    }
+
+    function calcularFechaVencimientoPorTipo() {
+        if (!fechaVencimientoInput || !tipoProductoInput) return;
+
+        const tipo = tipoProductoInput.value;
+        const hoy = new Date();
+        let fechaBase = new Date(hoy);
+
+        if (tipo === 'Verduras_Frutas') {
+            fechaBase.setDate(hoy.getDate() + 7);
+        } else if (tipo === 'Utiles' || tipo === 'Limpieza') {
+            fechaBase.setFullYear(hoy.getFullYear() + 1);
+        } else {
+            fechaBase = new Date(hoy.getFullYear(), hoy.getMonth() + 6, 1);
+            const ultimoDia = new Date(fechaBase.getFullYear(), fechaBase.getMonth() + 1, 0).getDate();
+            const dia = Math.min(hoy.getDate(), ultimoDia);
+            fechaBase = new Date(fechaBase.getFullYear(), fechaBase.getMonth(), dia);
+        }
+
+        fechaVencimientoInput.value = formatearFecha(fechaBase);
+    }
+
+    function ajustarZonaPorTipo() {
+        if (!tipoProductoInput || !zonaInput) return;
+        zonaInput.value = getZonaPorTipo(tipoProductoInput.value);
+    }
+
+    if (tipoProductoInput) {
+        tipoProductoInput.addEventListener('change', function () {
+            calcularFechaVencimientoPorTipo();
+            ajustarZonaPorTipo();
+        });
+    }
+
+    if (zonaInput && !zonaInput.value) {
+        ajustarZonaPorTipo();
+    }
+
+    if (fechaVencimientoInput && !fechaVencimientoInput.value) {
+        calcularFechaVencimientoPorTipo();
+    }
 
 });
+
 </script>
 
 {% endblock %}

@@ -3,220 +3,1851 @@
 {% block title %}Cotizar Gastos{% endblock %}
 
 {% block content %}
-<div class="container-fluid px-3 py-3">
-  <div class="card mb-4">
-    <div class="card-body">
-      <h1 class="mb-3"><i class="fa-solid fa-file-invoice-dollar"></i> Cotizar Gastos</h1>
-      <p>Busca productos, agrega la cantidad deseada y calcula la ganancia de cada línea de producto (precio - costo).</p>
 
-      <div class="row gy-3">
-        <div class="col-12 col-lg-6">
-          <label for="buscarProducto" class="form-label">Buscar producto</label>
-          <input type="text" id="buscarProducto" class="form-control" placeholder="Escribe el nombre del producto para buscar...">
-          <div id="sugerenciasProductos" class="list-group position-relative mt-2" style="z-index: 1050;"></div>
-        </div>
+<style>
+  /* =========================================================
+       COTIZACIÓN - DISEÑO MODERNO DOÑA CATITA
+       ========================================================= */
 
-        <div class="col-12 col-lg-6">
-          <div class="card border-secondary h-100">
-            <div class="card-body">
-              <h5 class="card-title">Resumen</h5>
-              <div class="row gy-2">
-                <div class="col-12">
-                  <p class="mb-1"><strong>Total costo:</strong> S/ <span id="totalCosto">0.00</span></p>
-                </div>
-                <div class="col-12">
-                  <p class="mb-1"><strong>Total precio:</strong> S/ <span id="totalPrecio">0.00</span></p>
-                </div>
-                <div class="col-12">
-                  <p class="mb-0"><strong>Total ganancia:</strong> S/ <span id="totalGanancia">0.00</span></p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+  .dc-cotizacion-page {
+    max-width: 1450px;
+    margin: 0 auto;
+    padding: 22px 18px 45px;
+  }
+
+  /* =========================================================
+       ENCABEZADO
+       ========================================================= */
+
+  .dc-cotizacion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+  }
+
+  .dc-cotizacion-title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .dc-title-icon {
+    width: 54px;
+    height: 54px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #06152D, #0D5BA8);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    box-shadow: 0 8px 20px rgba(6, 21, 45, .18);
+  }
+
+  .dc-cotizacion-title h1 {
+    margin: 0;
+    color: #06152D;
+    font-size: 27px;
+    font-weight: 700;
+  }
+
+  .dc-cotizacion-title p {
+    margin: 4px 0 0;
+    color: #64748b;
+    font-size: 13px;
+  }
+
+  /* =========================================================
+       TARJETA BUSCADOR
+       ========================================================= */
+
+  .dc-search-card {
+    background: #fff;
+    border: 1px solid #e6ebf1;
+    border-radius: 18px;
+    box-shadow: 0 8px 28px rgba(15, 23, 42, .06);
+    padding: 22px;
+    margin-bottom: 20px;
+  }
+
+  .dc-search-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 8px;
+  }
+
+  .dc-search-label i {
+    color: #0D5BA8;
+  }
+
+  .dc-search-wrapper {
+    position: relative;
+  }
+
+  .dc-search-input-wrapper {
+    position: relative;
+  }
+
+  .dc-search-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    z-index: 2;
+  }
+
+  #buscarProducto {
+    height: 48px;
+    border-radius: 12px;
+    border: 1px solid #dbe2ea;
+    padding-left: 43px;
+    padding-right: 45px;
+    font-size: 14px;
+    box-shadow: none;
+    transition: all .2s ease;
+  }
+
+  #buscarProducto:focus {
+    border-color: #0D5BA8;
+    box-shadow: 0 0 0 4px rgba(13, 91, 168, .10);
+  }
+
+  .dc-search-shortcut {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #f1f5f9;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 10px;
+    padding: 3px 6px;
+    pointer-events: none;
+  }
+
+  /* =========================================================
+       SUGERENCIAS
+       ========================================================= */
+
+  #sugerenciasProductos {
+    position: absolute !important;
+    width: 100%;
+    left: 0;
+    top: calc(100% + 6px);
+    z-index: 1050 !important;
+    margin: 0 !important;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 14px 35px rgba(15, 23, 42, .15);
+    border: 1px solid #e2e8f0;
+  }
+
+  #sugerenciasProductos .list-group-item {
+    border: 0;
+    border-bottom: 1px solid #eef2f7;
+    padding: 13px 15px;
+    background: #fff;
+    transition: all .15s ease;
+  }
+
+  #sugerenciasProductos .list-group-item:last-child {
+    border-bottom: 0;
+  }
+
+  #sugerenciasProductos .list-group-item:hover {
+    background: #f8fbff;
+    padding-left: 19px;
+  }
+
+  .dc-suggestion-name {
+    color: #1e293b;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .dc-suggestion-info {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 5px;
+    color: #64748b;
+    font-size: 11px;
+  }
+
+  .dc-suggestion-price {
+    color: #07852F;
+    font-weight: 700;
+  }
+
+  /* =========================================================
+       RESUMEN
+       ========================================================= */
+
+  .dc-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 13px;
+  }
+
+  .dc-summary-card {
+    border-radius: 15px;
+    padding: 16px;
+    min-height: 108px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid transparent;
+  }
+
+  .dc-summary-card::after {
+    content: "";
+    position: absolute;
+    width: 75px;
+    height: 75px;
+    border-radius: 50%;
+    right: -25px;
+    top: -25px;
+    background: rgba(255, 255, 255, .35);
+  }
+
+  .dc-summary-blue {
+    background: #eef6ff;
+    border-color: #d9eaff;
+  }
+
+  .dc-summary-green {
+    background: #effaf3;
+    border-color: #d7f0df;
+  }
+
+  .dc-summary-orange {
+    background: #fff7e8;
+    border-color: #f9e7bd;
+  }
+
+  .dc-summary-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    z-index: 2;
+  }
+
+  .dc-summary-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+  }
+
+  .dc-summary-icon {
+    width: 35px;
+    height: 35px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .dc-summary-blue .dc-summary-icon {
+    color: #0D5BA8;
+    background: #dcecff;
+  }
+
+  .dc-summary-green .dc-summary-icon {
+    color: #07852F;
+    background: #d9f4e2;
+  }
+
+  .dc-summary-orange .dc-summary-icon {
+    color: #d97706;
+    background: #ffedc5;
+  }
+
+  .dc-summary-value {
+    display: block;
+    position: relative;
+    z-index: 2;
+    margin-top: 9px;
+    font-size: 21px;
+    font-weight: 800;
+    color: #1e293b;
+  }
+
+  .dc-summary-value small {
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  /* =========================================================
+       SECCIÓN PRODUCTOS
+       ========================================================= */
+
+  .dc-products-card {
+    background: #fff;
+    border: 1px solid #e6ebf1;
+    border-radius: 18px;
+    box-shadow: 0 8px 28px rgba(15, 23, 42, .06);
+    overflow: hidden;
+  }
+
+  .dc-products-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 19px 22px;
+    border-bottom: 1px solid #edf1f5;
+    flex-wrap: wrap;
+  }
+
+  .dc-products-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .dc-products-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 11px;
+    background: #f0f5fb;
+    color: #0D5BA8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .dc-products-title h2 {
+    margin: 0;
+    color: #1e293b;
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .dc-products-title small {
+    color: #94a3b8;
+    font-size: 11px;
+  }
+
+  .dc-product-count {
+    background: #eef2f7;
+    color: #475569;
+    border-radius: 20px;
+    padding: 5px 11px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  /* =========================================================
+       TABLA
+       ========================================================= */
+
+  .dc-table-wrapper {
+    overflow-x: auto;
+  }
+
+  .dc-products-table {
+    width: 100%;
+    margin: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 900px;
+  }
+
+  .dc-products-table thead th {
+    background: #f8fafc;
+    color: #64748b;
+    border-bottom: 1px solid #e5eaf0;
+    border-top: 0;
+    padding: 13px 12px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .dc-products-table tbody td {
+    padding: 13px 12px;
+    border-bottom: 1px solid #edf1f5;
+    color: #334155;
+    font-size: 13px;
+    vertical-align: middle;
+  }
+
+  .dc-products-table tbody tr {
+    transition: background .15s ease;
+  }
+
+  .dc-products-table tbody tr:hover {
+    background: #f8fbff;
+  }
+
+  .dc-products-table tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .dc-product-name {
+    font-weight: 700;
+    color: #1e293b;
+    min-width: 170px;
+  }
+
+  .dc-unit-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 8px;
+    background: #f1f5f9;
+    color: #475569;
+    border-radius: 7px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  .dc-money {
+    white-space: nowrap;
+    font-weight: 600;
+    color: #475569;
+  }
+
+  .dc-money-sale {
+    color: #07852F;
+    font-weight: 700;
+  }
+
+  .dc-total {
+    font-weight: 700;
+    color: #334155;
+    white-space: nowrap;
+  }
+
+  .dc-profit {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #ecfdf3;
+    color: #07852F;
+    border: 1px solid #ccefd9;
+    border-radius: 8px;
+    padding: 6px 9px;
+    font-weight: 800;
+    white-space: nowrap;
+    font-size: 12px;
+  }
+
+  .dc-profit-negative {
+    background: #fef2f2;
+    color: #dc2626;
+    border-color: #fecaca;
+  }
+
+  /* =========================================================
+       INPUT CANTIDAD
+       ========================================================= */
+
+  .dc-quantity-control {
+    display: flex;
+    align-items: center;
+    width: 122px;
+  }
+
+  .dc-quantity-btn {
+    width: 30px;
+    height: 34px;
+    border: 1px solid #dbe2ea;
+    background: #f8fafc;
+    color: #475569;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all .15s ease;
+  }
+
+  .dc-quantity-btn:first-child {
+    border-radius: 8px 0 0 8px;
+  }
+
+  .dc-quantity-btn:last-child {
+    border-radius: 0 8px 8px 0;
+  }
+
+  .dc-quantity-btn:hover {
+    background: #eaf3ff;
+    color: #0D5BA8;
+  }
+
+  .cantidad-input {
+    width: 62px !important;
+    height: 34px;
+    border-radius: 0 !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-top: 1px solid #dbe2ea !important;
+    border-bottom: 1px solid #dbe2ea !important;
+    text-align: center;
+    padding: 5px !important;
+    font-size: 12px !important;
+    font-weight: 700;
+    box-shadow: none !important;
+  }
+
+  .cantidad-input:focus {
+    border-color: #dbe2ea !important;
+  }
+
+  /* Quitar flechas */
+
+  .cantidad-input::-webkit-inner-spin-button,
+  .cantidad-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* =========================================================
+       BOTÓN ELIMINAR
+       ========================================================= */
+
+  .btn-eliminar {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff1f2;
+    color: #dc2626;
+    border: 1px solid #fecdd3;
+    transition: all .2s ease;
+  }
+
+  .btn-eliminar:hover {
+    background: #dc2626;
+    color: #fff;
+    border-color: #dc2626;
+    transform: translateY(-1px);
+  }
+
+  /* =========================================================
+       ESTADO VACÍO
+       ========================================================= */
+
+  .dc-empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #94a3b8;
+  }
+
+  .dc-empty-icon {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 15px;
+    border-radius: 20px;
+    background: #f1f5f9;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+  }
+
+  .dc-empty-state h3 {
+    margin: 0 0 5px;
+    font-size: 16px;
+    color: #475569;
+  }
+
+  .dc-empty-state p {
+    margin: 0;
+    font-size: 13px;
+  }
+
+  /* =========================================================
+       FOOTER / RESUMEN INFERIOR
+       ========================================================= */
+
+  .dc-bottom-summary {
+    padding: 17px 22px;
+    background: #f8fafc;
+    border-top: 1px solid #edf1f5;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 30px;
+    flex-wrap: wrap;
+  }
+
+  .dc-bottom-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .dc-bottom-label {
+    font-size: 10px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: .4px;
+  }
+
+  .dc-bottom-value {
+    font-size: 15px;
+    font-weight: 800;
+    color: #334155;
+  }
+
+  .dc-bottom-profit {
+    color: #07852F;
+  }
+
+  /* =========================================================
+       RESPONSIVE
+       ========================================================= */
+
+  @media (max-width: 991.98px) {
+
+    .dc-summary-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .dc-summary-card {
+      min-height: auto;
+    }
+
+  }
+
+  @media (max-width: 575.98px) {
+
+    .dc-cotizacion-page {
+      padding: 15px 10px 35px;
+    }
+
+    .dc-cotizacion-title h1 {
+      font-size: 22px;
+    }
+
+    .dc-title-icon {
+      width: 46px;
+      height: 46px;
+      font-size: 18px;
+    }
+
+    .dc-search-card {
+      padding: 16px;
+    }
+
+    .dc-products-header {
+      padding: 16px;
+    }
+
+    .dc-bottom-summary {
+      justify-content: space-between;
+      gap: 15px;
+      padding: 15px;
+    }
+
+    .dc-bottom-item {
+      align-items: flex-start;
+    }
+
+  }
+</style>
+
+
+<div class="dc-cotizacion-page">
+
+  <!-- =====================================================
+         ENCABEZADO
+         ===================================================== -->
+
+  <div class="dc-cotizacion-header">
+
+    <div class="dc-cotizacion-title">
+
+      <div class="dc-title-icon">
+        <i class="fa-solid fa-file-invoice-dollar"></i>
       </div>
+
+      <div>
+        <h1>Cotización de gastos</h1>
+
+        <p>
+          Agrega productos para calcular costos,
+          precios y ganancias.
+        </p>
+      </div>
+
     </div>
+
   </div>
 
-  <div class="card">
-    <div class="card-header bg-secondary text-white">
-      <h5 class="mb-0"><i class="fa-solid fa-boxes-stacked"></i> Productos seleccionados</h5>
+
+  <!-- =====================================================
+         BUSCADOR + RESUMEN
+         ===================================================== -->
+
+  <div class="dc-search-card">
+
+    <div class="row g-4 align-items-stretch">
+
+      <!-- BUSCADOR -->
+
+      <div class="col-12 col-lg-6">
+
+        <label for="buscarProducto" class="dc-search-label">
+          <i class="fas fa-search"></i>
+          Buscar producto
+        </label>
+
+        <div class="dc-search-wrapper">
+
+          <div class="dc-search-input-wrapper">
+
+            <i class="fas fa-search dc-search-icon"></i>
+
+            <input type="text" id="buscarProducto" class="form-control" placeholder="Escribe el nombre del producto..."
+              autocomplete="off">
+
+            <span class="dc-search-shortcut">
+              Buscar
+            </span>
+
+          </div>
+
+          <div id="sugerenciasProductos" class="list-group"></div>
+
+        </div>
+
+      </div>
+
+
+      <!-- RESUMEN -->
+
+      <div class="col-12 col-lg-6">
+
+        <div class="dc-summary-grid">
+
+          <!-- COSTO -->
+
+          <div class="dc-summary-card dc-summary-blue">
+
+            <div class="dc-summary-top">
+
+              <span class="dc-summary-label">
+                Total costo
+              </span>
+
+              <div class="dc-summary-icon">
+                <i class="fas fa-coins"></i>
+              </div>
+
+            </div>
+
+            <span class="dc-summary-value">
+              <small>S/</small>
+              <span id="totalCosto">0.00</span>
+            </span>
+
+          </div>
+
+
+          <!-- PRECIO -->
+
+          <div class="dc-summary-card dc-summary-green">
+
+            <div class="dc-summary-top">
+
+              <span class="dc-summary-label">
+                Total precio
+              </span>
+
+              <div class="dc-summary-icon">
+                <i class="fas fa-tags"></i>
+              </div>
+
+            </div>
+
+            <span class="dc-summary-value">
+              <small>S/</small>
+              <span id="totalPrecio">0.00</span>
+            </span>
+
+          </div>
+
+
+          <!-- GANANCIA -->
+
+          <div class="dc-summary-card dc-summary-orange">
+
+            <div class="dc-summary-top">
+
+              <span class="dc-summary-label">
+                Ganancia
+              </span>
+
+              <div class="dc-summary-icon">
+                <i class="fas fa-chart-line"></i>
+              </div>
+
+            </div>
+
+            <span class="dc-summary-value">
+              <small>S/</small>
+              <span id="totalGanancia">0.00</span>
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
     </div>
-    <div class="card-body table-responsive">
-      <table class="table table-bordered table-striped align-middle" id="tablaProductosSeleccionados">
-        <thead class="table-light">
-          <tr>
-            <th>Producto</th>
-            <th>Unidad</th>
-            <th>Costo</th>
-            <th>Precio</th>
-            <th>Cantidad</th>
-            <th>Costo total</th>
-            <th>Precio total</th>
-            <th>Ganancia</th>
-            <th>Acción</th>
-          </tr>
-        </thead>
-        <tbody id="productosSeleccionadosBody">
-          <tr id="sinProductosRow">
-            <td colspan="9" class="text-center text-muted">Aún no has seleccionado ningún producto.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+
   </div>
+
+
+  <!-- =====================================================
+         PRODUCTOS SELECCIONADOS
+         ===================================================== -->
+
+  <div class="dc-products-card">
+
+    <div class="dc-products-header">
+
+      <div class="dc-products-title">
+
+        <div class="dc-products-icon">
+          <i class="fas fa-boxes-stacked"></i>
+        </div>
+
+        <div>
+          <h2>Productos seleccionados</h2>
+
+          <small>
+            Ajusta cantidades para actualizar la cotización.
+          </small>
+        </div>
+
+      </div>
+
+      <span id="cantidadProductos" class="dc-product-count">
+        0 productos
+      </span>
+
+    </div>
+
+
+    <div class="dc-table-wrapper">
+
+      <table class="dc-products-table" id="tablaProductosSeleccionados">
+
+        <thead>
+
+          <tr>
+
+            <th>Producto</th>
+
+            <th>Unidad</th>
+
+            <th>Costo</th>
+
+            <th>Precio</th>
+
+            <th>Cantidad</th>
+
+            <th>Costo total</th>
+
+            <th>Precio total</th>
+
+            <th>Ganancia</th>
+
+            <th class="text-center">Acción</th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody id="productosSeleccionadosBody">
+
+          <tr id="sinProductosRow">
+
+            <td colspan="9">
+
+              <div class="dc-empty-state">
+
+                <div class="dc-empty-icon">
+                  <i class="fas fa-box-open"></i>
+                </div>
+
+                <h3>
+                  No hay productos seleccionados
+                </h3>
+
+                <p>
+                  Busca un producto arriba para comenzar
+                  tu cotización.
+                </p>
+
+              </div>
+
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+
+    <!-- RESUMEN INFERIOR -->
+
+    <div class="dc-bottom-summary">
+
+      <div class="dc-bottom-item">
+
+        <span class="dc-bottom-label">
+          Inversión
+        </span>
+
+        <span class="dc-bottom-value">
+          S/
+          <span id="totalCostoBottom">0.00</span>
+        </span>
+
+      </div>
+
+
+      <div class="dc-bottom-item">
+
+        <span class="dc-bottom-label">
+          Venta estimada
+        </span>
+
+        <span class="dc-bottom-value">
+          S/
+          <span id="totalPrecioBottom">0.00</span>
+        </span>
+
+      </div>
+
+
+      <div class="dc-bottom-item">
+
+        <span class="dc-bottom-label">
+          Ganancia estimada
+        </span>
+
+        <span class="dc-bottom-value dc-bottom-profit">
+          S/
+          <span id="totalGananciaBottom">0.00</span>
+        </span>
+
+      </div>
+
+    </div>
+
+  </div>
+
 </div>
+
+
 {% endblock %}
+
 
 {% block extra_js %}
+
 <script>
-  function debounce(fn, delay) {
-    let timeout;
-    return function (...args) {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => fn.apply(this, args), delay);
-    };
-  }
 
-  const buscarProducto = document.getElementById('buscarProducto');
-  const sugerenciasProductos = document.getElementById('sugerenciasProductos');
-  const productosSeleccionadosBody = document.getElementById('productosSeleccionadosBody');
-  const totalCostoEl = document.getElementById('totalCosto');
-  const totalPrecioEl = document.getElementById('totalPrecio');
-  const totalGananciaEl = document.getElementById('totalGanancia');
+  document.addEventListener("DOMContentLoaded", function () {
 
-  function formatNumber(value) {
-    return Number(value).toFixed(2);
-  }
+    /* =====================================================
+       ELEMENTOS
+       ===================================================== */
 
-  async function buscarProductos(query) {
-    if (!query) {
-      sugerenciasProductos.innerHTML = '';
-      return;
+    const buscarProducto =
+      document.getElementById('buscarProducto');
+
+    const sugerenciasProductos =
+      document.getElementById('sugerenciasProductos');
+
+    const productosSeleccionadosBody =
+      document.getElementById(
+        'productosSeleccionadosBody'
+      );
+
+    const totalCostoEl =
+      document.getElementById('totalCosto');
+
+    const totalPrecioEl =
+      document.getElementById('totalPrecio');
+
+    const totalGananciaEl =
+      document.getElementById('totalGanancia');
+
+    const totalCostoBottom =
+      document.getElementById('totalCostoBottom');
+
+    const totalPrecioBottom =
+      document.getElementById('totalPrecioBottom');
+
+    const totalGananciaBottom =
+      document.getElementById('totalGananciaBottom');
+
+    const cantidadProductosEl =
+      document.getElementById('cantidadProductos');
+
+
+    /* =====================================================
+       DEBOUNCE
+       ===================================================== */
+
+    function debounce(fn, delay) {
+
+      let timeout;
+
+      return function (...args) {
+
+        clearTimeout(timeout);
+
+        timeout = setTimeout(
+          () => fn.apply(this, args),
+          delay
+        );
+
+      };
+
     }
 
-    try {
-      const response = await fetch(`{% url 'buscar_productos' %}?q=${encodeURIComponent(query)}`);
-      if (!response.ok) return;
-      const productos = await response.json();
-      mostrarSugerencias(productos);
-    } catch (error) {
-      console.error('Error buscando productos:', error);
-    }
-  }
 
-  function mostrarSugerencias(productos) {
-    sugerenciasProductos.innerHTML = '';
-    if (!productos.length) {
-      const item = document.createElement('div');
-      item.className = 'list-group-item text-muted';
-      item.textContent = 'No se encontraron productos.';
-      sugerenciasProductos.appendChild(item);
-      return;
+    /* =====================================================
+       FORMATO DE NÚMEROS
+       ===================================================== */
+
+    function formatNumber(value) {
+
+      return Number(value).toFixed(2);
+
     }
 
-    productos.forEach(producto => {
-      const item = document.createElement('button');
-      item.type = 'button';
-      item.className = 'list-group-item list-group-item-action';
-      item.innerHTML = `<strong>${producto.nombre}</strong><br><small>Costo: S/ ${formatNumber(producto.costo)} · Precio: S/ ${formatNumber(producto.precio)} · Stock: ${producto.stock}</small>`;
-      item.addEventListener('click', () => seleccionarProducto(producto));
-      sugerenciasProductos.appendChild(item);
-    });
-  }
 
-  function seleccionarProducto(producto) {
-    const existingRow = document.getElementById(`producto_row_${producto.id}`);
-    if (existingRow) {
-      const cantidadInput = existingRow.querySelector('.cantidad-input');
-      cantidadInput.value = Number(cantidadInput.value || 0) + 1;
-      updateRow(existingRow);
-      return;
-    }
+    /* =====================================================
+       BUSCAR PRODUCTOS
+       ===================================================== */
 
-    if (document.getElementById('sinProductosRow')) {
-      document.getElementById('sinProductosRow').remove();
-    }
+    async function buscarProductos(query) {
 
-    const row = document.createElement('tr');
-    row.id = `producto_row_${producto.id}`;
-    const step = (producto.unidadMedida && String(producto.unidadMedida).toLowerCase().includes('kilo')) ? '0.01' : '1';
-    row.innerHTML = `
-      <td>${producto.nombre}</td>
-      <td>${producto.unidadMedida || '-'}</td>
-      <td>S/ ${formatNumber(producto.costo)}</td>
-      <td>S/ ${formatNumber(producto.precio)}</td>
-      <td><input type="number" min="0.01" step="${step}" value="1" class="form-control cantidad-input" style="max-width:120px;"></td>
-      <td class="costo-total">S/ ${formatNumber(producto.costo)}</td>
-      <td class="precio-total">S/ ${formatNumber(producto.precio)}</td>
-      <td class="ganancia-line">S/ ${formatNumber(producto.precio - producto.costo)}</td>
-      <td><button type="button" class="btn btn-sm btn-danger btn-eliminar">Eliminar</button></td>
-    `;
+      if (!query) {
 
-    const cantidadInput = row.querySelector('.cantidad-input');
-    const eliminarBtn = row.querySelector('.btn-eliminar');
+        sugerenciasProductos.innerHTML = '';
 
-    cantidadInput.addEventListener('input', () => updateRow(row));
-    eliminarBtn.addEventListener('click', () => {
-      row.remove();
-      if (!productosSeleccionadosBody.querySelector('tr')) {
-        productosSeleccionadosBody.innerHTML = `<tr id="sinProductosRow"><td colspan="9" class="text-center text-muted">Aún no has seleccionado ningún producto.</td></tr>`;
+        return;
+
       }
+
+
+      try {
+
+        const response = await fetch(
+          `{% url 'buscar_productos' %}?q=${encodeURIComponent(query)}`
+        );
+
+
+        if (!response.ok) {
+
+          return;
+
+        }
+
+
+        const productos =
+          await response.json();
+
+
+        mostrarSugerencias(productos);
+
+      }
+
+      catch (error) {
+
+        console.error(
+          'Error buscando productos:',
+          error
+        );
+
+      }
+
+    }
+
+
+    /* =====================================================
+       MOSTRAR SUGERENCIAS
+       ===================================================== */
+
+    function mostrarSugerencias(productos) {
+
+      sugerenciasProductos.innerHTML = '';
+
+
+      if (!productos.length) {
+
+        const item =
+          document.createElement('div');
+
+        item.className =
+          'list-group-item text-muted';
+
+        item.innerHTML = `
+                <i class="fas fa-search me-2"></i>
+                No se encontraron productos.
+            `;
+
+        sugerenciasProductos.appendChild(item);
+
+        return;
+
+      }
+
+
+      productos.forEach(producto => {
+
+        const item =
+          document.createElement('button');
+
+        item.type = 'button';
+
+        item.className =
+          'list-group-item list-group-item-action';
+
+
+        item.innerHTML = `
+
+                <div class="dc-suggestion-name">
+                    <i class="fas fa-box me-2 text-primary"></i>
+                    ${producto.nombre}
+                </div>
+
+                <div class="dc-suggestion-info">
+
+                    <span>
+                        <i class="fas fa-coins me-1"></i>
+                        Costo:
+                        <strong>
+                            S/ ${formatNumber(producto.costo)}
+                        </strong>
+                    </span>
+
+                    <span class="dc-suggestion-price">
+                        <i class="fas fa-tag me-1"></i>
+                        Precio:
+                        S/ ${formatNumber(producto.precio)}
+                    </span>
+
+                    <span>
+                        <i class="fas fa-boxes-stacked me-1"></i>
+                        Stock:
+                        ${producto.stock}
+                    </span>
+
+                </div>
+
+            `;
+
+
+        item.addEventListener(
+          'click',
+          () => seleccionarProducto(producto)
+        );
+
+
+        sugerenciasProductos.appendChild(item);
+
+      });
+
+    }
+
+
+    /* =====================================================
+       SELECCIONAR PRODUCTO
+       ===================================================== */
+
+    function seleccionarProducto(producto) {
+
+      const existingRow =
+        document.getElementById(
+          `producto_row_${producto.id}`
+        );
+
+
+      /* Si ya existe, aumentar cantidad */
+
+      if (existingRow) {
+
+        const cantidadInput =
+          existingRow.querySelector(
+            '.cantidad-input'
+          );
+
+        cantidadInput.value =
+          Number(cantidadInput.value || 0) + 1;
+
+        updateRow(existingRow);
+
+        buscarProducto.value = '';
+
+        sugerenciasProductos.innerHTML = '';
+
+        return;
+
+      }
+
+
+      /* Quitar estado vacío */
+
+      const sinProductos =
+        document.getElementById(
+          'sinProductosRow'
+        );
+
+      if (sinProductos) {
+
+        sinProductos.remove();
+
+      }
+
+
+      const row =
+        document.createElement('tr');
+
+
+      row.id =
+        `producto_row_${producto.id}`;
+
+
+      /*
+       * Para productos por kilo
+       * permitimos decimales.
+       */
+
+      const step =
+        (
+          producto.unidadMedida &&
+          String(producto.unidadMedida)
+            .toLowerCase()
+            .includes('kilo')
+        )
+          ? '0.01'
+          : '1';
+
+
+      row.innerHTML = `
+
+            <td>
+
+                <div class="dc-product-name">
+                    ${producto.nombre}
+                </div>
+
+            </td>
+
+
+            <td>
+
+                <span class="dc-unit-badge">
+                    <i class="fas fa-ruler"></i>
+                    ${producto.unidadMedida || '-'}
+                </span>
+
+            </td>
+
+
+            <td>
+
+                <span class="dc-money">
+                    S/ ${formatNumber(producto.costo)}
+                </span>
+
+            </td>
+
+
+            <td>
+
+                <span class="dc-money-sale">
+                    S/ ${formatNumber(producto.precio)}
+                </span>
+
+            </td>
+
+
+            <td>
+
+                <div class="dc-quantity-control">
+
+                    <button
+                        type="button"
+                        class="dc-quantity-btn btn-minus"
+                    >
+                        <i class="fas fa-minus"></i>
+                    </button>
+
+
+                    <input
+                        type="number"
+                        min="0.01"
+                        step="${step}"
+                        value="1"
+                        class="form-control cantidad-input"
+                    >
+
+
+                    <button
+                        type="button"
+                        class="dc-quantity-btn btn-plus"
+                    >
+                        <i class="fas fa-plus"></i>
+                    </button>
+
+                </div>
+
+            </td>
+
+
+            <td>
+
+                <span class="dc-total costo-total">
+                    S/ ${formatNumber(producto.costo)}
+                </span>
+
+            </td>
+
+
+            <td>
+
+                <span class="dc-total precio-total">
+                    S/ ${formatNumber(producto.precio)}
+                </span>
+
+            </td>
+
+
+            <td>
+
+                <span class="dc-profit ganancia-line">
+
+                    <i class="fas fa-arrow-trend-up"></i>
+
+                    S/
+                    ${formatNumber(
+        producto.precio - producto.costo
+      )}
+
+                </span>
+
+            </td>
+
+
+            <td class="text-center">
+
+                <button
+                    type="button"
+                    class="btn-eliminar"
+                    title="Eliminar producto"
+                >
+                    <i class="fas fa-trash"></i>
+                </button>
+
+            </td>
+
+        `;
+
+
+      const cantidadInput =
+        row.querySelector(
+          '.cantidad-input'
+        );
+
+
+      const eliminarBtn =
+        row.querySelector(
+          '.btn-eliminar'
+        );
+
+
+      const btnMinus =
+        row.querySelector(
+          '.btn-minus'
+        );
+
+
+      const btnPlus =
+        row.querySelector(
+          '.btn-plus'
+        );
+
+
+      /* =================================================
+         CAMBIAR CANTIDAD
+         ================================================= */
+
+      cantidadInput.addEventListener(
+        'input',
+        () => updateRow(row)
+      );
+
+
+      /* =================================================
+         BOTÓN MENOS
+         ================================================= */
+
+      btnMinus.addEventListener(
+        'click',
+        function () {
+
+          let cantidad =
+            parseFloat(
+              cantidadInput.value
+            ) || 0;
+
+
+          cantidad -=
+            step === '0.01'
+              ? 0.01
+              : 1;
+
+
+          if (cantidad < 0.01) {
+
+            cantidad = 0.01;
+
+          }
+
+
+          cantidadInput.value =
+            cantidad.toFixed(
+              step === '0.01'
+                ? 2
+                : 0
+            );
+
+
+          updateRow(row);
+
+        }
+      );
+
+
+      /* =================================================
+         BOTÓN MÁS
+         ================================================= */
+
+      btnPlus.addEventListener(
+        'click',
+        function () {
+
+          let cantidad =
+            parseFloat(
+              cantidadInput.value
+            ) || 0;
+
+
+          cantidad +=
+            step === '0.01'
+              ? 0.01
+              : 1;
+
+
+          cantidadInput.value =
+            cantidad.toFixed(
+              step === '0.01'
+                ? 2
+                : 0
+            );
+
+
+          updateRow(row);
+
+        }
+      );
+
+
+      /* =================================================
+         ELIMINAR
+         ================================================= */
+
+      eliminarBtn.addEventListener(
+        'click',
+        function () {
+
+          row.remove();
+
+
+          if (
+            !productosSeleccionadosBody
+              .querySelector('tr')
+          ) {
+
+            mostrarEstadoVacio();
+
+          }
+
+
+          updateTotales();
+
+        }
+      );
+
+
+      productosSeleccionadosBody.appendChild(
+        row
+      );
+
+
+      updateRow(row);
+
+
+      buscarProducto.value = '';
+
+      sugerenciasProductos.innerHTML = '';
+
+    }
+
+
+    /* =====================================================
+       ESTADO VACÍO
+       ===================================================== */
+
+    function mostrarEstadoVacio() {
+
+      productosSeleccionadosBody.innerHTML = `
+
+            <tr id="sinProductosRow">
+
+                <td colspan="9">
+
+                    <div class="dc-empty-state">
+
+                        <div class="dc-empty-icon">
+                            <i class="fas fa-box-open"></i>
+                        </div>
+
+                        <h3>
+                            No hay productos seleccionados
+                        </h3>
+
+                        <p>
+                            Busca un producto arriba para comenzar
+                            tu cotización.
+                        </p>
+
+                    </div>
+
+                </td>
+
+            </tr>
+
+        `;
+
+    }
+
+
+    /* =====================================================
+       ACTUALIZAR FILA
+       ===================================================== */
+
+    function updateRow(row) {
+
+      const costo =
+        parseFloat(
+          row.children[2]
+            .textContent
+            .replace(/[A-Za-z/ ]/g, '')
+        ) || 0;
+
+
+      const precio =
+        parseFloat(
+          row.children[3]
+            .textContent
+            .replace(/[A-Za-z/ ]/g, '')
+        ) || 0;
+
+
+      const cantidadInput =
+        row.querySelector(
+          '.cantidad-input'
+        );
+
+
+      const cantidad =
+        parseFloat(
+          cantidadInput.value
+        ) || 0;
+
+
+      const costoTotal =
+        costo * cantidad;
+
+
+      const precioTotal =
+        precio * cantidad;
+
+
+      const ganancia =
+        (precio - costo) * cantidad;
+
+
+      row.querySelector(
+        '.costo-total'
+      ).textContent =
+        `S/ ${formatNumber(costoTotal)}`;
+
+
+      row.querySelector(
+        '.precio-total'
+      ).textContent =
+        `S/ ${formatNumber(precioTotal)}`;
+
+
+      const gananciaEl =
+        row.querySelector(
+          '.ganancia-line'
+        );
+
+
+      gananciaEl.innerHTML = `
+
+            <i class="fas ${ganancia >= 0
+          ? 'fa-arrow-trend-up'
+          : 'fa-arrow-trend-down'
+        }"></i>
+
+            S/ ${formatNumber(ganancia)}
+
+        `;
+
+
+      if (ganancia < 0) {
+
+        gananciaEl.classList.add(
+          'dc-profit-negative'
+        );
+
+      } else {
+
+        gananciaEl.classList.remove(
+          'dc-profit-negative'
+        );
+
+      }
+
+
       updateTotales();
-    });
 
-    productosSeleccionadosBody.appendChild(row);
-    updateRow(row);
-    buscarProducto.value = '';
-    sugerenciasProductos.innerHTML = '';
-  }
+    }
 
-  function updateRow(row) {
-    const costo = parseFloat(row.children[2].textContent.replace(/[A-Za-z/ ]/g, '')) || 0;
-    const precio = parseFloat(row.children[3].textContent.replace(/[A-Za-z/ ]/g, '')) || 0;
-    const cantidadInput = row.querySelector('.cantidad-input');
-    const cantidad = parseFloat(cantidadInput.value) || 0;
 
-    const costoTotal = costo * cantidad;
-    const precioTotal = precio * cantidad;
-    const ganancia = (precio - costo) * cantidad;
+    /* =====================================================
+       ACTUALIZAR TOTALES
+       ===================================================== */
 
-    row.querySelector('.costo-total').textContent = `S/ ${formatNumber(costoTotal)}`;
-    row.querySelector('.precio-total').textContent = `S/ ${formatNumber(precioTotal)}`;
-    row.querySelector('.ganancia-line').textContent = `S/ ${formatNumber(ganancia)}`;
+    function updateTotales() {
+
+      let totalCosto = 0;
+
+      let totalPrecio = 0;
+
+      let totalGanancia = 0;
+
+      let cantidadProductos = 0;
+
+
+      productosSeleccionadosBody
+        .querySelectorAll('tr')
+        .forEach(row => {
+
+          if (
+            row.id ===
+            'sinProductosRow'
+          ) {
+
+            return;
+
+          }
+
+
+          cantidadProductos++;
+
+
+          const costoTotal =
+            parseFloat(
+              row.querySelector(
+                '.costo-total'
+              )
+                .textContent
+                .replace(/[A-Za-z/ ]/g, '')
+            ) || 0;
+
+
+          const precioTotal =
+            parseFloat(
+              row.querySelector(
+                '.precio-total'
+              )
+                .textContent
+                .replace(/[A-Za-z/ ]/g, '')
+            ) || 0;
+
+
+          const gananciaLine =
+            parseFloat(
+              row.querySelector(
+                '.ganancia-line'
+              )
+                .textContent
+                .replace(/[A-Za-z/ ]/g, '')
+            ) || 0;
+
+
+          totalCosto +=
+            costoTotal;
+
+
+          totalPrecio +=
+            precioTotal;
+
+
+          totalGanancia +=
+            gananciaLine;
+
+        });
+
+
+      /* Resumen superior */
+
+      totalCostoEl.textContent =
+        formatNumber(totalCosto);
+
+
+      totalPrecioEl.textContent =
+        formatNumber(totalPrecio);
+
+
+      totalGananciaEl.textContent =
+        formatNumber(totalGanancia);
+
+
+      /* Resumen inferior */
+
+      totalCostoBottom.textContent =
+        formatNumber(totalCosto);
+
+
+      totalPrecioBottom.textContent =
+        formatNumber(totalPrecio);
+
+
+      totalGananciaBottom.textContent =
+        formatNumber(totalGanancia);
+
+
+      /* Cantidad de productos */
+
+      cantidadProductosEl.textContent =
+        `${cantidadProductos} ${cantidadProductos === 1
+          ? 'producto'
+          : 'productos'
+        }`;
+
+    }
+
+
+    /* =====================================================
+       BUSCADOR
+       ===================================================== */
+
+    buscarProducto.addEventListener(
+      'input',
+      debounce(
+        event => {
+
+          buscarProductos(
+            event.target.value.trim()
+          );
+
+        },
+        300
+      )
+    );
+
+
+    /* =====================================================
+       CERRAR SUGERENCIAS
+       ===================================================== */
+
+    document.addEventListener(
+      'click',
+      event => {
+
+        if (
+          !sugerenciasProductos
+            .contains(event.target) &&
+          event.target !== buscarProducto
+        ) {
+
+          sugerenciasProductos.innerHTML = '';
+
+        }
+
+      }
+    );
+
+
+    /* =====================================================
+       ATAJO DE TECLADO
+       ===================================================== */
+
+    document.addEventListener(
+      'keydown',
+      event => {
+
+        if (
+          event.key === '/' &&
+          document.activeElement !== buscarProducto
+        ) {
+
+          event.preventDefault();
+
+          buscarProducto.focus();
+
+        }
+
+      }
+    );
+
+
+    /* =====================================================
+       INICIALIZAR
+       ===================================================== */
 
     updateTotales();
-  }
 
-  function updateTotales() {
-    let totalCosto = 0;
-    let totalPrecio = 0;
-    let totalGanancia = 0;
-
-    productosSeleccionadosBody.querySelectorAll('tr').forEach(row => {
-      if (row.id === 'sinProductosRow') return;
-      const costoTotal = parseFloat(row.querySelector('.costo-total').textContent.replace(/[A-Za-z/ ]/g, '')) || 0;
-      const precioTotal = parseFloat(row.querySelector('.precio-total').textContent.replace(/[A-Za-z/ ]/g, '')) || 0;
-      const gananciaLine = parseFloat(row.querySelector('.ganancia-line').textContent.replace(/[A-Za-z/ ]/g, '')) || 0;
-      totalCosto += costoTotal;
-      totalPrecio += precioTotal;
-      totalGanancia += gananciaLine;
-    });
-
-    totalCostoEl.textContent = formatNumber(totalCosto);
-    totalPrecioEl.textContent = formatNumber(totalPrecio);
-    totalGananciaEl.textContent = formatNumber(totalGanancia);
-  }
-
-  buscarProducto.addEventListener('input', debounce((event) => {
-    buscarProductos(event.target.value.trim());
-  }, 300));
-
-  document.addEventListener('click', (event) => {
-    if (!sugerenciasProductos.contains(event.target) && event.target !== buscarProducto) {
-      sugerenciasProductos.innerHTML = '';
-    }
   });
-</script>
-{% endblock %}
 
+</script>
+
+{% endblock %}

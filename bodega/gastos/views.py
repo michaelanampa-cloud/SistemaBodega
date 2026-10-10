@@ -99,14 +99,18 @@ def registrar_gastos(request):
         for producto in productos:
             cantidad = request.POST.get(f'cantidad_{producto.pk}')
             costo = request.POST.get(f'costo_{producto.pk}')
+            paquete = request.POST.get(f'paquete_{producto.pk}', '1')
             if not cantidad or not costo:
                 continue
 
             try:
+                factor = Decimal(paquete)
+                if factor <= 0:
+                    factor = Decimal('1')
                 if producto.unidadMedida and producto.unidadMedida.lower() in ('kilo', 'kg'):
-                    cantidad_val = Decimal(cantidad)
+                    cantidad_val = Decimal(cantidad) * factor
                 else:
-                    cantidad_val = Decimal(int(cantidad))
+                    cantidad_val = Decimal(cantidad) * factor
                 costo_val = Decimal(costo)
             except (ValueError, TypeError, InvalidOperation):
                 continue

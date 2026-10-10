@@ -1,119 +1,1138 @@
 {% extends 'base_admin.html' %}
-
 {% load static %}
 
 {% block title %}Editar Producto{% endblock %}
 
 {% block content %}
 
-<div class="container">
-  <br>
-  <div class="row justify-content-center">
-    <div class="col-md-8">
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <h3 class="card-title mb-4">
-            <i class="fas fa-edit"></i>
-            Editar Producto
-          </h3>
-          <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ form.non_field_errors }}
+<style>
+  /* =========================================================
+       EDITAR PRODUCTO - DISEÑO MODERNO
+       ========================================================= */
+
+  .dc-edit-page {
+    max-width: 1250px;
+    margin: 0 auto;
+    padding: 28px 20px 45px;
+  }
+
+  /* ---------- ENCABEZADO ---------- */
+
+  .dc-edit-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+  }
+
+  .dc-edit-title {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .dc-edit-title-icon {
+    width: 55px;
+    height: 55px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #06152D, #0D5BA8);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    box-shadow: 0 8px 20px rgba(6, 21, 45, .18);
+  }
+
+  .dc-edit-title h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: #06152D;
+  }
+
+  .dc-edit-title p {
+    margin: 4px 0 0;
+    color: #64748b;
+    font-size: 14px;
+  }
+
+  .dc-back-btn {
+    border: 1px solid #e2e8f0;
+    background: white;
+    color: #334155;
+    padding: 10px 17px;
+    border-radius: 11px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all .2s ease;
+  }
+
+  .dc-back-btn:hover {
+    background: #f8fafc;
+    color: #06152D;
+    transform: translateY(-1px);
+  }
+
+  /* ---------- ALERTAS ---------- */
+
+  .dc-form-errors {
+    border: none;
+    border-left: 4px solid #dc2626;
+    border-radius: 12px;
+    background: #fef2f2;
+    color: #991b1b;
+    padding: 15px 18px;
+    margin-bottom: 20px;
+  }
+
+  /* ---------- TARJETAS ---------- */
+
+  .dc-edit-card {
+    background: #fff;
+    border: 1px solid #e8edf3;
+    border-radius: 18px;
+    box-shadow: 0 8px 30px rgba(15, 23, 42, .06);
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .dc-card-header {
+    padding: 18px 22px;
+    border-bottom: 1px solid #edf1f5;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+  }
+
+  .dc-card-header-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    flex-shrink: 0;
+  }
+
+  .dc-icon-blue {
+    background: #eaf3ff;
+    color: #0D5BA8;
+  }
+
+  .dc-icon-green {
+    background: #eaf9ef;
+    color: #07852F;
+  }
+
+  .dc-icon-orange {
+    background: #fff4df;
+    color: #d97706;
+  }
+
+  .dc-card-header h2 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+    color: #1e293b;
+  }
+
+  .dc-card-header small {
+    display: block;
+    color: #94a3b8;
+    font-size: 12px;
+    margin-top: 2px;
+  }
+
+  .dc-card-body {
+    padding: 22px;
+  }
+
+  /* ---------- CAMPOS ---------- */
+
+  .dc-field {
+    margin-bottom: 18px;
+  }
+
+  .dc-field:last-child {
+    margin-bottom: 0;
+  }
+
+  .dc-field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 7px;
+  }
+
+  .dc-field label i {
+    color: #64748b;
+    margin-right: 5px;
+  }
+
+  .dc-field input,
+  .dc-field select,
+  .dc-field textarea {
+    width: 100%;
+    border: 1px solid #dbe2ea;
+    border-radius: 10px;
+    padding: 10px 12px;
+    color: #1e293b;
+    background: #fff;
+    font-size: 14px;
+    transition: all .2s ease;
+    box-shadow: none;
+  }
+
+  .dc-field textarea {
+    min-height: 105px;
+    resize: vertical;
+  }
+
+  .dc-field input:focus,
+  .dc-field select:focus,
+  .dc-field textarea:focus {
+    border-color: #0D5BA8;
+    box-shadow: 0 0 0 3px rgba(13, 91, 168, .10);
+    outline: none;
+  }
+
+  .dc-field input[type="file"] {
+    padding: 8px;
+    background: #f8fafc;
+  }
+
+  .dc-field-error {
+    color: #dc2626;
+    font-size: 12px;
+    margin-top: 5px;
+  }
+
+  /* ---------- PRECIO ---------- */
+
+  .dc-price-box {
+    background: linear-gradient(135deg, #f8fbff, #f1f7ff);
+    border: 1px solid #dcecff;
+    border-radius: 14px;
+    padding: 16px;
+  }
+
+  .dc-price-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin-bottom: 7px;
+  }
+
+  .dc-price-input-wrap {
+    position: relative;
+  }
+
+  .dc-price-input-wrap span {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    font-weight: 600;
+    font-size: 13px;
+  }
+
+  .dc-price-input-wrap input {
+    padding-left: 35px;
+  }
+
+  /* ---------- RENTABILIDAD ---------- */
+
+  .dc-profit-card {
+    margin-top: 18px;
+    border-radius: 15px;
+    padding: 17px;
+    border: 1px solid #dbeafe;
+    background: #eff6ff;
+    transition: all .25s ease;
+  }
+
+  .dc-profit-card.profit-positive {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+  }
+
+  .dc-profit-card.profit-negative {
+    background: #fef2f2;
+    border-color: #fecaca;
+  }
+
+  .dc-profit-card.profit-zero {
+    background: #fffbeb;
+    border-color: #fde68a;
+  }
+
+  .dc-profit-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 13px;
+  }
+
+  .dc-profit-title strong {
+    font-size: 14px;
+    color: #334155;
+  }
+
+  .dc-profit-title i {
+    font-size: 18px;
+  }
+
+  .dc-profit-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .dc-profit-item {
+    background: rgba(255, 255, 255, .75);
+    border-radius: 10px;
+    padding: 11px;
+    text-align: center;
+  }
+
+  .dc-profit-item span {
+    display: block;
+    color: #64748b;
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: .3px;
+    margin-bottom: 3px;
+  }
+
+  .dc-profit-item strong {
+    font-size: 16px;
+    color: #1e293b;
+  }
+
+  /* ---------- IMAGEN ---------- */
+
+  .dc-image-preview {
+    position: relative;
+    min-height: 290px;
+    border: 2px dashed #d8e0e9;
+    border-radius: 16px;
+    background:
+      linear-gradient(45deg, #f8fafc 25%, transparent 25%),
+      linear-gradient(-45deg, #f8fafc 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #f8fafc 75%),
+      linear-gradient(-45deg, transparent 75%, #f8fafc 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .dc-image-preview img {
+    max-width: 100%;
+    max-height: 280px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 12px;
+    display: block;
+  }
+
+  .dc-no-image {
+    text-align: center;
+    color: #94a3b8;
+    padding: 30px;
+  }
+
+  .dc-no-image i {
+    font-size: 55px;
+    margin-bottom: 12px;
+    opacity: .6;
+  }
+
+  .dc-no-image p {
+    margin: 0;
+    font-size: 13px;
+  }
+
+  .dc-image-current {
+    margin-top: 10px;
+    color: #64748b;
+    font-size: 12px;
+    text-align: center;
+  }
+
+  /* ---------- BOTÓN ARCHIVO ---------- */
+
+  .dc-file-box {
+    margin-top: 15px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 14px;
+    background: #f8fafc;
+  }
+
+  .dc-file-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 8px;
+  }
+
+  .dc-file-help {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-top: 7px;
+  }
+
+  /* ---------- CÓDIGO DE BARRAS ---------- */
+
+  .dc-barcode-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 18px;
+    text-align: center;
+  }
+
+  .dc-barcode-image {
+    width: 100%;
+    max-width: 390px;
+    height: 125px;
+    object-fit: contain;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 10px;
+  }
+
+  .dc-barcode-number {
+    margin-top: 10px;
+    font-weight: 700;
+    color: #1e293b;
+    letter-spacing: 2px;
+    font-size: 14px;
+  }
+
+  .dc-no-barcode {
+    padding: 22px;
+    color: #94a3b8;
+  }
+
+  .dc-no-barcode i {
+    font-size: 42px;
+    margin-bottom: 8px;
+  }
+
+  /* ---------- BOTONES ---------- */
+
+  .dc-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+    padding: 18px 0 0;
+  }
+
+  .dc-btn {
+    border-radius: 11px;
+    padding: 11px 18px;
+    font-weight: 600;
+    font-size: 14px;
+    border: none;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all .2s ease;
+  }
+
+  .dc-btn:hover {
+    transform: translateY(-1px);
+  }
+
+  .dc-btn-primary {
+    color: white;
+    background: linear-gradient(135deg, #06152D, #0D5BA8);
+    box-shadow: 0 7px 16px rgba(13, 91, 168, .20);
+  }
+
+  .dc-btn-primary:hover {
+    color: white;
+    box-shadow: 0 10px 22px rgba(13, 91, 168, .28);
+  }
+
+  .dc-btn-secondary {
+    background: white;
+    border: 1px solid #dbe2ea;
+    color: #475569;
+  }
+
+  .dc-btn-secondary:hover {
+    background: #f8fafc;
+    color: #1e293b;
+  }
+
+  /* ---------- RESPONSIVE ---------- */
+
+  @media (max-width: 991.98px) {
+    .dc-edit-page {
+      padding: 20px 15px 35px;
+    }
+
+    .dc-profit-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 575.98px) {
+
+    .dc-edit-title h1 {
+      font-size: 22px;
+    }
+
+    .dc-edit-title-icon {
+      width: 46px;
+      height: 46px;
+      font-size: 18px;
+    }
+
+    .dc-edit-header {
+      align-items: flex-start;
+    }
+
+    .dc-back-btn {
+      width: 100%;
+      text-align: center;
+    }
+
+    .dc-card-body {
+      padding: 17px;
+    }
+
+    .dc-card-header {
+      padding: 16px;
+    }
+
+    .dc-actions {
+      flex-direction: column-reverse;
+    }
+
+    .dc-actions .dc-btn {
+      width: 100%;
+    }
+
+    .dc-image-preview {
+      min-height: 230px;
+    }
+  }
+</style>
+
+
+<div class="dc-edit-page">
+
+  <!-- =====================================================
+         ENCABEZADO
+         ===================================================== -->
+
+  <div class="dc-edit-header">
+
+    <div class="dc-edit-title">
+
+      <div class="dc-edit-title-icon">
+        <i class="fas fa-edit"></i>
+      </div>
+
+      <div>
+        <h1>Editar Producto</h1>
+        <p>Actualiza la información, precios, stock e imagen del producto.</p>
+      </div>
+
+    </div>
+
+    <a href="{% url 'lista_productos' %}" class="dc-back-btn">
+      <i class="fas fa-arrow-left me-2"></i>
+      Volver a productos
+    </a>
+
+  </div>
+
+
+  <!-- =====================================================
+         FORMULARIO
+         ===================================================== -->
+
+  <form method="post" enctype="multipart/form-data">
+
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="dc-form-errors">
+      <strong>
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        Hay errores en el formulario
+      </strong>
+
+      <div class="mt-1">
+        {{ form.non_field_errors }}
+      </div>
+    </div>
+    {% endif %}
+
+
+    <div class="row g-4">
+
+
+      <!-- =================================================
+                 COLUMNA IZQUIERDA
+                 ================================================= -->
+
+      <div class="col-lg-7">
+
+
+        <!-- =============================================
+                     DATOS DEL PRODUCTO
+                     ============================================= -->
+
+        <div class="dc-edit-card">
+
+          <div class="dc-card-header">
+
+            <div class="dc-card-header-icon dc-icon-blue">
+              <i class="fas fa-box"></i>
+            </div>
+
+            <div>
+              <h2>Datos del producto</h2>
+              <small>Información general del producto</small>
+            </div>
+
+          </div>
+
+
+          <div class="dc-card-body">
 
             {% for field in form %}
 
-            <div class="mb-3">
-              {{ field.label_tag }}
+            {% if field.name == 'nombre' %}
 
+            <div class="dc-field">
+              {{ field.label_tag }}
               {{ field }}
 
               {% if field.errors %}
-
-              <div class="text-danger small mt-1">
+              <div class="dc-field-error">
                 {{ field.errors }}
               </div>
               {% endif %}
             </div>
-            <!-- ================================= -->
-            <!-- CAMPO DE IMAGEN -->
-            <!-- ================================= -->
-            {% if field.name == 'archivo_imagen' %}
-            <div class="mb-4">
-              <label class="form-label fw-bold">
-                Vista previa
-              </label>
-              <div class="text-center border rounded p-3" style="background:#f8f9fa;">
-                {% if producto.imagen %}
-                <img id="previewImagen" src="{% static 'img/productos/' %}{{ producto.imagen }}"
-                  alt="{{ producto.nombre }}" class="img-fluid rounded" style="
-                                                    max-width:300px;
-                                                    max-height:300px;
-                                                    object-fit:contain;
-                                                ">
-                {% else %}
-                <div id="mensajeSinImagen" class="text-muted">
-                  <i class="fas fa-image fa-4x mb-2"></i>
-                  <p class="mb-0"> Este producto no tiene imagen.
-                  </p>
-                </div>
-                <img id="previewImagen" src="" alt="Previsualización" class="img-fluid rounded d-none" style="
-                                                    max-width:300px;
-                                                    max-height:300px;
-                                                    object-fit:contain;
-                                                ">
-                {% endif %}
-              </div>
-            </div>
-            {% endif %}
 
-            {% if field.name == 'codigo_barras' %}
-            <div class="mb-4">
-              <label class="form-label fw-bold">
-                <i class="fa-solid fa-barcode me-2"></i>
-                Vista previa del código de barras
-              </label>
-              <div class="border rounded p-3 text-center" style="background:#f8fafc;">
-                {% if producto.codigo_barras_imagen %}
-                <img src="{% static producto.codigo_barras_imagen %}" alt="Código de barras de {{ producto.nombre }}" style="max-width:100%; height:120px; background:white; border-radius:10px; border:1px solid #e5e7eb; padding:10px;">
-                {% else %}
-                <div class="text-muted">
-                  <i class="fas fa-barcode fa-3x mb-2"></i>
-                  <p class="mb-0">Sin código de barras generado</p>
-                </div>
-                {% endif %}
-                <div class="mt-3 fw-bold" style="letter-spacing:1px; color:#111827;">{{ producto.codigo_barras }}</div>
+            {% elif field.name == 'tipoProducto' %}
+
+            <div class="dc-field">
+              {{ field.label_tag }}
+              {{ field }}
+
+              {% if field.errors %}
+              <div class="dc-field-error">
+                {{ field.errors }}
               </div>
+              {% endif %}
             </div>
+
+            {% elif field.name == 'zona' %}
+
+            <div class="dc-field">
+              {{ field.label_tag }}
+              {{ field }}
+
+              {% if field.errors %}
+              <div class="dc-field-error">
+                {{ field.errors }}
+              </div>
+              {% endif %}
+            </div>
+
+            {% elif field.name == 'zona' %}
+
+            <div class="dc-field">
+              {{ field.label_tag }}
+              {{ field }}
+
+              {% if field.errors %}
+              <div class="dc-field-error">
+                {{ field.errors }}
+              </div>
+              {% endif %}
+            </div>
+
+            {% elif field.name == 'unidadMedida' %}
+
+            <div class="dc-field">
+              {{ field.label_tag }}
+              {{ field }}
+
+              {% if field.errors %}
+              <div class="dc-field-error">
+                {{ field.errors }}
+              </div>
+              {% endif %}
+            </div>
+
+            {% elif field.name == 'fechaVencimiento' %}
+
+            <div class="dc-field">
+              {{ field.label_tag }}
+              {{ field }}
+
+              {% if field.errors %}
+              <div class="dc-field-error">
+                {{ field.errors }}
+              </div>
+              {% endif %}
+            </div>
+
+            {% elif field.name == 'detalle' %}
+
+            <div class="dc-field">
+              {{ field.label_tag }}
+              {{ field }}
+
+              {% if field.errors %}
+              <div class="dc-field-error">
+                {{ field.errors }}
+              </div>
+              {% endif %}
+            </div>
+
             {% endif %}
 
             {% endfor %}
-            <!-- ================================= -->
-            <!-- BOTONES -->
-            <!-- ================================= -->
-            <div class="mt-4">
-              <button class="btn btn-primary" type="submit">
-                <i class="fas fa-save"></i> Actualizar
-              </button>
-              <a class="btn btn-secondary" href="{% url 'lista_productos' %}">
-                <i class="fas fa-arrow-left"></i> Cancelar
-              </a>
-            </div>
-          </form>
+
+          </div>
+
         </div>
+
+
+        <!-- =============================================
+                     PRECIO Y STOCK
+                     ============================================= -->
+
+        <div class="dc-edit-card">
+
+          <div class="dc-card-header">
+
+            <div class="dc-card-header-icon dc-icon-green">
+              <i class="fas fa-chart-line"></i>
+            </div>
+
+            <div>
+              <h2>Precio, costo y stock</h2>
+              <small>Control de rentabilidad e inventario</small>
+            </div>
+
+          </div>
+
+
+          <div class="dc-card-body">
+
+            <div class="row g-3">
+
+              {% for field in form %}
+
+              {% if field.name == 'costo' %}
+
+              <div class="col-md-6">
+
+                <div class="dc-field dc-price-box">
+
+                  <div class="dc-price-label">
+                    <i class="fas fa-coins me-1"></i>
+                    Costo
+                  </div>
+
+                  <div class="dc-price-input-wrap">
+
+                    <span>S/</span>
+
+                    {{ field }}
+
+                  </div>
+
+                  {% if field.errors %}
+                  <div class="dc-field-error">
+                    {{ field.errors }}
+                  </div>
+                  {% endif %}
+
+                </div>
+
+              </div>
+
+              {% elif field.name == 'precio' %}
+
+              <div class="col-md-6">
+
+                <div class="dc-field dc-price-box">
+
+                  <div class="dc-price-label">
+                    <i class="fas fa-tag me-1"></i>
+                    Precio de venta
+                  </div>
+
+                  <div class="dc-price-input-wrap">
+
+                    <span>S/</span>
+
+                    {{ field }}
+
+                  </div>
+
+                  {% if field.errors %}
+                  <div class="dc-field-error">
+                    {{ field.errors }}
+                  </div>
+                  {% endif %}
+
+                </div>
+
+              </div>
+
+              {% elif field.name == 'stock' %}
+
+              <div class="col-12">
+
+                <div class="dc-field">
+
+                  {{ field.label_tag }}
+
+                  {{ field }}
+
+                  {% if field.errors %}
+                  <div class="dc-field-error">
+                    {{ field.errors }}
+                  </div>
+                  {% endif %}
+
+                </div>
+
+              </div>
+
+              {% endif %}
+
+              {% endfor %}
+
+            </div>
+
+
+            <!-- =====================================
+                             RENTABILIDAD
+                             ===================================== -->
+
+            <div id="infoGanancia" class="dc-profit-card">
+
+              <div class="dc-profit-title">
+
+                <strong>
+                  <i class="fas fa-chart-line me-2"></i>
+                  Rentabilidad del producto
+                </strong>
+
+                <i id="profitIcon" class="fas fa-money-bill-trend-up">
+                </i>
+
+              </div>
+
+              <div class="dc-profit-grid">
+
+                <div class="dc-profit-item">
+
+                  <span>Ganancia</span>
+
+                  <strong id="gananciaValor">
+                    S/ 0.00
+                  </strong>
+
+                </div>
+
+                <div class="dc-profit-item">
+
+                  <span>Margen</span>
+
+                  <strong id="porcentajeValor">
+                    0.00 %
+                  </strong>
+
+                </div>
+
+                <div class="dc-profit-item">
+
+                  <span>Precio venta</span>
+
+                  <strong id="precioValor">
+                    S/ 0.00
+                  </strong>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <!-- Precio sugerido -->
+
+            <div class="mt-3">
+
+              <div class="alert alert-light border mb-0">
+
+                <div class="d-flex align-items-center gap-2">
+
+                  <i class="fas fa-lightbulb text-warning"></i>
+
+                  <div>
+
+                    <strong>Precio sugerido</strong>
+
+                    <div class="small text-muted">
+                      Se calcula automáticamente aplicando
+                      un 15% sobre el costo cuando modifiques el costo.
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
       </div>
-      <br>
+
+
+      <!-- =================================================
+                 COLUMNA DERECHA
+                 ================================================= -->
+
+      <div class="col-lg-5">
+
+
+        <!-- =============================================
+                     IMAGEN DEL PRODUCTO
+                     ============================================= -->
+
+        <div class="dc-edit-card">
+
+          <div class="dc-card-header">
+
+            <div class="dc-card-header-icon dc-icon-orange">
+              <i class="fas fa-image"></i>
+            </div>
+
+            <div>
+              <h2>Imagen del producto</h2>
+              <small>Actualiza la fotografía del producto</small>
+            </div>
+
+          </div>
+
+
+          <div class="dc-card-body">
+
+
+            <div class="dc-image-preview">
+
+              {% if producto.imagen %}
+
+              <img id="previewImagen" src="{% static 'img/productos/' %}{{ producto.imagen }}"
+                alt="{{ producto.nombre }}">
+
+              <div id="mensajeSinImagen" class="dc-no-image d-none">
+                <i class="fas fa-image d-block"></i>
+                <p>No hay imagen disponible</p>
+              </div>
+
+              {% else %}
+
+              <div id="mensajeSinImagen" class="dc-no-image">
+                <i class="fas fa-image d-block"></i>
+                <p>Este producto no tiene imagen.</p>
+              </div>
+
+              <img id="previewImagen" src="" alt="Previsualización" class="d-none">
+
+              {% endif %}
+
+            </div>
+
+
+            <div class="dc-image-current">
+
+              {% if producto.imagen %}
+
+              <i class="fas fa-check-circle text-success me-1"></i>
+              Imagen actual del producto
+
+              {% else %}
+
+              <i class="fas fa-info-circle me-1"></i>
+              Puedes agregar una imagen
+
+              {% endif %}
+
+            </div>
+
+
+            <!-- Campo de imagen -->
+
+            {% for field in form %}
+
+            {% if field.name == 'archivo_imagen' %}
+
+            <div class="dc-file-box">
+
+              <div class="dc-file-title">
+                <i class="fas fa-camera me-2"></i>
+                Seleccionar nueva imagen
+              </div>
+
+              {{ field }}
+
+              {% if field.errors %}
+              <div class="dc-field-error">
+                {{ field.errors }}
+              </div>
+              {% endif %}
+
+              <div class="dc-file-help">
+                Formatos recomendados: JPG, JPEG, PNG o WEBP.
+              </div>
+
+            </div>
+
+            {% endif %}
+
+            {% endfor %}
+
+          </div>
+
+        </div>
+
+
+        <!-- =============================================
+                     CÓDIGO DE BARRAS
+                     ============================================= -->
+
+        <div class="dc-edit-card">
+
+          <div class="dc-card-header">
+
+            <div class="dc-card-header-icon dc-icon-blue">
+              <i class="fas fa-barcode"></i>
+            </div>
+
+            <div>
+              <h2>Código de barras</h2>
+              <small>Identificación del producto</small>
+            </div>
+
+          </div>
+
+
+          <div class="dc-card-body">
+
+            <div class="dc-barcode-box">
+
+              {% if producto.codigo_barras_imagen %}
+
+              <img src="{% static producto.codigo_barras_imagen %}" alt="Código de barras de {{ producto.nombre }}"
+                class="dc-barcode-image">
+
+              {% else %}
+
+              <div class="dc-no-barcode">
+
+                <i class="fas fa-barcode d-block"></i>
+
+                <div>
+                  Sin código de barras generado
+                </div>
+
+              </div>
+
+              {% endif %}
+
+
+              {% if producto.codigo_barras %}
+
+              <div class="dc-barcode-number">
+                {{ producto.codigo_barras }}
+              </div>
+
+              {% endif %}
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+      </div>
+
     </div>
-  </div>
+
+
+    <!-- =====================================================
+             BOTONES
+             ===================================================== -->
+
+    <div class="dc-actions">
+
+      <a href="{% url 'lista_productos' %}" class="dc-btn dc-btn-secondary">
+        <i class="fas fa-times"></i>
+        Cancelar
+      </a>
+
+      <button type="submit" class="dc-btn dc-btn-primary">
+        <i class="fas fa-save"></i>
+        Guardar cambios
+      </button>
+
+    </div>
+
+  </form>
+
 </div>
-<!-- ================================================= -->
-<!-- PREVISUALIZACIÓN DE IMAGEN -->
-<!-- ================================================= -->
+
+
+<!-- =========================================================
+     JAVASCRIPT
+     ========================================================= -->
+
 <script>
+
   document.addEventListener("DOMContentLoaded", function () {
 
-    // =================================================
-    // PREVISUALIZACIÓN DE IMAGEN
-    // =================================================
+    /* =====================================================
+       IMAGEN - PREVISUALIZACIÓN
+       ===================================================== */
 
     const inputImagen = document.querySelector(
       'input[name="archivo_imagen"]'
@@ -140,7 +1159,9 @@
             return;
           }
 
-          // Comprobar que sea una imagen
+
+          /* Comprobar que sea una imagen */
+
           if (!archivo.type.startsWith('image/')) {
 
             alert(
@@ -152,7 +1173,11 @@
             return;
           }
 
+
+          /* Mostrar vista previa */
+
           const reader = new FileReader();
+
 
           reader.onload = function (e) {
 
@@ -162,6 +1187,7 @@
             previewImagen.classList.remove(
               'd-none'
             );
+
 
             if (mensajeSinImagen) {
 
@@ -173,6 +1199,7 @@
 
           };
 
+
           reader.readAsDataURL(
             archivo
           );
@@ -183,9 +1210,9 @@
     }
 
 
-    // =================================================
-    // PRECIO SUGERIDO Y GANANCIA
-    // =================================================
+    /* =====================================================
+       PRECIO Y RENTABILIDAD
+       ===================================================== */
 
     const costoInput = document.getElementById(
       'id_costo'
@@ -196,34 +1223,35 @@
     );
 
 
+    const infoGanancia = document.getElementById(
+      'infoGanancia'
+    );
+
+    const gananciaValor = document.getElementById(
+      'gananciaValor'
+    );
+
+    const porcentajeValor = document.getElementById(
+      'porcentajeValor'
+    );
+
+    const precioValor = document.getElementById(
+      'precioValor'
+    );
+
+    const profitIcon = document.getElementById(
+      'profitIcon'
+    );
+
+
     if (!costoInput || !precioInput) {
       return;
     }
 
 
-    // =================================================
-    // CREAR CUADRO DE INFORMACIÓN
-    // =================================================
-
-    const infoGanancia =
-      document.createElement('div');
-
-    infoGanancia.className =
-      'alert alert-info mt-2 py-2';
-
-    infoGanancia.style.display =
-      'none';
-
-
-    // Colocarlo debajo del campo Precio
-    precioInput.parentNode.appendChild(
-      infoGanancia
-    );
-
-
-    // =================================================
-    // CONVERTIR VALOR A NÚMERO
-    // =================================================
+    /* =====================================================
+       CONVERTIR A NÚMERO
+       ===================================================== */
 
     function obtenerNumero(valor) {
 
@@ -240,9 +1268,9 @@
     }
 
 
-    // =================================================
-    // MOSTRAR GANANCIA ACTUAL
-    // =================================================
+    /* =====================================================
+       MOSTRAR RENTABILIDAD
+       ===================================================== */
 
     function mostrarGanancia() {
 
@@ -266,97 +1294,81 @@
           'none';
 
         return;
+
       }
 
 
-      // Ganancia real
       const ganancia =
         precio - costo;
 
 
-      // Porcentaje real de ganancia
       const porcentajeGanancia =
         (ganancia / costo) * 100;
 
 
-      // =================================================
-      // CAMBIAR COLOR SEGÚN GANANCIA
-      // =================================================
+      /* Mostrar */
+
+      gananciaValor.textContent =
+        'S/ ' + ganancia.toFixed(2);
+
+      porcentajeValor.textContent =
+        porcentajeGanancia.toFixed(2) + ' %';
+
+      precioValor.textContent =
+        'S/ ' + precio.toFixed(2);
+
+
+      /* Limpiar estados */
 
       infoGanancia.classList.remove(
-        'alert-info',
-        'alert-success',
-        'alert-danger',
-        'alert-warning'
+        'profit-positive',
+        'profit-negative',
+        'profit-zero'
       );
 
+
+      profitIcon.className =
+        'fas fa-money-bill-trend-up';
+
+
+      /* Ganancia */
 
       if (ganancia > 0) {
 
         infoGanancia.classList.add(
-          'alert-success'
+          'profit-positive'
         );
 
+        profitIcon.className =
+          'fas fa-circle-check text-success';
+
       }
+
+      /* Pérdida */
+
       else if (ganancia < 0) {
 
         infoGanancia.classList.add(
-          'alert-danger'
+          'profit-negative'
         );
 
+        profitIcon.className =
+          'fas fa-circle-exclamation text-danger';
+
       }
+
+      /* Sin ganancia */
+
       else {
 
         infoGanancia.classList.add(
-          'alert-warning'
+          'profit-zero'
         );
 
+        profitIcon.className =
+          'fas fa-triangle-exclamation text-warning';
+
       }
-
-
-      // =================================================
-      // MOSTRAR RESULTADO
-      // =================================================
-
-      infoGanancia.innerHTML = `
-
-            <div>
-                <i class="fa-solid fa-money-bill-trend-up"></i>
-
-                <strong>
-                    Ganancia estimada:
-                </strong>
-
-                S/ ${ganancia.toFixed(2)}
-            </div>
-
-
-            <div class="mt-1">
-
-                <i class="fa-solid fa-percent"></i>
-
-                <strong>
-                    Porcentaje de ganancia:
-                </strong>
-
-                ${porcentajeGanancia.toFixed(2)} %
-
-            </div>
-
-
-            <div class="mt-1">
-
-                <i class="fa-solid fa-tag"></i>
-
-                <strong>
-                    Precio de venta:
-                </strong>
-
-                S/ ${precio.toFixed(2)}
-
-            </div>
-
-        `;
 
 
       infoGanancia.style.display =
@@ -365,9 +1377,9 @@
     }
 
 
-    // =================================================
-    // CALCULAR PRECIO SUGERIDO
-    // =================================================
+    /* =====================================================
+       CALCULAR PRECIO SUGERIDO
+       ===================================================== */
 
     function calcularPrecioSugerido() {
 
@@ -379,47 +1391,44 @@
 
       if (costo <= 0) {
 
-        precioInput.value = '';
-
-        infoGanancia.style.display =
-          'none';
+        mostrarGanancia();
 
         return;
       }
 
 
-      // Porcentaje sugerido
       const porcentajeSugerido =
         15;
 
 
-      // Ganancia sugerida
       const gananciaSugerida =
         costo *
         (porcentajeSugerido / 100);
 
 
-      // Precio sugerido
       const precioSugerido =
         costo +
         gananciaSugerida;
 
 
-      // Colocar automáticamente
-      // en el campo Precio
+      /*
+       * Al modificar el costo,
+       * actualizamos automáticamente
+       * el precio.
+       */
+
       precioInput.value =
         precioSugerido.toFixed(2);
 
 
-      // Mostrar información
       mostrarGanancia();
 
     }
 
 
-    // =================================================
-    // AL CAMBIAR COSTO
-    // =================================================
+    /* =====================================================
+       CAMBIO DE COSTO
+       ===================================================== */
 
     costoInput.addEventListener(
       'input',
@@ -427,9 +1436,9 @@
     );
 
 
-    // =================================================
-    // AL CAMBIAR PRECIO MANUALMENTE
-    // =================================================
+    /* =====================================================
+       CAMBIO MANUAL DE PRECIO
+       ===================================================== */
 
     precioInput.addEventListener(
       'input',
@@ -437,20 +1446,83 @@
     );
 
 
-    // =================================================
-    // MOSTRAR GANANCIA ACTUAL AL ABRIR EDITAR
-    // =================================================
+    /* =====================================================
+       MOSTRAR RENTABILIDAD AL CARGAR
+    ===================================================== */
 
-    if (
-      obtenerNumero(costoInput.value) > 0 &&
-      obtenerNumero(precioInput.value) > 0
-    ) {
+    mostrarGanancia();
 
-      mostrarGanancia();
+    const fechaVencimientoInput = document.getElementById('id_fechaVencimiento');
+    const tipoProductoInput = document.getElementById('id_tipoProducto');
+    const zonaInput = document.getElementById('id_zona');
 
+    function formatearFecha(fecha) {
+      const pad = (valor) => String(valor).padStart(2, '0');
+      return `${fecha.getFullYear()}-${pad(fecha.getMonth() + 1)}-${pad(fecha.getDate())}`;
+    }
+
+    function getZonaPorTipo(tipo) {
+      const mapa = {
+        Cerveza: 'zona1',
+        Abarrotes: 'zona2',
+        Limpieza: 'zona2',
+        Gaseosa: 'zona3',
+        Aguas: 'zona3',
+        Utiles: 'zona4',
+        Ropa: 'zona5',
+        Bolsas: 'zona5',
+        Galleta: 'zona6',
+        Verduras_Frutas: 'zona7',
+        Snack: 'zona8',
+        Helado: 'EqFrio1',
+        Bebidas: 'EqFrio2',
+      };
+      return mapa[tipo] || 'zona1';
+    }
+
+    function calcularFechaVencimientoPorTipo() {
+      if (!fechaVencimientoInput || !tipoProductoInput) return;
+
+      const tipo = tipoProductoInput.value;
+      const hoy = new Date();
+      let fechaBase = new Date(hoy);
+
+      if (tipo === 'Verduras_Frutas') {
+        fechaBase.setDate(hoy.getDate() + 7);
+      } else if (tipo === 'Utiles' || tipo === 'Limpieza') {
+        fechaBase.setFullYear(hoy.getFullYear() + 1);
+      } else {
+        fechaBase = new Date(hoy.getFullYear(), hoy.getMonth() + 6, 1);
+        const ultimoDia = new Date(fechaBase.getFullYear(), fechaBase.getMonth() + 1, 0).getDate();
+        const dia = Math.min(hoy.getDate(), ultimoDia);
+        fechaBase = new Date(fechaBase.getFullYear(), fechaBase.getMonth(), dia);
+      }
+
+      fechaVencimientoInput.value = formatearFecha(fechaBase);
+    }
+
+    function ajustarZonaPorTipo() {
+      if (!tipoProductoInput || !zonaInput) return;
+      zonaInput.value = getZonaPorTipo(tipoProductoInput.value);
+    }
+
+    if (tipoProductoInput) {
+      tipoProductoInput.addEventListener('change', function () {
+        calcularFechaVencimientoPorTipo();
+        ajustarZonaPorTipo();
+      });
+    }
+
+    if (zonaInput && !zonaInput.value) {
+      ajustarZonaPorTipo();
+    }
+
+    if (fechaVencimientoInput && !fechaVencimientoInput.value) {
+      calcularFechaVencimientoPorTipo();
     }
 
   });
+
 </script>
 
 {% endblock %}

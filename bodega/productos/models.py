@@ -15,6 +15,26 @@ class Producto(models.Model):
     stock = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     tipoProducto = models.CharField(max_length=100)
     unidadMedida = models.CharField(max_length=50, blank=True)
+    zona = models.CharField(
+        max_length=30,
+        choices=[
+            ('zona1', 'zona1'),
+            ('zona2', 'zona2'),
+            ('zona3', 'zona3'),
+            ('zona4', 'zona4'),
+            ('zona5', 'zona5'),
+            ('zona6', 'zona6'),
+            ('zona7', 'zona7'),
+            ('zona8', 'zona8'),
+            ('EqFrio1', 'EqFrio1'),
+            ('EqFrio2', 'EqFrio2'),
+            ('EqFrio3', 'EqFrio3'),
+            ('EqFrio4', 'EqFrio4'),
+            ('EqFrio5', 'EqFrio5'),
+        ],
+        default='zona1',
+        blank=True,
+    )
     fechaVencimiento = models.DateField(blank=True, null=True)
     detalle = models.TextField(blank=True)
     imagen = models.CharField(max_length=255, blank=True)

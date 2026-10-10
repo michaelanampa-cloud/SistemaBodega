@@ -55,7 +55,7 @@
 
   <form method="get" class="dc-filter-card">
 
-    <div class="dc-filter-grid dc-filter-grid-3">
+    <div class="dc-filter-grid dc-filter-grid-4">
 
       <div class="dc-filter-field">
 
@@ -91,6 +91,30 @@
 
           <option value="{{ tipo_item }}" {% if tipo_item == tipo %}selected{% endif %}>
             {{ tipo_item }}
+          </option>
+
+          {% endfor %}
+
+        </select>
+
+      </div>
+
+      <div class="dc-filter-field">
+
+        <label for="zonaProducto">
+          Zona
+        </label>
+
+        <select id="zonaProducto" name="zona" class="form-select">
+
+          <option value="">
+            Todas las zonas
+          </option>
+
+          {% for zona_item in zonas_disponibles %}
+
+          <option value="{{ zona_item }}" {% if zona_item == zona %}selected{% endif %}>
+            {{ zona_item }}
           </option>
 
           {% endfor %}
@@ -177,6 +201,7 @@
             </th>
             <th>Producto</th>
             <th>Tipo</th>
+            <th>Zona</th>
             <th>Precio</th>
             <th>Stock</th>
             <th class="text-center">Acciones</th>
@@ -216,6 +241,14 @@
 
               <span class="dc-badge dc-badge-blue">
                 {{ p.tipoProducto }}
+              </span>
+
+            </td>
+
+            <td data-label="Zona">
+
+              <span class="dc-badge dc-badge-secondary">
+                {{ p.zona }}
               </span>
 
             </td>
@@ -379,7 +412,7 @@
         <li class="page-item">
 
           <a class="page-link"
-            href="?q={{ query|urlencode }}&tipo={{ tipo|urlencode }}&page={{ page_obj.previous_page_number }}"
+            href="?q={{ query|urlencode }}&tipo={{ tipo|urlencode }}&zona={{ zona|urlencode }}&page={{ page_obj.previous_page_number }}"
             aria-label="Página anterior">
             <i class="fa-solid fa-chevron-left"></i>
           </a>
@@ -403,7 +436,7 @@
 
         {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %} <li class="page-item">
 
-          <a class="page-link" href="?q={{ query|urlencode }}&tipo={{ tipo|urlencode }}&page={{ num }}">
+          <a class="page-link" href="?q={{ query|urlencode }}&tipo={{ tipo|urlencode }}&zona={{ zona|urlencode }}&page={{ num }}">
             {{ num }}
           </a>
 
@@ -419,7 +452,7 @@
           <li class="page-item">
 
             <a class="page-link"
-              href="?q={{ query|urlencode }}&tipo={{ tipo|urlencode }}&page={{ page_obj.next_page_number }}"
+              href="?q={{ query|urlencode }}&tipo={{ tipo|urlencode }}&zona={{ zona|urlencode }}&page={{ page_obj.next_page_number }}"
               aria-label="Página siguiente">
               <i class="fa-solid fa-chevron-right"></i>
             </a>

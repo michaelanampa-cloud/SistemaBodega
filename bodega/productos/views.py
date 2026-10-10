@@ -288,6 +288,7 @@ def registros_productos(request):
 def lista_productos(request):
 	query = request.GET.get('q', '').strip()
 	tipo = request.GET.get('tipo', '').strip()
+	zona = request.GET.get('zona', '').strip()
 	productos = Producto.objects.all().order_by('-created_at')
 
 	if query:
@@ -296,7 +297,10 @@ def lista_productos(request):
 		)
 	if tipo:
 		productos = productos.filter(tipoProducto__iexact=tipo)
+	if zona:
+		productos = productos.filter(zona__iexact=zona)
 	tipos_disponibles = Producto.objects.values_list('tipoProducto', flat=True).distinct().order_by('tipoProducto')
+	zonas_disponibles = Producto.objects.exclude(zona='').values_list('zona', flat=True).distinct().order_by('zona')
 	paginator = Paginator(productos, 14)  # Mostrar 14 productos por página
 	page_number = request.GET.get('page')
 	page_obj = paginator.get_page(page_number)
@@ -307,7 +311,9 @@ def lista_productos(request):
 		'page_obj': page_obj,
 		'query': query,
 		'tipo': tipo,
+		'zona': zona,
 		'tipos_disponibles': tipos_disponibles,
+		'zonas_disponibles': zonas_disponibles,
 		'productos_seleccionados': productos_seleccionados,
 		'productos_seleccionados_ids': productos_seleccionados_ids,
 		'vista_seleccionados': False,
@@ -326,7 +332,9 @@ def productos_seleccionados(request):
         'page_obj': page_obj,
         'query': '',
         'tipo': '',
+        'zona': '',
         'tipos_disponibles': Producto.objects.values_list('tipoProducto', flat=True).distinct().order_by('tipoProducto'),
+        'zonas_disponibles': Producto.objects.exclude(zona='').values_list('zona', flat=True).distinct().order_by('zona'),
         'productos_seleccionados': productos,
         'productos_seleccionados_ids': ids,
         'vista_seleccionados': True,
@@ -746,26 +754,151 @@ def productos_vencer(request):
 		'hasta': hasta,
 	})
 
+@login_required
 def productos_stock(request):
+
+    # ==========================================
+    # OBTENER LÍMITE DE STOCK
+    # ==========================================
+
     stock_maximo = request.GET.get('stock', '5')
+
     try:
         stock_maximo = float(stock_maximo)
+
+        if stock_maximo < 0:
+            stock_maximo = 5
+
     except (ValueError, TypeError):
         stock_maximo = 5
-    # Kilo: stock menor a 0.5
-    # Otras unidades: stock menor o igual a 5
+
+
+    # ==========================================
+    # FILTRO DE PRODUCTOS CON POCO STOCK
+    # ==========================================
+    #
+    # Productos vendidos por Kilo:
+    #     stock < 0.5
+    #
+    # Otras unidades:
+    #     stock <= stock_maximo
+    #
+    # ==========================================
+
+    filtro_stock = (
+        Q(
+            unidadMedida__iexact='Kilo',
+            stock__lt=0.5
+        )
+        |
+        Q(
+            ~Q(unidadMedida__iexact='Kilo'),
+            stock__lte=stock_maximo
+        )
+    )
+
+
     productos = Producto.objects.filter(
-        Q(unidadMedida__iexact='Kilo', stock__lt=0.5) |
-        Q(~Q(unidadMedida__iexact='Kilo'), stock__lte=stock_maximo)
-    ).order_by('stock', 'nombre')
-    paginator = Paginator(productos, 10)
+        filtro_stock
+    ).order_by(
+        'stock',
+        'nombre'
+    )
+
+
+    # ==========================================
+    # INDICADORES
+    # ==========================================
+
+    total_productos = productos.count()
+
+
+    # ------------------------------------------
+    # AGOTADOS
+    # ------------------------------------------
+
+    agotados = productos.filter(
+        stock__lte=0
+    ).count()
+
+
+    # ------------------------------------------
+    # CRÍTICOS
+    # ------------------------------------------
+    #
+    # Kilo:
+    #     0 < stock < 0.5
+    #
+    # Otras unidades:
+    #     0 < stock <= 2
+    #
+    # ------------------------------------------
+
+    criticos = productos.filter(
+        Q(
+            unidadMedida__iexact='Kilo',
+            stock__gt=0,
+            stock__lt=0.5
+        )
+        |
+        Q(
+            ~Q(unidadMedida__iexact='Kilo'),
+            stock__gt=0,
+            stock__lte=2
+        )
+    ).count()
+
+
+    # ------------------------------------------
+    # POCO STOCK
+    # ------------------------------------------
+
+    poco_stock = (
+        total_productos
+        - agotados
+        - criticos
+    )
+
+
+    # ==========================================
+    # PAGINACIÓN
+    # ==========================================
+
+    paginator = Paginator(
+        productos,
+        10
+    )
+
     page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+
+    page_obj = paginator.get_page(
+        page_number
+    )
+
+
+    # ==========================================
+    # CONTEXTO
+    # ==========================================
+
+    context = {
+
+        'page_obj': page_obj,
+
+        'stock_maximo': stock_maximo,
+
+        'total_productos': total_productos,
+
+        'agotados': agotados,
+
+        'criticos': criticos,
+
+        'poco_stock': poco_stock,
+
+    }
+
+
     return render(
         request,
         'productos/productos_stock.html',
-        {
-            'page_obj': page_obj,
-            'stock_maximo': stock_maximo,
-        }
+        context
     )

@@ -3,560 +3,2968 @@
 {% block title %}Registrar Gastos{% endblock %}
 
 {% block content %}
-<br>
-<div class="container">
-  <h1 class="mb-4 text-center"><i class="fa-solid fa-cash-register"></i> Registrar Gastos</h1>
 
-  <div class="card mb-4 shadow-sm">
-    <div class="card-body">
-      <form id="gastosForm" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div class="row mb-3">
-          <div class="col-md-6 mb-3 input-group">
-            <label for="proveedor" class="input-group-text">Proveedor</label>
-            <select id="proveedor" name="proveedor" class="form-select" required>
-              <option value="">-- Seleccionar proveedor --</option>
-              {% for proveedor in proveedores %}
-                <option value="{{ proveedor.id }}">{{ proveedor.nombre }}{% if proveedor.telefono %} - {{ proveedor.telefono }}{% endif %}</option>
-              {% endfor %}
-            </select>
-          </div>
+<div class="dc-gastos-page">
 
-          <div class="col-md-6 mb-3 input-group">
-            <label for="tipo_compra" class="input-group-text">Tipo de compra</label>
-            <select id="tipo_compra" name="tipo_compra" class="form-select" required>
-              <option value="">-- Seleccionar tipo --</option>
-              <option value="yape">Yape</option>
-              <option value="efectivo">Efectivo</option>
-              <option value="fiado">Fiado</option>
-            </select>
-          </div>
-        </div>
+  <!-- =====================================================
+         ENCABEZADO
+    ====================================================== -->
 
-        <div class="mb-4 input-group">
-          <label for="descripcion" class="input-group-text">Descripción del gasto</label>
-          <textarea id="descripcion" name="descripcion" class="form-control" rows="2" placeholder="Opcional, agrega una nota sobre el gasto"></textarea>
-        </div>
+  <div class="dc-page-header">
 
-        <!-- ==========================================
-     FOTO DE BOLETA / FACTURA
-     ========================================== -->
+    <div class="dc-page-header-info">
 
-        <div class="mb-4 input-group">
-          <label class="form-label fw-bold">
-            <i class="fa-solid fa-receipt"></i>Boleta / Factura
-          </label>
-          <div class="border rounded p-3">
-            <!-- Botones -->
-            <div class="d-flex flex-wrap gap-2 mb-3">
-              <!-- Tomar foto -->
-              <label for="image" class="btn btn-primary">
-                <i class="fa-solid fa-camera"></i>Tomar foto
-              </label>
-              <!-- Seleccionar imagen -->
-              <label for="image" class="btn btn-secondary">
-                <i class="fa-solid fa-image"></i>Elegir imagen
-              </label>
-            </div>
+      <div class="dc-page-header-icon">
+        <i class="fa-solid fa-receipt"></i>
+      </div>
 
-            <!-- Input real -->
-            <input id="image" name="image" type="file" accept="image/*" capture="environment" class="d-none">
-            <!-- Vista previa -->
-            <div id="previewContainer" class="text-center" style="display: none;">
-              <div class="mb-2">
-                <img id="imagePreview" src="" alt="Vista previa de la boleta" class="img-fluid rounded border shadow-sm" style="
-                                max-width: 100%;
-                                max-height: 400px;
-                                object-fit: contain;
-                            ">
-              </div>
-              <!-- Nombre del archivo -->
-              <div id="imageName" class="small text-muted mb-3"></div>
-              <!-- Botones de acción -->
-              <div class="d-flex justify-content-center gap-2 flex-wrap">
-                <label for="image" class="btn btn-warning">
-                  <i class="fa-solid fa-rotate"></i>Cambiar foto
-                </label>
-                <button type="button" id="removeImage" class="btn btn-danger">
-                  <i class="fa-solid fa-trash"></i>Eliminar foto
-                </button>
-              </div>
-            </div>
-            <!-- Mensaje inicial -->
-            <div id="noImageMessage" class="text-center text-muted py-3">
-              <i class="fa-solid fa-camera fa-2x mb-2" style="opacity: 0.5;"></i>
-              <div>
-                No se ha seleccionado ninguna imagen
-              </div>
-              <small>
-                Puedes tomar una foto de la boleta o elegir una imagen.
-              </small>
-            </div>
-          </div>
-        </div>
-        <div class="mb-3">
-          <label for="buscar_producto" class="form-label">Buscar producto</label>
-          <input id="buscar_producto" type="search" class="form-control is-valid" placeholder="Escribe el nombre del producto..." autocomplete="off">
-          <div id="sugerencias" class="list-group mt-1" style="position:relative; z-index:1050;"></div>
-        </div>
+      <div>
+        <h1>Registrar gasto</h1>
+        <p>
+          Registra compras, productos, bonificaciones y comprobantes.
+        </p>
+      </div>
 
-        <div class="mb-3">
-          <label for="buscar_bono" class="form-label text-danger">Buscar producto de bonificación</label>
-          <input id="buscar_bono" type="search" class="form-control is-invalid" placeholder="Buscar producto para bonificación..." autocomplete="off">
-          <div id="sugerencias_bono" class="list-group mt-1" style="position:relative; z-index:1050;"></div>
-        </div>
-
-        <br>
-
-        <div class="card mb-3">
-          <div class="card-body p-0">
-            <div class="table-responsive">
-              <table id="itemsSeleccionados" class="table table-bordered align-middle m-0">
-                <thead class="table-light">
-                  <tr>
-                    <th>Producto</th>
-                    <th>Stock actual</th>
-                    <th>Cantidad a ingresar</th>
-                    <th>Costo Unitario</th>
-                    <th>Total Unitario</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <!-- Filas añadidas dinámicamente -->
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <div class="card mb-3">
-          <div class="card-body p-0">
-            <div class="table-responsive">
-              <table id="itemsBonificacion" class="table table-bordered align-middle m-0">
-                <thead class="table-light">
-                  <tr>
-                    <th>Producto (bonificación)</th>
-                    <th>Stock actual</th>
-                    <th>Cantidad a ingresar</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <!-- Filas de bonificación añadidas dinámicamente -->
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        
-
-        <div class="row g-3 mb-3">
-          <div class="col-md-4">
-            <label for="percepcion" class="form-label">Percepción (S/)</label>
-            <input id="percepcion" name="percepcion" type="number" step="0.01" min="0" class="form-control" value="0.00">
-          </div>
-        </div>
-
-        <div class="row mt-4 align-items-center">
-          <div class="col-md-6">
-            <div class="hstack gap-3">
-              <button type="submit" class="btn btn-success"><i class="fa-solid fa-folder-plus"></i> Registrar gasto</button>
-              <a href="{% url 'lista_proveedores' %}" class="btn btn-secondary"><i class="fa-solid fa-eye"></i> Ver proveedores</a>
-            </div>
-          </div>
-          <div class="col-md-6 text-md-end">
-            <div class="card border-primary shadow-sm d-inline-block px-3 py-2">
-              <div class="small text-muted">Total previsto</div>
-              <div class="h4 mb-0" id="total_gastos_display">S/ 0.00</div>
-              <div class="small text-muted" id="detalle_total">Incluye productos + percepción</div>
-            </div>
-          </div>
-        </div>
-      </form>
     </div>
+
+    <div class="dc-page-header-badge">
+      <i class="fa-solid fa-store"></i>
+      Bodega Doña Catita
+    </div>
+
   </div>
+
+
+  <form id="gastosForm" method="post" enctype="multipart/form-data">
+
+    {% csrf_token %}
+
+
+    <!-- =================================================
+             FILA PRINCIPAL
+        ================================================== -->
+
+    <div class="row g-4">
+
+
+      <!-- =============================================
+                 INFORMACIÓN DEL GASTO
+            ============================================== -->
+
+      <div class="col-lg-7">
+
+        <div class="dc-gasto-card">
+
+          <div class="dc-card-header">
+
+            <div class="dc-card-icon dc-blue">
+              <i class="fa-solid fa-file-invoice-dollar"></i>
+            </div>
+
+            <div>
+              <h5>Información del gasto</h5>
+              <p>Datos generales de la compra</p>
+            </div>
+
+          </div>
+
+
+          <div class="dc-card-body">
+
+            <div class="row g-3">
+
+              <!-- PROVEEDOR -->
+
+              <div class="col-md-7">
+
+                <label for="proveedor" class="dc-label">
+
+                  <i class="fa-solid fa-truck-field"></i>
+                  Proveedor
+
+                  <span>*</span>
+
+                </label>
+
+                <div class="dc-input-wrapper">
+
+                  <i class="fa-solid fa-building"></i>
+
+                  <select id="proveedor" name="proveedor" class="form-select dc-input" required>
+
+                    <option value="">
+                      -- Seleccionar proveedor --
+                    </option>
+
+                    {% for proveedor in proveedores %}
+
+                    <option value="{{ proveedor.id }}">
+                      {{ proveedor.nombre }}
+
+                      {% if proveedor.telefono %}
+                      - {{ proveedor.telefono }}
+                      {% endif %}
+
+                    </option>
+
+                    {% endfor %}
+
+                  </select>
+
+                </div>
+
+              </div>
+
+
+              <!-- TIPO DE COMPRA -->
+
+              <div class="col-md-5">
+
+                <label for="tipo_compra" class="dc-label">
+
+                  <i class="fa-solid fa-wallet"></i>
+                  Tipo de compra
+
+                  <span>*</span>
+
+                </label>
+
+                <div class="dc-input-wrapper">
+
+                  <i class="fa-solid fa-money-bill-wave"></i>
+
+                  <select id="tipo_compra" name="tipo_compra" class="form-select dc-input" required>
+
+                    <option value="">
+                      -- Seleccionar --
+                    </option>
+
+                    <option value="yape">
+                      Yape
+                    </option>
+
+                    <option value="efectivo">
+                      Efectivo
+                    </option>
+
+                    <option value="fiado">
+                      Fiado
+                    </option>
+
+                  </select>
+
+                </div>
+
+              </div>
+
+
+              <!-- DESCRIPCIÓN -->
+
+              <div class="col-12">
+
+                <label for="descripcion" class="dc-label">
+
+                  <i class="fa-solid fa-align-left"></i>
+                  Descripción
+
+                  <small>(opcional)</small>
+
+                </label>
+
+                <textarea id="descripcion" name="descripcion" class="form-control dc-textarea" rows="3"
+                  placeholder="Agrega una nota o detalle sobre este gasto..."></textarea>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- =============================================
+                 COMPROBANTE
+            ============================================== -->
+
+      <div class="col-lg-5">
+
+        <div class="dc-gasto-card dc-comprobante-card">
+
+          <div class="dc-card-header">
+
+            <div class="dc-card-icon dc-red">
+              <i class="fa-solid fa-camera"></i>
+            </div>
+
+            <div>
+              <h5>Comprobante</h5>
+              <p>Boleta o factura de la compra</p>
+            </div>
+
+          </div>
+
+
+          <div class="dc-card-body">
+
+            <input id="image" name="image" type="file" accept="image/*" capture="environment" class="d-none">
+
+
+            <!-- BOTONES -->
+
+            <div class="dc-camera-actions">
+
+              <label for="image" class="dc-camera-btn dc-camera-primary">
+
+                <i class="fa-solid fa-camera"></i>
+
+                <span>
+                  Tomar foto
+                </span>
+
+              </label>
+
+
+              <label for="image" class="dc-camera-btn dc-camera-secondary">
+
+                <i class="fa-solid fa-image"></i>
+
+                <span>
+                  Elegir imagen
+                </span>
+
+              </label>
+
+            </div>
+
+
+            <!-- PREVISUALIZACIÓN -->
+
+            <div id="previewContainer" class="dc-preview-container" style="display:none;">
+
+              <div class="dc-preview-header">
+
+                <div>
+                  <i class="fa-solid fa-eye"></i>
+                  Vista previa
+                </div>
+
+              </div>
+
+
+              <div class="dc-preview-image-box">
+
+                <img id="imagePreview" src="" alt="Vista previa de la boleta">
+
+              </div>
+
+
+              <div id="imageName" class="dc-image-name">
+              </div>
+
+
+              <div class="dc-preview-actions">
+
+                <label for="image" class="dc-small-btn dc-btn-warning">
+
+                  <i class="fa-solid fa-rotate"></i>
+                  Cambiar
+
+                </label>
+
+
+                <button type="button" id="removeImage" class="dc-small-btn dc-btn-danger">
+
+                  <i class="fa-solid fa-trash"></i>
+                  Eliminar
+
+                </button>
+
+              </div>
+
+            </div>
+
+
+            <!-- SIN IMAGEN -->
+
+            <div id="noImageMessage" class="dc-no-image">
+
+              <div class="dc-no-image-icon">
+                <i class="fa-solid fa-receipt"></i>
+              </div>
+
+              <strong>
+                No hay comprobante
+              </strong>
+
+              <span>
+                Toma una foto o selecciona una imagen
+                de tu boleta o factura.
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- =================================================
+             AGREGAR PRODUCTOS
+        ================================================== -->
+
+    <div class="dc-gasto-card dc-products-search-card mt-4">
+
+      <div class="dc-card-header">
+
+        <div class="dc-card-icon dc-green">
+          <i class="fa-solid fa-cart-plus"></i>
+        </div>
+
+        <div>
+          <h5>Agregar productos</h5>
+          <p>
+            Busca los productos incluidos en la compra
+          </p>
+        </div>
+
+      </div>
+
+
+      <div class="dc-card-body">
+
+        <label for="buscar_producto" class="dc-label">
+
+          <i class="fa-solid fa-magnifying-glass"></i>
+          Buscar producto
+
+        </label>
+
+
+        <div class="dc-search-wrapper">
+
+          <i class="fa-solid fa-search"></i>
+
+          <input id="buscar_producto" type="search" class="form-control dc-search-input"
+            placeholder="Escribe el nombre del producto..." autocomplete="off">
+
+        </div>
+
+
+        <div id="sugerencias" class="dc-suggestions">
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- =================================================
+             PRODUCTOS SELECCIONADOS
+        ================================================== -->
+
+    <div class="dc-gasto-card mt-4">
+
+      <div class="dc-card-header dc-table-header">
+
+        <div class="dc-card-header-left">
+
+          <div class="dc-card-icon dc-blue">
+            <i class="fa-solid fa-boxes-stacked"></i>
+          </div>
+
+          <div>
+            <h5>Productos del gasto</h5>
+            <p>
+              Productos que ingresarán al inventario
+            </p>
+          </div>
+
+        </div>
+
+
+        <span class="dc-section-badge">
+          <i class="fa-solid fa-box"></i>
+          Productos
+        </span>
+
+      </div>
+
+
+      <div class="dc-table-wrapper">
+
+        <div class="table-responsive">
+
+          <table id="itemsSeleccionados" class="table dc-modern-table align-middle">
+
+            <thead>
+
+              <tr>
+
+                <th>
+                  Producto
+                </th>
+
+                <th>
+                  Paquete
+                </th>
+
+                <th>
+                  Cantidad
+                </th>
+
+                <th>
+                  Costo unitario
+                </th>
+
+                <th>
+                  Total
+                </th>
+
+                <th class="text-center">
+                  Acción
+                </th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody>
+
+              <!-- Filas añadidas dinámicamente -->
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- =================================================
+             BONIFICACIONES
+        ================================================== -->
+
+    <div class="dc-gasto-card dc-bonificacion-card mt-4">
+
+      <div class="dc-card-header">
+
+        <div class="dc-card-icon dc-orange">
+          <i class="fa-solid fa-gift"></i>
+        </div>
+
+        <div>
+          <h5>Bonificaciones</h5>
+          <p>
+            Productos adicionales entregados por el proveedor
+          </p>
+        </div>
+
+      </div>
+
+
+      <div class="dc-card-body">
+
+        <label for="buscar_bono" class="dc-label dc-label-bono">
+
+          <i class="fa-solid fa-gift"></i>
+          Buscar producto de bonificación
+
+        </label>
+
+
+        <div class="dc-search-wrapper dc-bono-search">
+
+          <i class="fa-solid fa-gift"></i>
+
+          <input id="buscar_bono" type="search" class="form-control dc-search-input"
+            placeholder="Buscar producto para bonificación..." autocomplete="off">
+
+        </div>
+
+
+        <div id="sugerencias_bono" class="dc-suggestions">
+        </div>
+
+      </div>
+
+
+      <div class="dc-table-wrapper">
+
+        <div class="table-responsive">
+
+          <table id="itemsBonificacion" class="table dc-modern-table dc-bono-table align-middle">
+
+            <thead>
+
+              <tr>
+
+                <th>
+                  Producto
+                </th>
+
+                <th>
+                  Stock actual
+                </th>
+
+                <th>
+                  Cantidad a ingresar
+                </th>
+
+                <th class="text-center">
+                  Acción
+                </th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody>
+
+              <!-- Filas de bonificación añadidas dinámicamente -->
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- =================================================
+             RESUMEN
+        ================================================== -->
+
+    <div class="row g-4 mt-1">
+
+
+      <!-- PERCEPCIÓN -->
+
+      <div class="col-lg-6">
+
+        <div class="dc-gasto-card dc-percepcion-card">
+
+          <div class="dc-card-header">
+
+            <div class="dc-card-icon dc-purple">
+              <i class="fa-solid fa-percent"></i>
+            </div>
+
+            <div>
+              <h5>Percepción</h5>
+              <p>
+                Importe adicional de la compra
+              </p>
+            </div>
+
+          </div>
+
+
+          <div class="dc-card-body">
+
+            <label for="percepcion" class="dc-label">
+
+              <i class="fa-solid fa-coins"></i>
+              Percepción (S/)
+
+            </label>
+
+
+            <div class="dc-money-input">
+
+              <span>S/</span>
+
+              <input id="percepcion" name="percepcion" type="number" step="0.01" min="0" class="form-control"
+                value="0.00">
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- TOTAL -->
+
+      <div class="col-lg-6">
+
+        <div class="dc-total-card">
+
+          <div class="dc-total-icon">
+
+            <i class="fa-solid fa-calculator"></i>
+
+          </div>
+
+
+          <div class="dc-total-info">
+
+            <span>
+              Total previsto
+            </span>
+
+            <strong id="total_gastos_display">
+              S/ 0.00
+            </strong>
+
+            <small id="detalle_total">
+              Incluye productos + percepción
+            </small>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- =================================================
+             ACCIONES
+        ================================================== -->
+
+    <div class="dc-form-actions mt-4">
+
+      <a href="{% url 'lista_proveedores' %}" class="dc-action-secondary">
+
+        <i class="fa-solid fa-users"></i>
+        Ver proveedores
+
+      </a>
+
+
+      <button type="submit" class="dc-action-primary">
+
+        <i class="fa-solid fa-check"></i>
+        Registrar gasto
+
+      </button>
+
+    </div>
+
+
+  </form>
+
 </div>
 
+
+
+<!-- =========================================================
+     JAVASCRIPT
+========================================================= -->
+
 <script>
-  const buscarInput = document.getElementById('buscar_producto');
-  const buscarBonoInput = document.getElementById('buscar_bono');
-  const sugerenciasBox = document.getElementById('sugerencias');
-  const sugerenciasBonoBox = document.getElementById('sugerencias_bono');
-  const itemsTableBody = document.querySelector('#itemsSeleccionados tbody');
-  const itemsBonoBody = document.querySelector('#itemsBonificacion tbody');
+
+  const buscarInput =
+    document.getElementById('buscar_producto');
+
+  const buscarBonoInput =
+    document.getElementById('buscar_bono');
+
+  const sugerenciasBox =
+    document.getElementById('sugerencias');
+
+  const sugerenciasBonoBox =
+    document.getElementById('sugerencias_bono');
+
+  const itemsTableBody =
+    document.querySelector('#itemsSeleccionados tbody');
+
+  const itemsBonoBody =
+    document.querySelector('#itemsBonificacion tbody');
+
   let debounceTimer = null;
 
+
+  /* =========================================================
+     DEBOUNCE
+  ========================================================= */
+
   function debounce(fn, delay) {
+
     return (...args) => {
+
       clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(() => fn(...args), delay);
+
+      debounceTimer =
+        setTimeout(() => fn(...args), delay);
+
     };
+
   }
+
+
+  /* =========================================================
+     SUGERENCIAS PRODUCTOS
+  ========================================================= */
 
   function renderSugerencias(items) {
+
     sugerenciasBox.innerHTML = '';
-    if (!items.length) return;
-    items.forEach(p => {
-      const el = document.createElement('button');
-      el.type = 'button';
-      el.className = 'list-group-item list-group-item-action';
-      el.textContent = `${p.nombre} (Stock: ${p.stock}) - S/ ${p.costo}`;
-      el.dataset.id = p.id;
-      el.dataset.nombre = p.nombre;
-      el.dataset.stock = p.stock;
-      el.dataset.costo = p.costo;
-      el.addEventListener('click', () => addItemFromSuggestion(p));
-      sugerenciasBox.appendChild(el);
-    });
-  }
 
-  function renderSugerenciasBono(items) {
-    sugerenciasBonoBox.innerHTML = '';
-    if (!items.length) return;
-    items.forEach(p => {
-      const el = document.createElement('button');
-      el.type = 'button';
-      el.className = 'list-group-item list-group-item-action';
-      el.textContent = `${p.nombre} (Stock: ${p.stock})`;
-      el.dataset.id = p.id;
-      el.dataset.nombre = p.nombre;
-      el.dataset.stock = p.stock;
-      el.addEventListener('click', () => addBonoFromSuggestion(p));
-      sugerenciasBonoBox.appendChild(el);
-    });
-  }
-
-  async function fetchProductos(q, forBono = false) {
-    if (!q) {
-      if (forBono) renderSugerenciasBono([]); else renderSugerencias([]);
+    if (!items.length) {
       return;
     }
-    try {
-      const res = await fetch(`{% url 'buscar_productos' %}?q=${encodeURIComponent(q)}`);
-      if (!res.ok) return;
-      const data = await res.json();
-      if (forBono) renderSugerenciasBono(data); else renderSugerencias(data);
-    } catch (e) {
-      console.error(e);
-    }
+
+
+    items.forEach(p => {
+
+      const el =
+        document.createElement('button');
+
+      el.type = 'button';
+
+      el.className =
+        'list-group-item list-group-item-action dc-suggestion-item';
+
+
+      el.innerHTML = `
+            <div class="dc-suggestion-icon">
+                <i class="fa-solid fa-box"></i>
+            </div>
+
+            <div class="dc-suggestion-info">
+
+                <strong>${p.nombre}</strong>
+
+                <span>
+                    Stock: ${p.stock}
+                    &nbsp;·&nbsp;
+                    Costo: S/ ${p.costo}
+                </span>
+
+            </div>
+
+            <i class="fa-solid fa-plus dc-suggestion-plus"></i>
+        `;
+
+
+      el.dataset.id =
+        p.id;
+
+      el.dataset.nombre =
+        p.nombre;
+
+      el.dataset.stock =
+        p.stock;
+
+      el.dataset.costo =
+        p.costo;
+
+
+      el.addEventListener(
+        'click',
+        () => addItemFromSuggestion(p)
+      );
+
+
+      sugerenciasBox.appendChild(el);
+
+    });
+
   }
+
+
+  /* =========================================================
+     SUGERENCIAS BONIFICACIÓN
+  ========================================================= */
+
+  function renderSugerenciasBono(items) {
+
+    sugerenciasBonoBox.innerHTML = '';
+
+    if (!items.length) {
+      return;
+    }
+
+
+    items.forEach(p => {
+
+      const el =
+        document.createElement('button');
+
+      el.type = 'button';
+
+      el.className =
+        'list-group-item list-group-item-action dc-suggestion-item';
+
+
+      el.innerHTML = `
+            <div class="dc-suggestion-icon dc-suggestion-gift">
+                <i class="fa-solid fa-gift"></i>
+            </div>
+
+            <div class="dc-suggestion-info">
+
+                <strong>${p.nombre}</strong>
+
+                <span>
+                    Stock actual: ${p.stock}
+                </span>
+
+            </div>
+
+            <i class="fa-solid fa-plus dc-suggestion-plus"></i>
+        `;
+
+
+      el.dataset.id =
+        p.id;
+
+      el.dataset.nombre =
+        p.nombre;
+
+      el.dataset.stock =
+        p.stock;
+
+
+      el.addEventListener(
+        'click',
+        () => addBonoFromSuggestion(p)
+      );
+
+
+      sugerenciasBonoBox.appendChild(el);
+
+    });
+
+  }
+
+
+  /* =========================================================
+     BUSCAR PRODUCTOS
+  ========================================================= */
+
+  async function fetchProductos(q, forBono = false) {
+
+    if (!q) {
+
+      if (forBono) {
+
+        renderSugerenciasBono([]);
+
+      } else {
+
+        renderSugerencias([]);
+
+      }
+
+      return;
+
+    }
+
+
+    try {
+
+      const res =
+        await fetch(
+          `{% url 'buscar_productos' %}?q=${encodeURIComponent(q)}`
+        );
+
+
+      if (!res.ok) {
+        return;
+      }
+
+
+      const data =
+        await res.json();
+
+
+      if (forBono) {
+
+        renderSugerenciasBono(data);
+
+      } else {
+
+        renderSugerencias(data);
+
+      }
+
+
+    } catch (e) {
+
+      console.error(e);
+
+    }
+
+  }
+
+
+  /* =========================================================
+     AGREGAR PRODUCTO
+  ========================================================= */
 
   window.addItemFromSuggestion = function (p) {
-    // evitar duplicados
-    if (document.querySelector(`#row_prod_${p.id}`)) return;
 
-    const tr = document.createElement('tr');
-    tr.id = `row_prod_${p.id}`;
+    /* Evitar duplicados */
 
-    const totalCalculado = (1 * parseFloat(p.costo)).toFixed(2);
-    const stepCantidad = p.unidadMedida && String(p.unidadMedida).toLowerCase().includes('kilo') ? '0.01' : '1';
-    tr.innerHTML = `
-              <td>${p.nombre}<input type="hidden" name="producto_id_${p.id}" value="${p.id}"></td>
-              <td>${p.stock}</td>
-              <td><input type="number" step="${stepCantidad}" name="cantidad_${p.id}" min="0.00" value="1" class="form-control" style="width:110px"></td>
-              <td><input type="number" step="0.01" name="costo_${p.id}" value="${p.costo}" class="form-control" style="width:130px"></td>
-              <td class="totalCalculado" id="total_unitario_${p.id}"></td>
-              <td><button type="button" class="btn btn-sm btn-danger btn-eliminar"><i class="fas fa-trash"></i> Eliminar</button></td>
-            `;
+    if (
+      document.querySelector(
+        `#row_prod_${p.id}`
+      )
+    ) {
 
-    tr.querySelector('.btn-eliminar').addEventListener('click', () => {
-      tr.remove();
-      updateTotal();
-    });
-    itemsTableBody.appendChild(tr);
-    bindInputsToTotal(tr);
-    updateTotal();
-    const totalUnitario = tr.querySelector('.totalCalculado');
-    const cantidadInput = tr.querySelector(`input[name="cantidad_${p.id}"]`);
-    const costoInput = tr.querySelector(`input[name="costo_${p.id}"]`);
-    function calcularTotalUnitario() {
-      const cantidad = parseFloat(cantidadInput.value) || 0;
-      const costo = parseFloat(costoInput.value) || 0;
-      totalUnitario.textContent = (cantidad * costo).toFixed(2);
+      return;
+
     }
-    cantidadInput.addEventListener('input', calcularTotalUnitario);
-    costoInput.addEventListener('input', calcularTotalUnitario);
+
+
+    const tr =
+      document.createElement('tr');
+
+
+    tr.id =
+      `row_prod_${p.id}`;
+
+
+    const stepCantidad =
+      p.unidadMedida &&
+        String(p.unidadMedida)
+          .toLowerCase()
+          .includes('kilo')
+        ? '0.01'
+        : '1';
+
+
+    tr.innerHTML = `
+
+        <td>
+
+            <div class="dc-product-cell">
+
+                <div class="dc-product-mini-icon">
+                    <i class="fa-solid fa-box"></i>
+                </div>
+
+                <div>
+
+                    <strong>
+                        ${p.nombre}
+                    </strong>
+
+                    <input
+                        type="hidden"
+                        name="producto_id_${p.id}"
+                        value="${p.id}"
+                    >
+
+                </div>
+
+            </div>
+
+        </td>
+
+
+        <td>
+
+            <select
+                name="paquete_${p.id}"
+                class="form-select form-select-sm paquete-select dc-table-input">
+
+                <option value="1" selected>
+                    Unidades
+                </option>
+
+                <option value="12">
+                    Docenas
+                </option>
+
+                <option value="100">
+                    Ciento
+                </option>
+
+            </select>
+
+        </td>
+
+
+        <td>
+
+            <input
+                type="number"
+                step="${stepCantidad}"
+                name="cantidad_${p.id}"
+                min="0.00"
+                value="1"
+                class="form-control dc-table-input">
+
+        </td>
+
+
+        <td>
+
+            <div class="dc-table-money">
+
+                <span>S/</span>
+
+                <input
+                    type="number"
+                    step="0.01"
+                    name="costo_${p.id}"
+                    value="${p.costo}"
+                    class="form-control dc-table-input">
+
+            </div>
+
+        </td>
+
+
+        <td>
+
+            <strong
+                class="dc-row-total"
+                id="total_unitario_${p.id}">
+
+                S/ 0.00
+
+            </strong>
+
+        </td>
+
+
+        <td class="text-center">
+
+            <button
+                type="button"
+                class="dc-delete-btn btn-eliminar"
+                title="Eliminar producto">
+
+                <i class="fas fa-trash"></i>
+
+            </button>
+
+        </td>
+
+    `;
+
+
+    tr.querySelector(
+      '.btn-eliminar'
+    ).addEventListener(
+      'click',
+      () => {
+
+        tr.remove();
+
+        updateTotal();
+
+      }
+    );
+
+
+    itemsTableBody.appendChild(tr);
+
+
+    bindInputsToTotal(tr);
+
+    updateTotal();
+
+
+    const totalUnitario =
+      tr.querySelector('.dc-row-total');
+
+
+    const cantidadInput =
+      tr.querySelector(
+        `input[name="cantidad_${p.id}"]`
+      );
+
+
+    const costoInput =
+      tr.querySelector(
+        `input[name="costo_${p.id}"]`
+      );
+
+
+    const paqueteSelect =
+      tr.querySelector(
+        `select[name="paquete_${p.id}"]`
+      );
+
+
+    function calcularTotalUnitario() {
+
+      const cantidad =
+        parseFloat(cantidadInput.value) || 0;
+
+
+      const factor =
+        parseFloat(paqueteSelect.value) || 1;
+
+
+      const cantidadReal =
+        cantidad * factor;
+
+
+      const costo =
+        parseFloat(costoInput.value) || 0;
+
+
+      totalUnitario.textContent =
+        `S/ ${(cantidadReal * costo).toFixed(2)}`;
+
+    }
+
+
+    cantidadInput.addEventListener(
+      'input',
+      calcularTotalUnitario
+    );
+
+
+    costoInput.addEventListener(
+      'input',
+      calcularTotalUnitario
+    );
+
+
+    paqueteSelect.addEventListener(
+      'change',
+      calcularTotalUnitario
+    );
+
+
     calcularTotalUnitario();
+
+
     buscarInput.value = '';
+
     sugerenciasBox.innerHTML = '';
+
   };
+
+
+  /* =========================================================
+     AGREGAR BONIFICACIÓN
+  ========================================================= */
 
   window.addBonoFromSuggestion = function (p) {
-    if (document.querySelector(`#row_bono_${p.id}`)) return;
-    const tr = document.createElement('tr');
-    tr.id = `row_bono_${p.id}`;
+
+    if (
+      document.querySelector(
+        `#row_bono_${p.id}`
+      )
+    ) {
+
+      return;
+
+    }
+
+
+    const tr =
+      document.createElement('tr');
+
+
+    tr.id =
+      `row_bono_${p.id}`;
+
+
     tr.innerHTML = `
-              <td>${p.nombre}<input type="hidden" name="producto_id_bono_${p.id}" value="${p.id}"></td>
-              <td>${p.stock}</td>
-              <td><input type="number" name="cantidad_bono_${p.id}" min="0.00" value="1" class="form-control" style="width:110px"></td>
-              <td><button type="button" class="btn btn-sm btn-danger btn-eliminar-b">Eliminar</button></td>
-            `;
-    tr.querySelector('.btn-eliminar-b').addEventListener('click', () => tr.remove());
+
+        <td>
+
+            <div class="dc-product-cell">
+
+                <div class="dc-product-mini-icon dc-gift-icon">
+                    <i class="fa-solid fa-gift"></i>
+                </div>
+
+                <div>
+
+                    <strong>
+                        ${p.nombre}
+                    </strong>
+
+                    <input
+                        type="hidden"
+                        name="producto_id_bono_${p.id}"
+                        value="${p.id}"
+                    >
+
+                </div>
+
+            </div>
+
+        </td>
+
+
+        <td>
+
+            <span class="dc-stock-badge">
+                ${p.stock}
+            </span>
+
+        </td>
+
+
+        <td>
+
+            <input
+                type="number"
+                name="cantidad_bono_${p.id}"
+                min="0.00"
+                value="1"
+                class="form-control dc-table-input">
+
+        </td>
+
+
+        <td class="text-center">
+
+            <button
+                type="button"
+                class="dc-delete-btn btn-eliminar-b"
+                title="Eliminar bonificación">
+
+                <i class="fas fa-trash"></i>
+
+            </button>
+
+        </td>
+
+    `;
+
+
+    tr.querySelector(
+      '.btn-eliminar-b'
+    ).addEventListener(
+      'click',
+      () => tr.remove()
+    );
+
+
     itemsBonoBody.appendChild(tr);
+
+
     buscarBonoInput.value = '';
+
     sugerenciasBonoBox.innerHTML = '';
+
   };
 
-  buscarInput.addEventListener('input', debounce((e) => {
-    const q = e.target.value.trim();
-    fetchProductos(q, false);
-  }, 300));
 
-  buscarBonoInput.addEventListener('input', debounce((e) => {
-    const q = e.target.value.trim();
-    fetchProductos(q, true);
-  }, 300));
+  /* =========================================================
+     EVENTOS DE BÚSQUEDA
+  ========================================================= */
 
-  // cerrar sugerencias al hacer click fuera
-  document.addEventListener('click', (e) => {
-    if (!sugerenciasBox.contains(e.target) && e.target !== buscarInput) {
-      sugerenciasBox.innerHTML = '';
+  buscarInput.addEventListener(
+    'input',
+    debounce((e) => {
+
+      const q =
+        e.target.value.trim();
+
+      fetchProductos(q, false);
+
+    }, 300)
+  );
+
+
+  buscarBonoInput.addEventListener(
+    'input',
+    debounce((e) => {
+
+      const q =
+        e.target.value.trim();
+
+      fetchProductos(q, true);
+
+    }, 300)
+  );
+
+
+  /* =========================================================
+     CERRAR SUGERENCIAS
+  ========================================================= */
+
+  document.addEventListener(
+    'click',
+    (e) => {
+
+      if (
+        !sugerenciasBox.contains(e.target) &&
+        e.target !== buscarInput
+      ) {
+
+        sugerenciasBox.innerHTML = '';
+
+      }
+
+
+      if (
+        !sugerenciasBonoBox.contains(e.target) &&
+        e.target !== buscarBonoInput
+      ) {
+
+        sugerenciasBonoBox.innerHTML = '';
+
+      }
+
     }
-    if (!sugerenciasBonoBox.contains(e.target) && e.target !== buscarBonoInput) {
-      sugerenciasBonoBox.innerHTML = '';
-    }
-  });
+  );
+
+
+  /* =========================================================
+     ACTUALIZAR TOTAL
+  ========================================================= */
 
   function updateTotal() {
-    const tbody = document.querySelector('#itemsSeleccionados tbody');
+
+    const tbody =
+      document.querySelector(
+        '#itemsSeleccionados tbody'
+      );
+
+
     let total = 0;
-    tbody.querySelectorAll('tr').forEach(row => {
-      const cantidadInput = row.querySelector('input[name^="cantidad_"]');
-      const costoInput = row.querySelector('input[name^="costo_"]');
-      if (!cantidadInput || !costoInput) return;
-      const cantidad = parseFloat(cantidadInput.value) || 0;
-      const costo = parseFloat(costoInput.value) || 0;
-      total += cantidad * costo;
-    });
-    // sumar percepción si existe
-    const percepEl = document.getElementById('percepcion');
-    const percepcion = percepEl ? parseFloat(percepEl.value) || 0 : 0;
+
+
+    tbody.querySelectorAll('tr')
+      .forEach(row => {
+
+        const cantidadInput =
+          row.querySelector(
+            'input[name^="cantidad_"]'
+          );
+
+
+        const costoInput =
+          row.querySelector(
+            'input[name^="costo_"]'
+          );
+
+
+        const paqueteSelect =
+          row.querySelector(
+            'select[name^="paquete_"]'
+          );
+
+
+        if (
+          !cantidadInput ||
+          !costoInput
+        ) {
+
+          return;
+
+        }
+
+
+        const cantidad =
+          parseFloat(
+            cantidadInput.value
+          ) || 0;
+
+
+        const factor =
+          parseFloat(
+            paqueteSelect
+              ? paqueteSelect.value
+              : 1
+          ) || 1;
+
+
+        const costo =
+          parseFloat(
+            costoInput.value
+          ) || 0;
+
+
+        total +=
+          (cantidad * factor) * costo;
+
+      });
+
+
+    /* Percepción */
+
+    const percepEl =
+      document.getElementById(
+        'percepcion'
+      );
+
+
+    const percepcion =
+      percepEl
+        ? parseFloat(percepEl.value) || 0
+        : 0;
+
+
     total += percepcion;
 
-    const display = document.getElementById('total_gastos_display');
-    const detalle = document.getElementById('detalle_total');
+
+    const display =
+      document.getElementById(
+        'total_gastos_display'
+      );
+
+
+    const detalle =
+      document.getElementById(
+        'detalle_total'
+      );
+
+
     if (display) {
-      display.textContent = `S/ ${total.toFixed(2)}`;
+
+      display.textContent =
+        `S/ ${total.toFixed(2)}`;
+
     }
+
+
     if (detalle) {
-      const percepEl = document.getElementById('percepcion');
-      const percepcion = percepEl ? parseFloat(percepEl.value) || 0 : 0;
-      detalle.textContent = percepcion > 0
-        ? `Productos + percepción (S/ ${percepcion.toFixed(2)})`
-        : 'Incluye productos + percepción';
+
+      detalle.textContent =
+        percepcion > 0
+
+          ? `Productos + percepción (S/ ${percepcion.toFixed(2)})`
+
+          : 'Incluye productos + percepción';
+
     }
+
   }
+
+
+  /* =========================================================
+     ENLAZAR INPUTS
+  ========================================================= */
 
   function bindInputsToTotal(row) {
-    const cantidadInput = row.querySelector('input[name^="cantidad_"]');
-    const costoInput = row.querySelector('input[name^="costo_"]');
-    if (cantidadInput) cantidadInput.addEventListener('input', updateTotal);
-    if (costoInput) costoInput.addEventListener('input', updateTotal);
+
+    const cantidadInput =
+      row.querySelector(
+        'input[name^="cantidad_"]'
+      );
+
+
+    const costoInput =
+      row.querySelector(
+        'input[name^="costo_"]'
+      );
+
+
+    const paqueteSelect =
+      row.querySelector(
+        'select[name^="paquete_"]'
+      );
+
+
+    if (cantidadInput) {
+
+      cantidadInput.addEventListener(
+        'input',
+        updateTotal
+      );
+
+    }
+
+
+    if (costoInput) {
+
+      costoInput.addEventListener(
+        'input',
+        updateTotal
+      );
+
+    }
+
+
+    if (paqueteSelect) {
+
+      paqueteSelect.addEventListener(
+        'change',
+        updateTotal
+      );
+
+    }
+
   }
 
-  const tbodyObserver = new MutationObserver(() => updateTotal());
-  const tbodyEl = document.querySelector('#itemsSeleccionados tbody');
-  if (tbodyEl) tbodyObserver.observe(tbodyEl, { childList: true, subtree: true });
 
-  const percepEl = document.getElementById('percepcion');
-  if (percepEl) percepEl.addEventListener('input', updateTotal);
+  /* =========================================================
+     OBSERVER
+  ========================================================= */
 
-  /*
-  function initGastosPage() {
-    document.querySelectorAll('#itemsSeleccionados tbody tr').forEach(bindInputsToTotal);
-    updateTotal();
-    const gastosForm = document.getElementById('gastosForm');
-    if (gastosForm) {
-      gastosForm.addEventListener('submit', (event) => {
-        const confirmed = window.confirm('¿Estás seguro de registrar este gasto?');
-        if (!confirmed) {
-          event.preventDefault();
-        }
-      });
-    }
-  }*/
-
-  //Funcion con modal para confirmar el registro de gasto
-  function initGastosPage() {
-    document.querySelectorAll('#itemsSeleccionados tbody tr').forEach(bindInputsToTotal);
-    updateTotal();
-    const gastosForm = document.getElementById('gastosForm');
-    const modal = new bootstrap.Modal(
-      document.getElementById('confirmarGastoModal')
+  const tbodyObserver =
+    new MutationObserver(
+      () => updateTotal()
     );
-    const btnConfirmar = document.getElementById('btnConfirmarRegistro');
+
+
+  const tbodyEl =
+    document.querySelector(
+      '#itemsSeleccionados tbody'
+    );
+
+
+  if (tbodyEl) {
+
+    tbodyObserver.observe(
+      tbodyEl,
+      {
+        childList: true,
+        subtree: true
+      }
+    );
+
+  }
+
+
+  /* PERCEPCIÓN */
+
+  const percepEl =
+    document.getElementById(
+      'percepcion'
+    );
+
+
+  if (percepEl) {
+
+    percepEl.addEventListener(
+      'input',
+      updateTotal
+    );
+
+  }
+
+
+  /* =========================================================
+     MODAL DE CONFIRMACIÓN
+  ========================================================= */
+
+  function initGastosPage() {
+
+    document
+      .querySelectorAll(
+        '#itemsSeleccionados tbody tr'
+      )
+      .forEach(
+        bindInputsToTotal
+      );
+
+
+    updateTotal();
+
+
+    const gastosForm =
+      document.getElementById(
+        'gastosForm'
+      );
+
+
+    if (!gastosForm) {
+      return;
+    }
+
+
+    const modalElement =
+      document.getElementById(
+        'confirmarGastoModal'
+      );
+
+
+    const modal =
+      new bootstrap.Modal(
+        modalElement
+      );
+
+
+    const btnConfirmar =
+      document.getElementById(
+        'btnConfirmarRegistro'
+      );
+
+
     let enviando = false;
 
-    gastosForm.addEventListener('submit', function (e) {
-      if (enviando) return;
-      e.preventDefault();
-      modal.show();
-    });
 
-    btnConfirmar.addEventListener('click', function () {
-      enviando = true;
-      modal.hide();
-      gastosForm.submit();
-    });
+    gastosForm.addEventListener(
+      'submit',
+      function (e) {
+
+        if (enviando) {
+          return;
+        }
+
+
+        e.preventDefault();
+
+        modal.show();
+
+      }
+    );
+
+
+    btnConfirmar.addEventListener(
+      'click',
+      function () {
+
+        enviando = true;
+
+        modal.hide();
+
+        gastosForm.submit();
+
+      }
+    );
+
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initGastosPage);
+
+  /* =========================================================
+     INICIALIZAR
+  ========================================================= */
+
+  if (
+    document.readyState === 'loading'
+  ) {
+
+    document.addEventListener(
+      'DOMContentLoaded',
+      initGastosPage
+    );
+
   } else {
+
     initGastosPage();
+
   }
 
-  /* ==========================================
-   FOTO DE BOLETA / FACTURA
-   ========================================== */
 
-    const imageInput = document.getElementById('image');
-    const imagePreview = document.getElementById('imagePreview');
-    const previewContainer = document.getElementById('previewContainer');
-    const noImageMessage = document.getElementById('noImageMessage');
-    const imageName = document.getElementById('imageName');
-    const removeImageBtn = document.getElementById('removeImage');
+  /* =========================================================
+     FOTO DE BOLETA / FACTURA
+  ========================================================= */
+
+  const imageInput =
+    document.getElementById('image');
 
 
-    /* ==========================================
-      CUANDO SE SELECCIONA O TOMA UNA FOTO
-      ========================================== */
+  const imagePreview =
+    document.getElementById(
+      'imagePreview'
+    );
 
-    if (imageInput) {
 
-      imageInput.addEventListener('change', function () {
+  const previewContainer =
+    document.getElementById(
+      'previewContainer'
+    );
 
-        const file = this.files[0];
+
+  const noImageMessage =
+    document.getElementById(
+      'noImageMessage'
+    );
+
+
+  const imageName =
+    document.getElementById(
+      'imageName'
+    );
+
+
+  const removeImageBtn =
+    document.getElementById(
+      'removeImage'
+    );
+
+
+  /* =========================================================
+     SELECCIONAR FOTO
+  ========================================================= */
+
+  if (imageInput) {
+
+    imageInput.addEventListener(
+      'change',
+      function () {
+
+        const file =
+          this.files[0];
+
 
         if (!file) {
           return;
         }
 
-        // Verificar que sea una imagen
-        if (!file.type.startsWith('image/')) {
 
-          alert('Por favor selecciona una imagen válida.');
+        /* Validar imagen */
+
+        if (
+          !file.type.startsWith(
+            'image/'
+          )
+        ) {
+
+          alert(
+            'Por favor selecciona una imagen válida.'
+          );
+
 
           imageInput.value = '';
 
           return;
+
         }
 
-        // Mostrar nombre
+
+        /* Nombre */
+
         imageName.textContent =
           `${file.name} - ${formatFileSize(file.size)}`;
 
-        // Crear vista previa
-        const reader = new FileReader();
 
-        reader.onload = function (event) {
+        /* Preview */
 
-          imagePreview.src = event.target.result;
+        const reader =
+          new FileReader();
 
-          previewContainer.style.display = 'block';
 
-          noImageMessage.style.display = 'none';
+        reader.onload =
+          function (event) {
 
-        };
+            imagePreview.src =
+              event.target.result;
+
+
+            previewContainer.style.display =
+              'block';
+
+
+            noImageMessage.style.display =
+              'none';
+
+          };
+
 
         reader.readAsDataURL(file);
 
-      });
+      }
+    );
 
-    }
+  }
 
 
-    /* ==========================================
-      ELIMINAR FOTO
-      ========================================== */
+  /* =========================================================
+     ELIMINAR FOTO
+  ========================================================= */
 
-    if (removeImageBtn) {
+  if (removeImageBtn) {
 
-      removeImageBtn.addEventListener('click', function () {
+    removeImageBtn.addEventListener(
+      'click',
+      function () {
 
-        // Limpiar input
         imageInput.value = '';
 
-        // Limpiar imagen
         imagePreview.src = '';
 
-        // Limpiar nombre
         imageName.textContent = '';
 
-        // Ocultar vista previa
-        previewContainer.style.display = 'none';
+        previewContainer.style.display =
+          'none';
 
-        // Mostrar mensaje inicial
-        noImageMessage.style.display = 'block';
+        noImageMessage.style.display =
+          'flex';
 
-      });
-
-    }
-
-
-    /* ==========================================
-      FORMATEAR TAMAÑO DE ARCHIVO
-      ========================================== */
-
-    function formatFileSize(bytes) {
-
-      if (bytes === 0) {
-        return '0 Bytes';
       }
+    );
 
-      const units = [
-        'Bytes',
-        'KB',
-        'MB',
-        'GB'
-      ];
+  }
 
-      const i = Math.floor(
-        Math.log(bytes) / Math.log(1024)
-      );
 
-      return (
-        parseFloat(
-          (bytes / Math.pow(1024, i)).toFixed(2)
-        )
-        + ' '
-        + units[i]
-      );
+  /* =========================================================
+     FORMATO DEL TAMAÑO
+  ========================================================= */
 
+  function formatFileSize(bytes) {
+
+    if (bytes === 0) {
+      return '0 Bytes';
     }
 
+
+    const units = [
+      'Bytes',
+      'KB',
+      'MB',
+      'GB'
+    ];
+
+
+    const i =
+      Math.floor(
+        Math.log(bytes) /
+        Math.log(1024)
+      );
+
+
+    return (
+      parseFloat(
+        (
+          bytes /
+          Math.pow(1024, i)
+        ).toFixed(2)
+      )
+      + ' '
+      + units[i]
+    );
+
+  }
 
 </script>
-        
-<!-- Modal de confirmación -->
+
+
+
+<!-- =========================================================
+     MODAL DE CONFIRMACIÓN
+========================================================= -->
+
 <div class="modal fade" id="confirmarGastoModal" tabindex="-1" aria-labelledby="confirmarGastoLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
 
-            <div class="modal-header bg-success text-white">
-                <h5 class="modal-title" id="confirmarGastoLabel">
-                    Confirmar registro
-                </h5>
-                <button type="button" class="btn-close btn-close-white"
-                        data-bs-dismiss="modal"></button>
-            </div>
+  <div class="modal-dialog modal-dialog-centered">
 
-            <div class="modal-body">
-                ¿Estás seguro de registrar este gasto?
-            </div>
+    <div class="modal-content dc-confirm-modal">
 
-            <div class="modal-footer">
-              <button type="button" class="btn btn-success" id="btnConfirmarRegistro">
-                Sí, registrar
-              </button>
-              <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
-                Cancelar
-              </button>
-            </div>
+      <div class="modal-header dc-confirm-header">
+
+        <div class="dc-confirm-icon">
+          <i class="fa-solid fa-circle-question"></i>
+        </div>
+
+        <div>
+
+          <h5 class="modal-title" id="confirmarGastoLabel">
+
+            Confirmar registro
+
+          </h5>
+
+          <small>
+            Revisa los datos antes de continuar.
+          </small>
 
         </div>
+
+
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar">
+        </button>
+
+      </div>
+
+
+      <div class="modal-body dc-confirm-body">
+
+        <p>
+          ¿Estás seguro de registrar este gasto?
+        </p>
+
+        <div class="dc-confirm-warning">
+
+          <i class="fa-solid fa-circle-info"></i>
+
+          <span>
+            Se actualizará el inventario con los
+            productos registrados.
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <div class="modal-footer dc-confirm-footer">
+
+        <button type="button" class="dc-modal-cancel" data-bs-dismiss="modal">
+
+          Cancelar
+
+        </button>
+
+
+        <button type="button" class="dc-modal-confirm" id="btnConfirmarRegistro">
+
+          <i class="fa-solid fa-check"></i>
+
+          Sí, registrar
+
+        </button>
+
+      </div>
+
     </div>
+
+  </div>
+
 </div>
+
+
+
+<style>
+  /* =========================================================
+   PÁGINA
+========================================================= */
+
+  .dc-gastos-page {
+    max-width: 1450px;
+    margin: 0 auto;
+    padding: 25px 10px 50px;
+  }
+
+
+  /* =========================================================
+   HEADER
+========================================================= */
+
+  .dc-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 28px;
+    padding: 22px 26px;
+    background: linear-gradient(135deg,
+        #07152d,
+        #0a2348);
+    border-radius: 20px;
+    color: white;
+    box-shadow: 0 12px 30px rgba(7, 21, 45, .16);
+  }
+
+
+  .dc-page-header-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+
+  .dc-page-header-icon {
+    width: 58px;
+    height: 58px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, .12);
+    font-size: 25px;
+  }
+
+
+  .dc-page-header h1 {
+    margin: 0;
+    font-size: 25px;
+    font-weight: 700;
+  }
+
+
+  .dc-page-header p {
+    margin: 4px 0 0;
+    color: rgba(255, 255, 255, .72);
+    font-size: 14px;
+  }
+
+
+  .dc-page-header-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 14px;
+    border-radius: 50px;
+    background: rgba(255, 255, 255, .10);
+    border: 1px solid rgba(255, 255, 255, .14);
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+
+  /* =========================================================
+   CARDS
+========================================================= */
+
+  .dc-gasto-card {
+    background: white;
+    border: 1px solid #e8edf3;
+    border-radius: 18px;
+    overflow: visible;
+    box-shadow: 0 7px 22px rgba(15, 23, 42, .06);
+  }
+
+
+  .dc-card-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 20px 22px;
+    border-bottom: 1px solid #edf0f4;
+  }
+
+
+  .dc-card-header h5 {
+    margin: 0;
+    color: #07152d;
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+
+  .dc-card-header p {
+    margin: 3px 0 0;
+    color: #7a8798;
+    font-size: 12px;
+  }
+
+
+  .dc-card-body {
+    padding: 22px;
+  }
+
+
+  .dc-card-icon {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    border-radius: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+
+  .dc-blue {
+    background: #eaf3ff;
+    color: #0d5ba8;
+  }
+
+
+  .dc-green {
+    background: #eaf8ef;
+    color: #16803c;
+  }
+
+
+  .dc-red {
+    background: #fff0f1;
+    color: #d20b18;
+  }
+
+
+  .dc-orange {
+    background: #fff5e6;
+    color: #d97706;
+  }
+
+
+  .dc-purple {
+    background: #f3edff;
+    color: #7c3aed;
+  }
+
+
+  /* =========================================================
+   LABELS / INPUTS
+========================================================= */
+
+  .dc-label {
+    display: block;
+    margin-bottom: 8px;
+    color: #344054;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+
+  .dc-label i {
+    margin-right: 5px;
+    color: #64748b;
+  }
+
+
+  .dc-label span {
+    color: #e30613;
+  }
+
+
+  .dc-label small {
+    color: #98a2b3;
+    font-weight: 400;
+  }
+
+
+  .dc-input-wrapper {
+    position: relative;
+  }
+
+
+  .dc-input-wrapper>i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    color: #94a3b8;
+    pointer-events: none;
+  }
+
+
+  .dc-input-wrapper .dc-input {
+    min-height: 46px;
+    padding-left: 40px;
+    border-radius: 10px;
+    border-color: #dbe2ea;
+    font-size: 14px;
+    box-shadow: none;
+  }
+
+
+  .dc-input-wrapper .dc-input:focus,
+  .dc-textarea:focus {
+    border-color: #0d5ba8;
+    box-shadow: 0 0 0 3px rgba(13, 91, 168, .10);
+  }
+
+
+  .dc-textarea {
+    border-radius: 10px;
+    border-color: #dbe2ea;
+    resize: vertical;
+    font-size: 14px;
+  }
+
+
+  /* =========================================================
+   COMPROBANTE
+========================================================= */
+
+  .dc-comprobante-card {
+    height: 100%;
+  }
+
+
+  .dc-camera-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+
+  .dc-camera-btn {
+    min-height: 48px;
+    border-radius: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: .2s ease;
+  }
+
+
+  .dc-camera-btn:hover {
+    transform: translateY(-2px);
+  }
+
+
+  .dc-camera-primary {
+    background: #07152d;
+    color: white;
+  }
+
+
+  .dc-camera-secondary {
+    background: #f1f5f9;
+    color: #334155;
+    border: 1px solid #e2e8f0;
+  }
+
+
+  .dc-no-image {
+    min-height: 185px;
+    margin-top: 15px;
+    padding: 25px 15px;
+    border: 2px dashed #dbe2ea;
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #64748b;
+  }
+
+
+  .dc-no-image-icon {
+    width: 52px;
+    height: 52px;
+    margin-bottom: 10px;
+    border-radius: 50%;
+    background: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    font-size: 20px;
+  }
+
+
+  .dc-no-image strong {
+    color: #475569;
+    font-size: 14px;
+  }
+
+
+  .dc-no-image span {
+    margin-top: 4px;
+    max-width: 300px;
+    font-size: 12px;
+  }
+
+
+  .dc-preview-container {
+    margin-top: 15px;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #f8fafc;
+  }
+
+
+  .dc-preview-header {
+    padding: 11px 14px;
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+    color: #334155;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+
+  .dc-preview-header i {
+    color: #0d5ba8;
+    margin-right: 6px;
+  }
+
+
+  .dc-preview-image-box {
+    height: 250px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1f5f9;
+  }
+
+
+  .dc-preview-image-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+  }
+
+
+  .dc-image-name {
+    padding: 9px 12px;
+    text-align: center;
+    color: #64748b;
+    font-size: 12px;
+    background: white;
+  }
+
+
+  .dc-preview-actions {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    background: white;
+  }
+
+
+  .dc-small-btn {
+    border: 0;
+    border-radius: 8px;
+    padding: 8px 13px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+
+  .dc-btn-warning {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+
+  .dc-btn-danger {
+    background: #fee2e2;
+    color: #b91c1c;
+  }
+
+
+  /* =========================================================
+   BUSCADOR
+========================================================= */
+
+  .dc-search-wrapper {
+    position: relative;
+  }
+
+
+  .dc-search-wrapper>i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    z-index: 2;
+  }
+
+
+  .dc-search-input {
+    min-height: 48px;
+    padding-left: 43px;
+    border-radius: 11px;
+    border-color: #dbe2ea;
+    font-size: 14px;
+  }
+
+
+  .dc-search-input:focus {
+    border-color: #16803c;
+    box-shadow: 0 0 0 3px rgba(22, 128, 60, .10);
+  }
+
+
+  .dc-suggestions {
+    position: relative;
+    z-index: 1000;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+
+  .dc-suggestion-item {
+    display: flex !important;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 13px !important;
+    border-color: #edf0f4 !important;
+  }
+
+
+  .dc-suggestion-icon {
+    width: 35px;
+    height: 35px;
+    flex: 0 0 35px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eaf3ff;
+    color: #0d5ba8;
+  }
+
+
+  .dc-suggestion-gift {
+    background: #fff5e6;
+    color: #d97706;
+  }
+
+
+  .dc-suggestion-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    text-align: left;
+  }
+
+
+  .dc-suggestion-info strong {
+    color: #26364a;
+    font-size: 13px;
+  }
+
+
+  .dc-suggestion-info span {
+    margin-top: 2px;
+    color: #8a96a6;
+    font-size: 11px;
+  }
+
+
+  .dc-suggestion-plus {
+    color: #94a3b8;
+  }
+
+
+  /* =========================================================
+   TABLAS
+========================================================= */
+
+  .dc-table-header {
+    justify-content: space-between;
+  }
+
+
+  .dc-card-header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+
+  .dc-section-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 11px;
+    border-radius: 50px;
+    background: #eef5ff;
+    color: #0d5ba8;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+
+  .dc-table-wrapper {
+    overflow-x: auto;
+  }
+
+
+  .dc-modern-table {
+    margin: 0 !important;
+    min-width: 850px;
+  }
+
+
+  .dc-modern-table thead th {
+    padding: 13px 15px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e5eaf0;
+    color: #667085;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .3px;
+    white-space: nowrap;
+  }
+
+
+  .dc-modern-table tbody td {
+    padding: 13px 15px;
+    border-color: #edf0f4;
+    color: #344054;
+    font-size: 13px;
+  }
+
+
+  .dc-modern-table tbody tr {
+    transition: .15s ease;
+  }
+
+
+  .dc-modern-table tbody tr:hover {
+    background: #fafcff;
+  }
+
+
+  .dc-product-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+
+  .dc-product-mini-icon {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9px;
+    background: #edf5ff;
+    color: #0d5ba8;
+  }
+
+
+  .dc-gift-icon {
+    background: #fff5e6;
+    color: #d97706;
+  }
+
+
+  .dc-product-cell strong {
+    color: #26364a;
+    font-size: 13px;
+  }
+
+
+  .dc-table-input {
+    min-width: 105px;
+    border-radius: 8px;
+    border-color: #dbe2ea;
+    font-size: 12px;
+  }
+
+
+  .dc-table-money {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+
+  .dc-table-money span {
+    color: #7a8798;
+    font-size: 12px;
+  }
+
+
+  .dc-row-total {
+    color: #16803c;
+    white-space: nowrap;
+  }
+
+
+  .dc-delete-btn {
+    width: 34px;
+    height: 34px;
+    border: 0;
+    border-radius: 8px;
+    background: #fee2e2;
+    color: #dc2626;
+    transition: .2s ease;
+  }
+
+
+  .dc-delete-btn:hover {
+    background: #dc2626;
+    color: white;
+  }
+
+
+  .dc-stock-badge {
+    display: inline-block;
+    padding: 5px 9px;
+    border-radius: 7px;
+    background: #f1f5f9;
+    color: #475569;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+
+  /* =========================================================
+   BONIFICACIONES
+========================================================= */
+
+  .dc-bonificacion-card {
+    border-color: #f2e4c8;
+  }
+
+
+  .dc-label-bono {
+    color: #9a5a08;
+  }
+
+
+  .dc-bono-search .dc-search-input:focus {
+    border-color: #d97706;
+    box-shadow: 0 0 0 3px rgba(217, 119, 6, .10);
+  }
+
+
+  .dc-bono-table thead th {
+    background: #fffaf1;
+  }
+
+
+  /* =========================================================
+   PERCEPCIÓN
+========================================================= */
+
+  .dc-money-input {
+    display: flex;
+    align-items: center;
+    border: 1px solid #dbe2ea;
+    border-radius: 10px;
+    overflow: hidden;
+    background: white;
+  }
+
+
+  .dc-money-input>span {
+    padding-left: 14px;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+
+  .dc-money-input input {
+    border: 0;
+    box-shadow: none !important;
+    min-height: 45px;
+  }
+
+
+  /* =========================================================
+   TOTAL
+========================================================= */
+
+  .dc-total-card {
+    height: 100%;
+    min-height: 140px;
+    padding: 25px;
+    border-radius: 18px;
+    background: linear-gradient(135deg,
+        #07152d,
+        #0d386b);
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    box-shadow: 0 12px 25px rgba(7, 21, 45, .18);
+  }
+
+
+  .dc-total-icon {
+    width: 54px;
+    height: 54px;
+    flex: 0 0 54px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, .12);
+    font-size: 22px;
+  }
+
+
+  .dc-total-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+
+  .dc-total-info span {
+    color: rgba(255, 255, 255, .7);
+    font-size: 12px;
+  }
+
+
+  .dc-total-info strong {
+    margin-top: 2px;
+    font-size: 29px;
+    line-height: 1.2;
+  }
+
+
+  .dc-total-info small {
+    margin-top: 4px;
+    color: rgba(255, 255, 255, .6);
+    font-size: 11px;
+  }
+
+
+  /* =========================================================
+   BOTONES
+========================================================= */
+
+  .dc-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+  }
+
+
+  .dc-action-primary,
+  .dc-action-secondary {
+    min-height: 46px;
+    padding: 0 19px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    transition: .2s ease;
+  }
+
+
+  .dc-action-primary {
+    border: 0;
+    background: #07852f;
+    color: white;
+  }
+
+
+  .dc-action-primary:hover {
+    background: #066d26;
+    color: white;
+    transform: translateY(-2px);
+  }
+
+
+  .dc-action-secondary {
+    border: 1px solid #dbe2ea;
+    background: white;
+    color: #475569;
+  }
+
+
+  .dc-action-secondary:hover {
+    background: #f8fafc;
+    color: #07152d;
+  }
+
+
+  /* =========================================================
+   MODAL
+========================================================= */
+
+  .dc-confirm-modal {
+    border: 0;
+    border-radius: 18px;
+    overflow: hidden;
+  }
+
+
+  .dc-confirm-header {
+    border-bottom: 1px solid #edf0f4;
+    padding: 18px 20px;
+  }
+
+
+  .dc-confirm-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+
+  .dc-confirm-icon {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eaf8ef;
+    color: #16803c;
+    font-size: 20px;
+  }
+
+
+  .dc-confirm-header h5 {
+    margin: 0;
+    color: #07152d;
+    font-weight: 700;
+  }
+
+
+  .dc-confirm-header small {
+    color: #8a96a6;
+  }
+
+
+  .dc-confirm-body {
+    padding: 24px;
+  }
+
+
+  .dc-confirm-body p {
+    margin-bottom: 15px;
+    color: #344054;
+  }
+
+
+  .dc-confirm-warning {
+    display: flex;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 10px;
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 12px;
+  }
+
+
+  .dc-confirm-warning i {
+    color: #0d5ba8;
+  }
+
+
+  .dc-confirm-footer {
+    border-top: 1px solid #edf0f4;
+    padding: 14px 20px;
+  }
+
+
+  .dc-modal-cancel,
+  .dc-modal-confirm {
+    border: 0;
+    border-radius: 9px;
+    padding: 9px 15px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+
+  .dc-modal-cancel {
+    background: #f1f5f9;
+    color: #475569;
+  }
+
+
+  .dc-modal-confirm {
+    background: #07852f;
+    color: white;
+  }
+
+
+  /* =========================================================
+   RESPONSIVE
+========================================================= */
+
+  @media (max-width: 991.98px) {
+
+    .dc-page-header {
+      align-items: flex-start;
+    }
+
+    .dc-page-header-badge {
+      display: none;
+    }
+
+  }
+
+
+  @media (max-width: 767.98px) {
+
+    .dc-gastos-page {
+      padding: 15px 5px 35px;
+    }
+
+
+    .dc-page-header {
+      padding: 18px;
+      border-radius: 15px;
+    }
+
+
+    .dc-page-header-icon {
+      width: 48px;
+      height: 48px;
+      flex-basis: 48px;
+    }
+
+
+    .dc-page-header h1 {
+      font-size: 20px;
+    }
+
+
+    .dc-page-header p {
+      font-size: 12px;
+    }
+
+
+    .dc-card-header {
+      padding: 16px;
+    }
+
+
+    .dc-card-body {
+      padding: 16px;
+    }
+
+
+    .dc-camera-actions {
+      grid-template-columns: 1fr;
+    }
+
+
+    .dc-total-card {
+      min-height: 125px;
+    }
+
+
+    .dc-form-actions {
+      flex-direction: column-reverse;
+    }
+
+
+    .dc-action-primary,
+    .dc-action-secondary {
+      width: 100%;
+    }
+
+  }
+
+
+  @media (max-width: 480px) {
+
+    .dc-page-header-info {
+      gap: 10px;
+    }
+
+
+    .dc-page-header-icon {
+      width: 42px;
+      height: 42px;
+      flex-basis: 42px;
+      font-size: 18px;
+    }
+
+
+    .dc-page-header h1 {
+      font-size: 18px;
+    }
+
+
+    .dc-card-icon {
+      width: 38px;
+      height: 38px;
+      flex-basis: 38px;
+    }
+
+
+    .dc-total-info strong {
+      font-size: 24px;
+    }
+
+  }
+</style>
+
 {% endblock %}
