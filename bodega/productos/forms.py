@@ -2,6 +2,7 @@ from calendar import monthrange
 from datetime import date
 
 from django import forms
+from django.core.validators import RegexValidator
 
 from .models import Producto
 
@@ -97,6 +98,25 @@ class ProductoForm(forms.ModelForm):
         })
     )
 
+    codigo_barras = forms.CharField(
+        required=False,
+        max_length=13,
+        min_length=13,
+        label='Código de barras',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Se genera automáticamente',
+            'maxlength': '13',
+            'inputmode': 'numeric',
+        }),
+        validators=[
+            RegexValidator(
+                regex=r'^\d{13}$',
+                message='El código de barras debe tener exactamente 13 dígitos.',
+            )
+        ],
+    )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if not self.instance.pk and not self.initial.get('fechaVencimiento'):
@@ -170,6 +190,7 @@ class ProductoForm(forms.ModelForm):
             'codigo_barras': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Se genera automáticamente',
-                'readonly': True,
+                'maxlength': '13',
+                'inputmode': 'numeric',
             }),
         }

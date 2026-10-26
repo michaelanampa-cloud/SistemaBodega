@@ -717,6 +717,19 @@
               {% endif %}
             </div>
 
+            {% elif field.name == 'codigo_barras' %}
+
+            <div class="dc-field">
+              {{ field.label_tag }}
+              {{ field }}
+
+              {% if field.errors %}
+              <div class="dc-field-error">
+                {{ field.errors }}
+              </div>
+              {% endif %}
+            </div>
+
             {% endif %}
 
             {% endfor %}

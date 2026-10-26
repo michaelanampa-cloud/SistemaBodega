@@ -1,595 +1,975 @@
 {% extends 'dashboard_base.html' %}
+{% load static %}
 
-{% block title %}Detalle de Compra{% endblock %}
+{% block title %}Detalle de Compra | Bodega Doña Catita{% endblock %}
 
 {% block content %}
 
 <style>
-  .boleta-container {
-    max-width: 950px;
+  .dc-detalle {
+    --dc-green: #78b82a;
+    --dc-green-dark: #467d18;
+    --dc-green-soft: #f0f8e8;
+    --dc-ink: #17231b;
+    --dc-muted: #718078;
+    --dc-border: #e5ebe6;
+    max-width: 1120px;
     margin: 0 auto;
+    color: var(--dc-ink);
   }
 
-  .boleta-header {
-    border-bottom: 2px solid #212529;
-    padding-bottom: 15px;
+  .dc-detalle * {
+    box-sizing: border-box;
   }
 
-  .boleta-logo {
-    font-size: 28px;
-    font-weight: 700;
+  .dc-detalle .dc-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
   }
 
-  .boleta-subtitle {
-    color: #6c757d;
+  .dc-detalle .dc-page-title {
+    font-size: clamp(1.45rem, 3vw, 2rem);
+    font-weight: 800;
+    letter-spacing: -0.7px;
+    margin: 0;
   }
 
-  .info-label {
+  .dc-detalle .dc-page-subtitle {
+    color: var(--dc-muted);
+    margin: 5px 0 0;
+    font-size: .94rem;
+  }
+
+  .dc-detalle .dc-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .dc-detalle .btn {
+    border-radius: 10px;
     font-weight: 600;
-    color: #495057;
+    padding: 10px 15px;
+    transition: transform .18s ease, box-shadow .18s ease;
   }
 
-  .total-box {
-    max-width: 400px;
-    margin-left: auto;
+  .dc-detalle .btn:hover {
+    transform: translateY(-1px);
   }
 
-  .total-final {
+  .dc-detalle .dc-receipt {
+    background: #fff;
+    border: 1px solid var(--dc-border);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(26, 49, 31, .07);
+  }
+
+  .dc-detalle .dc-receipt-header {
+    padding: 27px 30px;
+    background: linear-gradient(125deg, #f5faef, #fff 68%);
+    border-bottom: 1px solid var(--dc-border);
+  }
+
+  .dc-detalle .dc-brand {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .dc-detalle .dc-brand-icon {
+    width: 58px;
+    height: 58px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: var(--dc-green);
+    color: #fff;
     font-size: 25px;
+    box-shadow: 0 5px 14px rgba(120, 184, 42, .23);
+  }
+
+  .dc-detalle .dc-brand-name {
+    font-size: clamp(1.2rem, 2.5vw, 1.7rem);
+    font-weight: 850;
+    letter-spacing: -.5px;
+    margin: 0;
+  }
+
+  .dc-detalle .dc-brand-description {
+    color: var(--dc-muted);
+    font-size: .88rem;
+    margin-top: 4px;
+  }
+
+  .dc-detalle .dc-business-info {
+    color: #58665c;
+    font-size: .82rem;
+    line-height: 1.7;
+    margin-top: 14px;
+  }
+
+  .dc-detalle .dc-code-card {
+    min-width: 205px;
+    padding: 17px 20px;
+    border: 1px solid #dce8d2;
+    background: rgba(255,255,255,.9);
+    border-radius: 14px;
+    text-align: right;
+  }
+
+  .dc-detalle .dc-code-label {
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--dc-muted);
+    font-size: .72rem;
+    font-weight: 800;
+  }
+
+  .dc-detalle .dc-code {
+    font-size: 1.35rem;
+    font-weight: 850;
+    color: var(--dc-green-dark);
+    margin-top: 5px;
+    overflow-wrap: anywhere;
+  }
+
+  .dc-detalle .dc-receipt-body {
+    padding: 26px 30px;
+  }
+
+  .dc-detalle .dc-section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.04rem;
+    font-weight: 800;
+    margin: 0 0 18px;
+  }
+
+  .dc-detalle .dc-section-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 11px;
+    background: var(--dc-green-soft);
+    color: var(--dc-green-dark);
+    flex-shrink: 0;
+  }
+
+  .dc-detalle .dc-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 13px;
+  }
+
+  .dc-detalle .dc-info-item {
+    padding: 15px 16px;
+    border: 1px solid var(--dc-border);
+    border-radius: 12px;
+    min-width: 0;
+  }
+
+  .dc-detalle .dc-info-label {
+    display: block;
+    color: var(--dc-muted);
+    font-size: .77rem;
     font-weight: 700;
+    margin-bottom: 6px;
   }
 
-  .vuelto-box {
-    background: #f8f9fa;
-    border-left: 4px solid #198754;
-    padding: 12px 15px;
+  .dc-detalle .dc-info-value {
+    font-size: .94rem;
+    font-weight: 750;
+    overflow-wrap: anywhere;
   }
 
-  .nota-box {
-    background: #fff8e1;
-    border-left: 4px solid #ffc107;
-    padding: 15px;
+  .dc-detalle .dc-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 11px;
+    border-radius: 30px;
+    font-size: .78rem;
+    font-weight: 750;
+  }
+
+  .dc-detalle .dc-badge-status {
+    background: #e8f7ed;
+    color: #19723b;
+  }
+
+  .dc-detalle .dc-badge-payment {
+    background: #eaf1ff;
+    color: #2855a2;
+  }
+
+  .dc-detalle .dc-products-section {
+    margin-top: 30px;
+  }
+
+  .dc-detalle .dc-table-wrap {
+    border: 1px solid var(--dc-border);
+    border-radius: 13px;
+    overflow: hidden;
+  }
+
+  .dc-detalle .dc-products-table {
+    width: 100%;
+    margin: 0;
+    border-collapse: collapse;
+  }
+
+  .dc-detalle .dc-products-table thead th {
+    background: #f5f8f5;
+    color: #526057;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--dc-border);
+    font-size: .76rem;
+    text-transform: uppercase;
+    letter-spacing: .55px;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .dc-detalle .dc-products-table tbody td {
+    padding: 16px;
+    border-bottom: 1px solid #edf1ed;
+    vertical-align: middle;
+    font-size: .9rem;
+  }
+
+  .dc-detalle .dc-products-table tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .dc-detalle .dc-product-name {
+    font-weight: 750;
+    color: var(--dc-ink);
+  }
+
+  .dc-detalle .dc-quantity {
+    display: inline-block;
+    min-width: 36px;
+    padding: 5px 9px;
+    border-radius: 8px;
+    background: #f1f5f1;
+    text-align: center;
+    font-weight: 750;
+  }
+
+  .dc-detalle .dc-money {
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .dc-detalle .dc-note {
+    margin-top: 24px;
+    padding: 17px 19px;
+    background: #fff9e9;
+    border: 1px solid #f4e6b9;
+    border-left: 4px solid #e9b526;
+    border-radius: 12px;
+    overflow-wrap: anywhere;
+  }
+
+  .dc-detalle .dc-note-title {
+    font-weight: 800;
+    margin-bottom: 7px;
+    color: #735817;
+  }
+
+  .dc-detalle .dc-note-content {
+    color: #675c40;
+    white-space: pre-line;
+  }
+
+  .dc-detalle .dc-totals-area {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 25px;
+  }
+
+  .dc-detalle .dc-totals {
+    width: 100%;
+    max-width: 420px;
+    padding: 21px;
+    background: #f8faf8;
+    border: 1px solid var(--dc-border);
+    border-radius: 15px;
+  }
+
+  .dc-detalle .dc-total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+    padding: 7px 0;
+    color: #536056;
+    font-size: .91rem;
+  }
+
+  .dc-detalle .dc-total-row strong {
+    color: var(--dc-ink);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .dc-detalle .dc-total-divider {
+    border: 0;
+    border-top: 1px dashed #cbd5cc;
+    margin: 13px 0;
+  }
+
+  .dc-detalle .dc-final-total {
+    padding: 16px;
+    margin-top: 8px;
+    border-radius: 12px;
+    background: #eaf6df;
+    color: #315c19;
+  }
+
+  .dc-detalle .dc-final-total span {
+    font-size: .9rem;
+    font-weight: 800;
+  }
+
+  .dc-detalle .dc-final-total strong {
+    font-size: 1.65rem;
+    font-weight: 900;
+    color: #315c19;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .dc-detalle .dc-change {
+    margin-top: 14px;
+    padding: 13px 15px;
+    background: #e8f7ed;
+    border: 1px solid #cdebd5;
+    border-radius: 11px;
+  }
+
+  .dc-detalle .dc-receipt-footer {
+    padding: 20px;
+    text-align: center;
+    border-top: 1px dashed #dce5dc;
+    color: var(--dc-muted);
+    font-size: .88rem;
+  }
+
+  .dc-detalle .dc-email-card {
+    margin-top: 25px;
+    border: 1px solid var(--dc-border);
+    border-radius: 16px;
+    background: #fff;
+    overflow: hidden;
+    box-shadow: 0 5px 22px rgba(26, 49, 31, .045);
+  }
+
+  .dc-detalle .dc-email-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--dc-border);
+    background: #f8faf8;
+  }
+
+  .dc-detalle .dc-email-header h2 {
+    font-size: 1rem;
+    font-weight: 800;
+    margin: 0;
+  }
+
+  .dc-detalle .dc-email-body {
+    padding: 22px;
+  }
+
+  .dc-detalle .form-label {
+    font-weight: 700;
+    font-size: .88rem;
+    color: #445148;
+  }
+
+  .dc-detalle .form-control,
+  .dc-detalle .form-select {
+    border-color: #dce5dc;
+    border-radius: 10px;
+    min-height: 45px;
+  }
+
+  .dc-detalle .form-control:focus,
+  .dc-detalle .form-select:focus {
+    border-color: var(--dc-green);
+    box-shadow: 0 0 0 .2rem rgba(120, 184, 42, .15);
+  }
+
+  .dc-detalle .dc-empty {
+    text-align: center;
+    padding: 28px 15px !important;
+    color: var(--dc-muted);
+  }
+
+  @media (max-width: 767.98px) {
+    .dc-detalle .dc-receipt-header,
+    .dc-detalle .dc-receipt-body {
+      padding: 20px 16px;
+    }
+
+    .dc-detalle .dc-code-card {
+      width: 100%;
+      text-align: left;
+      min-width: 0;
+      margin-top: 18px;
+    }
+
+    .dc-detalle .dc-info-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .dc-detalle .dc-topbar {
+      align-items: flex-start;
+    }
+
+    .dc-detalle .dc-actions {
+      width: 100%;
+    }
+
+    .dc-detalle .dc-actions .btn {
+      flex: 1 1 auto;
+    }
+
+    .dc-detalle .dc-products-table {
+      min-width: 580px;
+    }
+
+    .dc-detalle .dc-totals {
+      max-width: none;
+    }
+
+    .dc-detalle .dc-email-body {
+      padding: 17px;
+    }
   }
 
   @media print {
+    @page {
+      size: auto;
+      margin: 10mm;
+    }
 
     body {
-      background: white !important;
+      background: #fff !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
     }
 
     body * {
-      visibility: hidden;
+      visibility: hidden !important;
     }
 
-    .print-area,
-    .print-area * {
-      visibility: visible;
+    .dc-detalle .print-area,
+    .dc-detalle .print-area * {
+      visibility: visible !important;
     }
 
-    .print-area {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
-      padding: 15px;
+    .dc-detalle .print-area {
+      position: absolute !important;
+      left: 0 !important;
+      top: 0 !important;
+      width: 100% !important;
+      max-width: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
     }
 
-    .no-print {
+    .dc-detalle .no-print {
       display: none !important;
     }
 
-    .card {
-      border: 1px solid #ddd !important;
+    .dc-detalle .dc-receipt {
       box-shadow: none !important;
+      border: 1px solid #ddd !important;
+      border-radius: 0 !important;
     }
 
-    .boleta-container {
-      max-width: 100%;
+    .dc-detalle .dc-receipt-header,
+    .dc-detalle .dc-receipt-body,
+    .dc-detalle .dc-receipt-footer {
+      break-inside: avoid;
+    }
+
+    .dc-detalle .dc-table-wrap {
+      overflow: visible !important;
+    }
+
+    .dc-detalle .dc-products-table {
+      min-width: 0 !important;
+    }
+
+    .dc-detalle .dc-products-table thead {
+      display: table-header-group;
+    }
+
+    .dc-detalle .dc-products-table tr {
+      break-inside: avoid;
+    }
+
+    .dc-detalle .dc-totals-area {
+      break-inside: avoid;
     }
   }
 </style>
 
-<div class="container py-4">
-  <div class="boleta-container print-area">
-    <!-- ENCABEZADO -->
-    <div class="boleta-header mb-4">
-      <div class="row align-items-center">
-        <div class="col-md-7">
-          <div class="boleta-logo">
-            <i class="fas fa-store"></i>
-            Bodega Doña Catita
-          </div>
-          <div class="boleta-subtitle">
-            Venta de productos de bodega
-          </div>
-          <small>
-            RUC: 10470273793<br>
-            Dirección: calle 3 de octubre 1598
-          </small>
-        </div>
-        <div class="col-md-5 text-md-end mt-3 mt-md-0">
-          <div class="border rounded p-3">
-            <div class="text-muted">
-              DETALLE DE COMPRA
-            </div>
-            <h5 class="mb-0">
-              {{ compra.codigo }}
-            </h5>
-          </div>
-        </div>
-      </div>
-    </div>
+<div class="container-fluid py-3">
+  <div class="dc-detalle">
 
-    <!-- INFORMACIÓN DE LA COMPRA -->
-    <div class="card mb-4">
-      <div class="card-header bg-dark text-white">
-        <h5 class="mb-0">
-          <i class="fas fa-circle-info"></i>
-          Información de la Compra
-        </h5>
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col-md-6">
-            <p class="mb-2">
-              <span class="info-label">Código:</span>
-              {{ compra.codigo }}
-            </p>
-            <p class="mb-2">
-              <span class="info-label">Fecha:</span>
-              {{ compra.fecha|date:'d/m/Y H:i' }}
-            </p>
-            <p class="mb-2">
-              <span class="info-label">Usuario:</span>
-
-              {% if compra.user %}
-              {{ compra.user.username }}
-              {% else %}
-              Anónimo
-              {% endif %}
-
-            </p>
-            <p class="mb-0">
-              <span class="info-label">Estado:</span>
-              <span class="badge bg-success">
-                {{ compra.estado }}
-              </span>
-            </p>
-          </div>
-
-          <div class="col-md-6">
-            <p class="mb-2">
-              <span class="info-label">
-                Cliente:
-              </span>
-
-              {% if compra.cliente %}
-
-              {{ compra.cliente.nombre }}
-
-              {% if compra.cliente.telefono %}
-              <br>
-              <small class="text-muted">
-                Teléfono: {{ compra.cliente.telefono }}
-              </small>
-              {% endif %}
-
-              {% else %}
-
-              Sin cliente asignado
-
-              {% endif %}
-            </p>
-            <p class="mb-0">
-              <span class="info-label">
-                Tipo de compra:
-              </span>
-              <span class="badge bg-primary">
-                {{ compra.get_tipo_compra_display }}
-              </span>
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- PRODUCTOS -->
-    <div class="card mb-4">
-      <div class="card-header bg-success text-white">
-        <h5 class="mb-0">
-          <i class="fas fa-shopping-basket"></i>
-          Productos de la compra
-        </h5>
-      </div>
-
-      <div class="card-body p-0">
-        <div class="table-responsive">
-          <table class="table table-bordered table-hover mb-0">
-            <thead class="table-light">
-              <tr>
-                <th style="width: 45%;">
-                  Producto
-                </th>
-                <th class="text-end">
-                  Cantidad
-                </th>
-                <th class="text-end">
-                  Precio final
-                </th>
-                <th class="text-end">
-                  Subtotal
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for item in compra.items.all %}
-              <tr>
-                <td>
-                  {{ item.producto.nombre }}
-                </td>
-                <td class="text-end">
-                  {{ item.cantidad }}
-                </td>
-                <td class="text-end">
-                  <span class="precio-final" data-precio="{{ item.precio }}">
-                    S/ {{ item.precio|floatformat:2 }}
-                  </span>
-                </td>
-                <td class="text-end">
-                  <span class="subtotal" data-precio="{{ item.subtotal }}">
-                    S/ {{ item.subtotal|floatformat:2 }}
-                  </span>
-                </td>
-              </tr>
-              {% empty %}
-
-              <tr>
-                <td colspan="5" class="text-center text-muted py-4">
-                  No hay productos registrados en esta compra.
-                </td>
-              </tr>
-
-              {% endfor %}
-
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-    <!-- NOTA -->
-    {% if compra.descripcion %}
-
-    <div class="nota-box mb-4">
-      <div class="fw-bold mb-1">
-        <i class="fas fa-note-sticky"></i>
-        Nota sobre la compra
-      </div>
+    <!-- BARRA SUPERIOR -->
+    <div class="dc-topbar no-print">
       <div>
-        {{ compra.descripcion }}
+        <h1 class="dc-page-title">
+          <i class="fas fa-receipt me-2" style="color:#78b82a;"></i>
+          Detalle de compra
+        </h1>
+        <p class="dc-page-subtitle">
+          Consulta los productos, importes y datos de esta operación.
+        </p>
+      </div>
+
+      <div class="dc-actions">
+        <a href="{% url 'lista_compras' %}" class="btn btn-outline-secondary">
+          <i class="fas fa-arrow-left me-1"></i>
+          Volver
+        </a>
+
+        <button type="button" class="btn btn-outline-dark" onclick="window.print()">
+          <i class="fas fa-print me-1"></i>
+          Imprimir
+        </button>
+
+        <a href="{% url 'exportar_pdf' compra.pk %}" class="btn btn-success">
+          <i class="fas fa-file-pdf me-1"></i>
+          Exportar PDF
+        </a>
       </div>
     </div>
-    {% endif %}
 
-    <!-- TOTALES -->
-    <div class="card mb-4">
-      <div class="card-body">
-        <div class="total-box">
-          <div class="d-flex justify-content-between mb-2">
-            <span>
-              Subtotal:
-            </span>
-            <strong id="subtotalFinal" data-subtotal="{{ compra.subtotal }}">
-              S/ {{ compra.subtotal|floatformat:2 }}
-            </strong>
-          </div>
-          
-          <div class="d-flex justify-content-between mb-2">
-            <span>
-              Subtotal sin IGV:
-            </span>
-            <strong id="subtotalSinIGV">
-              S/ 0.00
-            </strong>
-          </div>
-          
-          <div class="d-flex justify-content-between mb-2">
-            <span>
-              IGV (18%):
-            </span>
-            <strong id="igv">
-              S/ 0.00
-            </strong>
-          </div>
+    <!-- BOLETA -->
+    <div class="dc-receipt print-area">
 
-          {% if compra.descuento > 0 %}
+      <!-- ENCABEZADO -->
+      <div class="dc-receipt-header">
+        <div class="row align-items-center">
+          <div class="col-md-7">
+            <div class="dc-brand">
+              <div class="dc-brand-icon">
+                <i class="fas fa-store"></i>
+              </div>
 
-          <div class="d-flex justify-content-between mb-2 text-danger">
-            <span>
-              Descuento:
-            </span>
-            <strong>
-              - S/ {{ compra.descuento|floatformat:2 }}
-            </strong>
-          </div>
-          {% endif %}
+              <div>
+                <h2 class="dc-brand-name">Bodega Doña Catita</h2>
+                <div class="dc-brand-description">
+                  Productos de calidad y atención rápida
+                </div>
+              </div>
+            </div>
 
-          {% if compra.adicional > 0 %}
-          <div class="d-flex justify-content-between mb-2 text-warning">
-            <span>
-              Adicional:
-            </span>
-            <strong>
-              + S/ {{ compra.adicional|floatformat:2 }}
-            </strong>
-          </div>
-          {% endif %}
-          <hr>
-
-          <div class="d-flex justify-content-between">
-            <span class="fw-bold">
-              TOTAL:
-            </span>
-            <span class="total-final text-primary">
-              S/ {{ compra.total|floatformat:2 }}
-            </span>
-          </div>
-
-          {% if compra.tipo_compra == 'efectivo' and compra.dinero_recibido > 0 %}
-
-          <hr>
-          <div class="d-flex justify-content-between mb-2">
-            <span>
-              Dinero recibido:
-            </span>
-            <strong>
-              S/ {{ compra.dinero_recibido|floatformat:2 }}
-            </strong>
-          </div>
-
-          <div class="vuelto-box">
-            <div class="d-flex justify-content-between">
-              <span class="fw-bold">
-                Vuelto:
-              </span>
-              <strong class="text-success">
-                S/ {{ compra.vuelto|floatformat:2 }}
-              </strong>
+            <div class="dc-business-info">
+              <div><strong>RUC:</strong> 10470273793</div>
+              <div><i class="fas fa-location-dot me-1"></i>
+                Calle 3 de Octubre #1598
+              </div>
             </div>
           </div>
-          {% endif %}
+
+          <div class="col-md-5">
+            <div class="dc-code-card">
+              <div class="dc-code-label">Detalle de compra</div>
+              <div class="dc-code">{{ compra.codigo }}</div>
+              <div class="small text-muted mt-2">
+                <i class="far fa-calendar-alt me-1"></i>
+                {{ compra.fecha|date:'d/m/Y H:i' }}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- PIE DE BOLETA -->
-    <div class="text-center text-muted mb-4">
-      <small>
-        Gracias por su compra.
-      </small>
+      <div class="dc-receipt-body">
 
-    </div>
+        <!-- INFORMACIÓN GENERAL -->
+        <section>
+          <h3 class="dc-section-title">
+            <span class="dc-section-icon">
+              <i class="fas fa-circle-info"></i>
+            </span>
+            Información de la compra
+          </h3>
 
-  </div>
+          <div class="dc-info-grid">
+            <div class="dc-info-item">
+              <span class="dc-info-label">Código de operación</span>
+              <div class="dc-info-value">{{ compra.codigo }}</div>
+            </div>
 
+            <div class="dc-info-item">
+              <span class="dc-info-label">Fecha y hora</span>
+              <div class="dc-info-value">
+                {{ compra.fecha|date:'d/m/Y H:i' }}
+              </div>
+            </div>
 
-  <!-- BOTONES -->
-  <div class="d-flex flex-wrap justify-content-between gap-2 mt-4 no-print">
+            <div class="dc-info-item">
+              <span class="dc-info-label">Usuario responsable</span>
+              <div class="dc-info-value">
+                {% if compra.user %}
+                  {{ compra.user.username }}
+                {% else %}
+                  Anónimo
+                {% endif %}
+              </div>
+            </div>
 
-    <a href="{% url 'lista_compras' %}" class="btn btn-secondary">
+            <div class="dc-info-item">
+              <span class="dc-info-label">Estado</span>
+              <div class="dc-info-value">
+                <span class="dc-badge dc-badge-status">
+                  <i class="fas fa-check-circle"></i>
+                  {{ compra.estado|default:"Registrada" }}
+                </span>
+              </div>
+            </div>
 
-      <i class="fas fa-arrow-left"></i>
-      Lista de compras
+            <div class="dc-info-item">
+              <span class="dc-info-label">Cliente</span>
+              <div class="dc-info-value">
+                {% if compra.cliente %}
+                  {{ compra.cliente.nombre }}
 
-    </a>
+                  {% if compra.cliente.telefono %}
+                    <div class="small text-muted mt-1">
+                      <i class="fas fa-phone me-1"></i>
+                      {{ compra.cliente.telefono }}
+                    </div>
+                  {% endif %}
+                {% else %}
+                  Sin cliente asignado
+                {% endif %}
+              </div>
+            </div>
 
+            <div class="dc-info-item">
+              <span class="dc-info-label">Tipo de compra</span>
+              <div class="dc-info-value">
+                <span class="dc-badge dc-badge-payment">
+                  <i class="fas fa-wallet"></i>
+                  {{ compra.get_tipo_compra_display }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
 
-    <a href="{% url 'carrito' %}" class="btn btn-primary">
+        <!-- PRODUCTOS -->
+        <section class="dc-products-section">
+          <h3 class="dc-section-title">
+            <span class="dc-section-icon">
+              <i class="fas fa-shopping-basket"></i>
+            </span>
+            Productos de la compra
+          </h3>
 
-      <i class="fas fa-shopping-cart"></i>
-      Carrito
+          <div class="dc-table-wrap">
+            <table class="dc-products-table">
+              <thead>
+                <tr>
+                  <th style="width:45%;">Producto</th>
+                  <th class="text-end">Cantidad</th>
+                  <th class="text-end">Precio final</th>
+                  <th class="text-end">Subtotal</th>
+                </tr>
+              </thead>
 
-    </a>
+              <tbody>
+                {% for item in compra.items.all %}
+                  <tr>
+                    <td>
+                      <div class="dc-product-name">
+                        {{ item.producto.nombre }}
+                      </div>
+                    </td>
 
+                    <td class="text-end">
+                      <span class="dc-quantity">{{ item.cantidad }}</span>
+                    </td>
 
-    <div class="d-flex gap-2">
+                    <td class="text-end dc-money">
+                      S/ {{ item.precio|floatformat:2 }}
+                    </td>
 
-      <button type="button" class="btn btn-outline-dark" onclick="window.print()">
+                    <td class="text-end dc-money fw-bold">
+                      S/ {{ item.subtotal|floatformat:2 }}
+                    </td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="4" class="dc-empty">
+                      <i class="fas fa-box-open fa-2x mb-2 d-block"></i>
+                      No hay productos registrados en esta compra.
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
 
-        <i class="fas fa-print"></i>
-        Imprimir
+        <!-- NOTA -->
+        {% if compra.descripcion %}
+          <div class="dc-note">
+            <div class="dc-note-title">
+              <i class="fas fa-note-sticky me-2"></i>
+              Nota sobre la compra
+            </div>
+            <div class="dc-note-content">{{ compra.descripcion }}</div>
+          </div>
+        {% endif %}
 
-      </button>
+        <!-- RESUMEN DE IMPORTES -->
+        <section class="dc-totals-area">
+          <div class="dc-totals">
+            <h3 class="dc-section-title mb-3">
+              <span class="dc-section-icon">
+                <i class="fas fa-calculator"></i>
+              </span>
+              Resumen de importes
+            </h3>
 
+            <div class="dc-total-row">
+              <span>Subtotal</span>
+              <strong>S/ {{ compra.subtotal|floatformat:2 }}</strong>
+            </div>
 
-      <a href="{% url 'exportar_pdf' compra.pk %}" class="btn btn-success">
+            <div class="dc-total-row">
+              <span>Subtotal sin IGV</span>
+              <strong id="subtotalSinIGV">S/ 0.00</strong>
+            </div>
 
-        <i class="fas fa-file-pdf"></i>
-        PDF
+            <div class="dc-total-row">
+              <span>IGV (18%)</span>
+              <strong id="igv">S/ 0.00</strong>
+            </div>
 
-      </a>
-
-    </div>
-
-  </div>
-
-
-  <!-- ENVÍO POR CORREO -->
-  <div class="card my-4 no-print">
-
-    <div class="card-header bg-primary text-white">
-
-      <h5 class="mb-0">
-
-        <i class="fas fa-envelope"></i>
-        Enviar boleta por correo
-
-      </h5>
-
-    </div>
-
-
-    <div class="card-body">
-
-      <form method="post" class="row g-3">
-
-        {% csrf_token %}
-
-
-        <div class="col-md-4">
-
-          <label for="clienteEmail" class="form-label">
-
-            Seleccionar cliente
-
-          </label>
-
-
-          <select id="clienteEmail" name="cliente" class="form-select">
-
-            <option value="">
-              -- Ingresar correo manualmente --
-            </option>
-
-            {% for cliente in clientes %}
-            {% with cliente_id_str=cliente.id|stringformat:'s' %}
-
-            {% if selected_cliente_id and cliente_id_str == selected_cliente_id %}
-            <option value="{{ cliente.id }}" data-email="{{ cliente.email }}" selected>
-              {{ cliente.nombre }}{% if cliente.email %} - {{ cliente.email }}{% endif %}
-            </option>
-            {% else %}
-            <option value="{{ cliente.id }}" data-email="{{ cliente.email }}">
-              {{ cliente.nombre }}{% if cliente.email %} - {{ cliente.email }}{% endif %}
-            </option>
+            {% if compra.descuento > 0 %}
+              <div class="dc-total-row">
+                <span class="text-danger">
+                  <i class="fas fa-tag me-1"></i> Descuento
+                </span>
+                <strong class="text-danger">
+                  - S/ {{ compra.descuento|floatformat:2 }}
+                </strong>
+              </div>
             {% endif %}
 
-            {% endwith %}
-            {% endfor %}
+            {% if compra.adicional > 0 %}
+              <div class="dc-total-row">
+                <span>Adicional</span>
+                <strong>
+                  + S/ {{ compra.adicional|floatformat:2 }}
+                </strong>
+              </div>
+            {% endif %}
 
-          </select>
+            <hr class="dc-total-divider">
 
-        </div>
+            <div class="dc-final-total">
+              <div class="d-flex justify-content-between align-items-center gap-3">
+                <span>TOTAL</span>
+                <strong>S/ {{ compra.total|floatformat:2 }}</strong>
+              </div>
+            </div>
 
+            {% if compra.tipo_compra == 'efectivo' and compra.dinero_recibido > 0 %}
+              <div class="dc-change">
+                <div class="dc-total-row">
+                  <span>Dinero recibido</span>
+                  <strong>
+                    S/ {{ compra.dinero_recibido|floatformat:2 }}
+                  </strong>
+                </div>
 
-        <div class="col-md-4">
-
-          <label for="emailEnviar" class="form-label">
-
-            Correo electrónico
-
-          </label>
-
-
-          <input type="email" id="emailEnviar" name="email" class="form-control" placeholder="ejemplo@correo.com"
-            value="{{ email_to }}" required>
-
-
-          <div class="form-text">
-
-            Si seleccionas un cliente con correo,
-            se utilizará automáticamente.
-
+                <div class="dc-total-row mb-0">
+                  <span class="fw-bold text-success">
+                    <i class="fas fa-money-bill-wave me-1"></i>
+                    Vuelto
+                  </span>
+                  <strong class="text-success">
+                    S/ {{ compra.vuelto|floatformat:2 }}
+                  </strong>
+                </div>
+              </div>
+            {% endif %}
           </div>
+        </section>
+      </div>
 
-        </div>
-
-
-        <div class="col-md-4 d-flex align-items-end">
-
-          <button type="submit" class="btn btn-outline-primary w-100">
-
-            <i class="fas fa-paper-plane"></i>
-            Enviar boleta
-
-          </button>
-
-        </div>
-
-      </form>
-
+      <!-- PIE -->
+      <div class="dc-receipt-footer">
+        <i class="fas fa-heart me-1" style="color:#78b82a;"></i>
+        Gracias por su compra. ¡Vuelva pronto!
+        <div class="small mt-1">Bodega Doña Catita, tu bodega de confianza.</div>
+      </div>
     </div>
 
-  </div>
+    <!-- ACCIONES ADICIONALES -->
+    <div class="dc-actions justify-content-between mt-4 no-print">
+      <a href="{% url 'lista_compras' %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-1"></i>
+        Lista de compras
+      </a>
 
+      <a href="{% url 'carrito' %}" class="btn btn-primary">
+        <i class="fas fa-shopping-cart me-1"></i>
+        Ir al carrito
+      </a>
+    </div>
+
+    <!-- ENVÍO POR CORREO -->
+    <section class="dc-email-card no-print">
+      <div class="dc-email-header">
+        <span class="dc-section-icon">
+          <i class="fas fa-envelope"></i>
+        </span>
+        <div>
+          <h2>Enviar boleta por correo</h2>
+          <div class="small text-muted mt-1">
+            Selecciona un cliente o escribe el correo del destinatario.
+          </div>
+        </div>
+      </div>
+
+      <div class="dc-email-body">
+        <form method="post" class="row g-3">
+          {% csrf_token %}
+
+          <div class="col-md-5">
+            <label for="clienteEmail" class="form-label">
+              Seleccionar cliente
+            </label>
+
+            <select id="clienteEmail" name="cliente" class="form-select">
+              <option value="">-- Ingresar correo manualmente --</option>
+
+              {% for cliente in clientes %}
+                {% with cliente_id_str=cliente.id|stringformat:'s' %}
+                  {% if selected_cliente_id and cliente_id_str == selected_cliente_id %}
+                    <option
+                      value="{{ cliente.id }}"
+                      data-email="{{ cliente.email|default:'' }}"
+                      selected>
+                      {{ cliente.nombre }}{% if cliente.email %} - {{ cliente.email }}{% endif %}
+                    </option>
+                  {% else %}
+                    <option
+                      value="{{ cliente.id }}"
+                      data-email="{{ cliente.email|default:'' }}">
+                      {{ cliente.nombre }}{% if cliente.email %} - {{ cliente.email }}{% endif %}
+                    </option>
+                  {% endif %}
+                {% endwith %}
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-md-5">
+            <label for="emailEnviar" class="form-label">
+              Correo electrónico
+            </label>
+
+            <input
+              type="email"
+              id="emailEnviar"
+              name="email"
+              class="form-control"
+              placeholder="ejemplo@correo.com"
+              value="{{ email_to|default:'' }}"
+              autocomplete="email"
+              required>
+
+            <div class="form-text">
+              Si el cliente tiene correo registrado, se completará automáticamente.
+            </div>
+          </div>
+
+          <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-success w-100">
+              <i class="fas fa-paper-plane me-1"></i>
+              Enviar
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+  </div>
 </div>
 
 {% endblock %}
 
-
 {% block extra_js %}
-
 <script>
-
-  const clienteEmailSelect =
-    document.getElementById('clienteEmail');
-
-  const emailEnviarInput =
-    document.getElementById('emailEnviar');
-
+document.addEventListener('DOMContentLoaded', function () {
+  // Completar el correo del cliente seleccionado.
+  const clienteSelect = document.getElementById('clienteEmail');
+  const emailInput = document.getElementById('emailEnviar');
 
   function actualizarEmailCliente() {
-    if (!clienteEmailSelect || !emailEnviarInput) {
-      return;
-    }
+    if (!clienteSelect || !emailInput) return;
 
-    const selectedOption =
-      clienteEmailSelect.options[
-      clienteEmailSelect.selectedIndex
-      ];
-
-
-    const email =
-      selectedOption.dataset.email || '';
-
+    const option = clienteSelect.options[clienteSelect.selectedIndex];
+    const email = option ? (option.dataset.email || '').trim() : '';
 
     if (email) {
-      emailEnviarInput.value = email;
-      emailEnviarInput.disabled = true;
-      emailEnviarInput.classList.add('bg-light');
-
+      emailInput.value = email;
+      emailInput.readOnly = true;
+      emailInput.classList.add('bg-light');
     } else {
-      emailEnviarInput.disabled = false;
-      emailEnviarInput.classList.remove('bg-light');
+      emailInput.readOnly = false;
+      emailInput.classList.remove('bg-light');
     }
   }
 
-  if (clienteEmailSelect) {
-    clienteEmailSelect.addEventListener(
-      'change',
-      actualizarEmailCliente
-    );
+  if (clienteSelect && emailInput) {
+    clienteSelect.addEventListener('change', actualizarEmailCliente);
     actualizarEmailCliente();
   }
 
-  document.addEventListener('DOMContentLoaded', function () {
+  // Desglosar el subtotal incluido IGV.
+  const subtotalElemento = document.getElementById('subtotalFinal');
+  const subtotalSinIGVElemento = document.getElementById('subtotalSinIGV');
+  const igvElemento = document.getElementById('igv');
 
-      const subtotalElemento = document.getElementById('subtotalFinal');
-      const subtotalSinIGVElemento = document.getElementById('subtotalSinIGV');
-      const igvElemento = document.getElementById('igv');
+  if (subtotalElemento && subtotalSinIGVElemento && igvElemento) {
+    const subtotal = Number(subtotalElemento.dataset.subtotal);
 
-      if (!subtotalElemento) {
-          return;
-      }
-
-      // Obtener directamente el valor numérico desde Django
-      const subtotal = parseFloat(subtotalElemento.dataset.subtotal);
-
-      if (isNaN(subtotal)) {
-          return;
-      }
-
-      // Calcular subtotal sin IGV
+    if (Number.isFinite(subtotal)) {
       const subtotalSinIGV = subtotal / 1.18;
-
-      // Calcular IGV
       const igv = subtotal - subtotalSinIGV;
 
-      // Mostrar con 2 decimales
       subtotalSinIGVElemento.textContent =
-          'S/ ' + subtotalSinIGV.toFixed(2);
+        'S/ ' + subtotalSinIGV.toFixed(2);
 
-      igvElemento.textContent =
-          'S/ ' + igv.toFixed(2);
-  });
+      igvElemento.textContent = 'S/ ' + igv.toFixed(2);
+    }
+  }
+});
 </script>
-
 {% endblock %}

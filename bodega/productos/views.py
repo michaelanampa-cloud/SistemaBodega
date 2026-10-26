@@ -293,7 +293,9 @@ def lista_productos(request):
 
 	if query:
 		productos = productos.filter(
-			Q(nombre__icontains=query) | Q(detalle__icontains=query)
+			Q(nombre__icontains=query)
+			| Q(detalle__icontains=query)
+			| Q(codigo_barras__icontains=query)
 		)
 	if tipo:
 		productos = productos.filter(tipoProducto__iexact=tipo)
@@ -623,97 +625,214 @@ def editar_producto(request, pk):
         }
     )
 
+def _dibujar_etiqueta_adhesiva(pdf, producto, x, y, ancho=85.04, alto=42.52, incluir_codigo_barras=True, incluir_nombre=True):
+    from reportlab.lib import colors
 
-def _dibujar_etiqueta_adhesiva(pdf, producto, x, y, ancho=220, alto=120):
-    pdf.setStrokeColorRGB(0.2, 0.2, 0.2)
-    pdf.setFillColorRGB(1, 1, 1)
+    # Fondo y borde de la etiqueta
+    pdf.setStrokeColor(colors.lightgrey)
+    pdf.setFillColor(colors.white)
     pdf.rect(x, y, ancho, alto, stroke=1, fill=1)
 
-    pdf.setFont('Helvetica-Bold', 11)
-    pdf.setFillColorRGB(0, 0, 0)
-    titulo = producto.nombre[:28]
-    pdf.drawString(x + 8, y + alto - 18, titulo)
+    # Nombre del producto
+    nombre = str(producto.nombre) if incluir_nombre else ''
+    margen = 3
+    ancho_texto = ancho - (margen * 2)
 
-    pdf.setFont('Helvetica', 9)
-    pdf.drawString(x + 8, y + alto - 34, f'Tipo: {producto.tipoProducto}')
-    pdf.drawString(x + 8, y + alto - 48, f'Precio: S/ {producto.precio}')
+    if incluir_nombre:
+        tamano_fuente = 7
+        while tamano_fuente > 4.5 and pdf.stringWidth(
+            nombre, 'Helvetica-Bold', tamano_fuente
+        ) > ancho_texto:
+            tamano_fuente -= 0.5
 
-    ruta_barra = _resolver_ruta_codigo_barras(producto)
-    if ruta_barra and os.path.exists(ruta_barra):
-        pdf.drawImage(ruta_barra, x + 8, y + 18, width=ancho - 16, height=42)
+        if pdf.stringWidth(nombre, 'Helvetica-Bold', tamano_fuente) > ancho_texto:
+            while nombre and pdf.stringWidth(
+                nombre + '...', 'Helvetica-Bold', tamano_fuente
+            ) > ancho_texto:
+                nombre = nombre[:-1]
+            nombre += '...'
 
+        pdf.setFillColor(colors.black)
+        pdf.setFont('Helvetica-Bold', tamano_fuente)
+        pdf.drawCentredString(
+            x + ancho / 2,
+            y + alto - 9,
+            nombre
+        )
+
+    # Precio
+    pdf.setFillColor(colors.black)
     pdf.setFont('Helvetica-Bold', 9)
-    pdf.drawString(x + 12, y + 8, str(producto.codigo_barras))
-    pdf.setFont('Helvetica', 7)
-    pdf.drawString(x + 8, y + 2, 'Bodega Doña Catita')
+    precio_y = y + alto - 20 if incluir_nombre else y + alto - 10
+    if not incluir_codigo_barras:
+        precio_y = y + alto * 0.46 if incluir_nombre else y + alto * 0.5
+        pdf.setFont('Helvetica-Bold', 12)
+    pdf.drawCentredString(
+        x + ancho / 2,
+        precio_y,
+        f'S/ {producto.precio:.2f}'
+    )
 
+    # Código de barras: opcional
+    if incluir_codigo_barras:
+        ruta_barra = _resolver_ruta_codigo_barras(producto)
+
+        if ruta_barra and os.path.exists(ruta_barra):
+            from reportlab.lib.utils import ImageReader
+
+            margen_barra = 1
+            ancho_barra = ancho - (margen_barra * 2)
+            alto_barra = alto * 0.50
+            y_barra = 2 if incluir_nombre else 5
+
+            pdf.drawImage(
+                ImageReader(ruta_barra),
+                x + margen_barra,
+                y + y_barra,
+                width=ancho_barra,
+                height=alto_barra,
+                anchor='c',
+                mask='auto'
+            )
 
 def imprimir_etiqueta_producto(request, pk):
     producto = get_object_or_404(Producto, pk=pk)
 
     try:
-        from reportlab.lib.pagesizes import A4
         from reportlab.pdfgen import canvas
     except ImportError:
-        messages.error(request, 'Falta instalar reportlab o python-barcode en el entorno del proyecto.')
-        return redirect('detalle_producto', pk=pk)
+        messages.error(
+            request,
+            "Falta instalar reportlab en el entorno del proyecto."
+        )
+        return redirect("detalle_producto", pk=pk)
 
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="etiqueta_{producto.pk}.pdf"'
+    ancho = 3.0 * 28.3464567
+    alto = 1.5 * 28.3464567
+
+    response = HttpResponse(content_type="application/pdf")
+    response["Content-Disposition"] = (
+        f'attachment; filename="etiqueta_{producto.pk}.pdf"'
+    )
 
     pdf_buffer = BytesIO()
-    pdf = canvas.Canvas(pdf_buffer, pagesize=A4)
-    pdf.setTitle(f'Etiqueta {producto.nombre}')
-    _dibujar_etiqueta_adhesiva(pdf, producto, 50, 540, ancho=240, alto=140)
-    pdf.save()
+    pdf = canvas.Canvas(
+        pdf_buffer,
+        pagesize=(ancho, alto)
+    )
+    pdf.setTitle(f"Etiqueta {producto.nombre}")
 
+    _dibujar_etiqueta_adhesiva(
+        pdf,
+        producto,
+        0,
+        0,
+        ancho=ancho,
+        alto=alto
+    )
+
+    pdf.save()
     pdf_buffer.seek(0)
     response.write(pdf_buffer.getvalue())
+
     return response
 
-
 def imprimir_etiquetas_productos(request):
-    if request.method != 'POST':
-        return redirect('lista_productos')
+    if request.method != "POST":
+        return redirect("lista_productos")
 
-    ids = request.POST.getlist('producto_ids')
+    ids = request.POST.getlist("producto_ids")
+    tipo_etiqueta = request.POST.get("tipo_etiqueta", "con_nombre_con_codigo")
+    incluir_codigo = tipo_etiqueta in {"con_nombre_con_codigo", "sin_nombre_con_codigo"}
+    incluir_nombre = tipo_etiqueta in {"con_nombre_con_codigo", "con_nombre_sin_codigo"}
+
     if not ids:
         ids = _obtener_ids_seleccionados(request)
-    productos = list(Producto.objects.filter(pk__in=ids).order_by('nombre')) if ids else []
+
+    productos = (
+        list(
+            Producto.objects.filter(pk__in=ids).order_by("nombre")
+        )
+        if ids else []
+    )
 
     if not productos:
-        messages.warning(request, 'Selecciona al menos un producto para imprimir sus etiquetas.')
-        return redirect('lista_productos')
+        messages.warning(
+            request,
+            "Selecciona al menos un producto para imprimir sus etiquetas."
+        )
+        return redirect("lista_productos")
 
     try:
         from reportlab.lib.pagesizes import A4
         from reportlab.pdfgen import canvas
     except ImportError:
-        messages.error(request, 'Falta instalar reportlab en el entorno del proyecto.')
-        return redirect('lista_productos')
+        messages.error(
+            request,
+            "Falta instalar reportlab en el entorno del proyecto."
+        )
+        return redirect("lista_productos")
 
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="etiquetas_seleccionadas.pdf"'
+    from reportlab.lib.units import cm
+
+    response = HttpResponse(content_type="application/pdf")
+    response["Content-Disposition"] = (
+        'attachment; filename="etiquetas_seleccionadas.pdf"'
+    )
 
     pdf_buffer = BytesIO()
     pdf = canvas.Canvas(pdf_buffer, pagesize=A4)
-    pdf.setTitle('Etiquetas de productos seleccionados')
+    pdf.setTitle("Etiquetas de productos seleccionados")
 
-    posiciones = [
-        (40, 720), (290, 720),
-        (40, 520), (290, 520),
-        (40, 320), (290, 320),
-    ]
+    pagina_ancho, pagina_alto = A4
+
+    ancho = 3.0 * cm
+    alto = 1.5 * cm
+
+    margen_x = 0.5 * cm
+    margen_y = 0.5 * cm
+    espacio_x = 0.15 * cm
+    espacio_y = 0.15 * cm
+
+    columnas = int(
+        (pagina_ancho - 2 * margen_x + espacio_x)
+        // (ancho + espacio_x)
+    )
+
+    filas = int(
+        (pagina_alto - 2 * margen_y + espacio_y)
+        // (alto + espacio_y)
+    )
+
+    por_pagina = columnas * filas
 
     for idx, producto in enumerate(productos):
-        if idx and idx % 6 == 0:
+        posicion = idx % por_pagina
+
+        if idx > 0 and posicion == 0:
             pdf.showPage()
-        x, y = posiciones[idx % 6]
-        _dibujar_etiqueta_adhesiva(pdf, producto, x, y, ancho=200, alto=120)
+
+        columna = posicion % columnas
+        fila = posicion // columnas
+
+        x = margen_x + columna * (ancho + espacio_x)
+        y = pagina_alto - margen_y - alto - fila * (alto + espacio_y)
+
+        _dibujar_etiqueta_adhesiva(
+            pdf,
+            producto,
+            x,
+            y,
+            ancho=ancho,
+            alto=alto,
+            incluir_codigo_barras=incluir_codigo,
+            incluir_nombre=incluir_nombre
+        )
 
     pdf.save()
     pdf_buffer.seek(0)
     response.write(pdf_buffer.getvalue())
+
     return response
 
 def eliminar_producto(request, pk):

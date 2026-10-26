@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
+from .forms import ProductoForm
 from .models import Producto
 
 User = get_user_model()
@@ -22,6 +23,53 @@ class ProductoBarcodeTests(TestCase):
         self.assertTrue(producto.codigo_barras)
         self.assertEqual(len(producto.codigo_barras), 13)
         self.assertTrue(producto.codigo_barras.isdigit())
+
+    def test_codigo_barras_es_editable_en_formulario(self):
+        producto = Producto.objects.create(
+            nombre='Galleta Dulce',
+            precio=4.50,
+            costo=2.80,
+            stock=30,
+            tipoProducto='Galleta',
+            unidadMedida='Unidad',
+            detalle='Galleta dulce',
+        )
+
+        form = ProductoForm(instance=producto)
+        self.assertNotIn('readonly', form.fields['codigo_barras'].widget.attrs)
+        self.assertEqual(form.fields['codigo_barras'].widget.attrs.get('placeholder'), 'Se genera automáticamente')
+
+    def test_codigo_barras_rechaza_valores_distintos_a_13_digitos(self):
+        form = ProductoForm(data={
+            'nombre': 'Coca Cola',
+            'precio': '12.50',
+            'costo': '8.00',
+            'stock': '20',
+            'tipoProducto': 'Bebidas',
+            'unidadMedida': 'Unidad',
+            'zona': 'EqFrio2',
+            'fechaVencimiento': '2035-12-31',
+            'detalle': 'Bebida refrescante',
+            'codigo_barras': '123456789012',
+        })
+
+        self.assertFalse(form.is_valid())
+        self.assertIn('codigo_barras', form.errors)
+
+        form_valido = ProductoForm(data={
+            'nombre': 'Coca Cola',
+            'precio': '12.50',
+            'costo': '8.00',
+            'stock': '20',
+            'tipoProducto': 'Bebidas',
+            'unidadMedida': 'Unidad',
+            'zona': 'EqFrio2',
+            'fechaVencimiento': '2035-12-31',
+            'detalle': 'Bebida refrescante',
+            'codigo_barras': '1234567890123',
+        })
+
+        self.assertTrue(form_valido.is_valid())
 
     def test_imprimir_etiquetas_seleccionadas_generates_pdf(self):
         producto_1 = Producto.objects.create(

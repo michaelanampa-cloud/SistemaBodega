@@ -1,229 +1,849 @@
 {% extends 'dashboard_base.html' %}
+{% load static %}
 
-{% block title %}Carrito{% endblock %}
+{% block title %}Carrito de compras | Doña Catita{% endblock %}
 
 {% block content %}
-<div class="container">
-  <br>
-  <h1 class="mb-4"><i class="fas fa-shopping-cart"></i> Carrito de compras</h1>
+<div class="dc-cart-page">
 
-  <div class="mb-3">
-    <label for="buscar_producto" class="form-label">Buscar producto</label>
-    <input id="buscar_producto" type="search" class="form-control is-valid" placeholder="Escribe el nombre del producto..." autocomplete="off">
-    <div id="sugerencias" class="list-group mt-1" style="position:relative; z-index:1050;"></div>
-  </div>
+    <!-- Encabezado -->
+    <div class="dc-cart-header">
+        <div class="dc-cart-heading">
+            <div class="dc-cart-icon">
+                <i class="fas fa-shopping-cart"></i>
+            </div>
+            <div>
+                <h1>Carrito de compras</h1>
+                <p>Revisa tus productos y prepara tu compra.</p>
+            </div>
+        </div>
 
-  {% if items %}
-    <form method="post" action="{% url 'actualizar_carrito' %}">
-      {% csrf_token %}
-      <div class="table-responsive">
-        <table class="table table-striped table-hover table-bordered align-middle">
-          <thead class="table-dark">
-            <tr>
-              <th>Producto</th>
-              <th>Precio</th>
-            <th>Cantidad</th>
-            <th>Subtotal</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for item in items %}
-          <tr>
-            <td>{{ item.producto.nombre }}
-              {% if item.producto.unidadMedida %}<br><small class="text-muted">({{ item.producto.unidadMedida }})</small>{% endif %}
-              {% if item.producto.en_oferta %}<br><small class="text-success fw-bold">En oferta -10%</small>{% endif %}
-            </td>
-            <td>
-              {% if item.producto.en_oferta %}
-                <span class="text-decoration-line-through text-muted">S/ {{ item.producto.precio|floatformat:2 }}</span><br>
-                <span class="fw-bold text-success">S/ {{ item.precio_unitario|floatformat:2 }}</span>
-              {% else %}
-                S/ {{ item.producto.precio|floatformat:2 }}
-              {% endif %}
-            </td>
-            <td>
-              {% if item.producto.unidadMedida|lower == "kilo" or item.producto.unidadMedida|lower == "kg" %}
-                <input type="number" step="0.01" min="0.01" max="{{ item.producto.stock }}" name="cantidad_{{ item.producto.pk }}" value="{{ item.cantidad }}" class="form-control" style="width: 100px;" required>
-              {% elif item.producto.unidadMedida|lower == "metro" or item.producto.unidadMedida|lower == "m" %}
-                <input type="number" step="0.01" min="0.01" max="{{ item.producto.stock }}" name="cantidad_{{ item.producto.pk }}" value="{{ item.cantidad }}" class="form-control" style="width: 100px;" required>
-              {% else %}
-                <input type="number" min="1" max="{{ item.producto.stock }}" name="cantidad_{{ item.producto.pk }}" value="{{ item.cantidad }}" class="form-control" style="width: 100px;" required>
-              {% endif %}
-              <div class="small text-muted">Stock: 
-                {% if item.producto.unidadMedida|lower == "kilo" or item.producto.unidadMedida|lower == "kg" %}
-                  {{ item.producto.stock|floatformat:2 }}
-                {% elif item.producto.unidadMedida|lower == "metro" or item.producto.unidadMedida|lower == "m" %}
-                  {{ item.producto.stock|floatformat:2 }}
-                {% else %}
-                  {{ item.producto.stock }}
-                {% endif %}
-              </div>
-            </td>
-            <td>S/ {{ item.subtotal|floatformat:2 }}</td>
-            <td>
-                <button type="button" class="btn btn-sm btn-danger btn-eliminar" data-url="{% url 'eliminar_carrito' item.producto.pk %}" data-nombre="{{ item.producto.nombre }}"><i class="fas fa-trash"></i>Eliminar</button>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-          <button type="submit" class="btn btn-primary"><i class="fas fa-sync-alt"></i> Actualizar total</button>
-          <a class="btn btn-outline-dark" href="{% url 'lista_productos' %}"><i class="fas fa-shopping-cart"></i> Seguir comprando</a>
+        {% if items %}
+        <div class="dc-cart-count">
+            <i class="fas fa-box-open"></i>
+            <span>{{ items|length }} producto{{ items|length|pluralize:"s" }}</span>
         </div>
-        <div class="text-end">
-          <h4>Total: S/ {{ total|floatformat:2 }}</h4>
+        {% endif %}
+    </div>
+
+    <!-- Buscador -->
+    <div class="dc-search-card">
+        <label for="buscar_producto" class="dc-search-label">
+            <i class="fas fa-search"></i>
+            Buscar y agregar productos
+        </label>
+
+        <div class="dc-search-wrapper">
+            <i class="fas fa-search dc-search-icon"></i>
+            <input
+                id="buscar_producto"
+                type="search"
+                class="form-control dc-search-input"
+                placeholder="Escribe el nombre del producto..."
+                autocomplete="off"
+            >
+            <span class="dc-search-hint">Buscar</span>
         </div>
-      </div>
+        <div id="sugerencias" class="list-group dc-suggestions"></div>
+        <small class="dc-search-help">
+            Busca un producto y selecciónalo para agregarlo al carrito.
+        </small>
+    </div>
+
+    {% if items %}
+    <form method="post" action="{% url 'actualizar_carrito' %}" id="cartForm">
+        {% csrf_token %}
+
+        <div class="dc-cart-layout">
+
+            <!-- Lista de productos -->
+            <section class="dc-cart-products">
+                <div class="dc-section-heading">
+                    <div>
+                        <h2>Productos seleccionados</h2>
+                        <p>Modifica las cantidades antes de continuar.</p>
+                    </div>
+                    <span class="dc-items-badge">
+                        {{ items|length }} artículo{{ items|length|pluralize:"s" }}
+                    </span>
+                </div>
+
+                <div class="table-responsive dc-table-responsive">
+                    <table class="table dc-cart-table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Precio unitario</th>
+                                <th>Cantidad</th>
+                                <th>Subtotal</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr>
+                                <td>
+                                    <div class="dc-product-info">
+                                        <div class="dc-product-avatar">
+                                            <i class="fas fa-box"></i>
+                                        </div>
+                                        <div class="dc-product-text">
+                                            <span class="dc-product-name">
+                                                {{ item.producto.nombre }}
+                                            </span>
+
+                                            {% if item.producto.unidadMedida %}
+                                            <span class="dc-product-unit">
+                                                <i class="fas fa-ruler-combined"></i>
+                                                {{ item.producto.unidadMedida }}
+                                            </span>
+                                            {% endif %}
+
+                                            {% if item.producto.en_oferta %}
+                                            <span class="dc-offer-badge">
+                                                <i class="fas fa-tag"></i> Oferta -10%
+                                            </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div class="dc-price">
+                                        {% if item.producto.en_oferta %}
+                                        <span class="dc-old-price">
+                                            S/ {{ item.producto.precio|floatformat:2 }}
+                                        </span>
+                                        <span class="dc-current-price">
+                                            S/ {{ item.precio_unitario|floatformat:2 }}
+                                        </span>
+                                        {% else %}
+                                        <span class="dc-current-price">
+                                            S/ {{ item.producto.precio|floatformat:2 }}
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div class="dc-quantity-wrapper">
+                                        {% if item.producto.unidadMedida|lower == "kilo" or item.producto.unidadMedida|lower == "kg" or item.producto.unidadMedida|lower == "metro" or item.producto.unidadMedida|lower == "m" %}
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            min="0.01"
+                                            max="{{ item.producto.stock }}"
+                                            name="cantidad_{{ item.producto.pk }}"
+                                            value="{{ item.cantidad }}"
+                                            class="form-control dc-quantity-input"
+                                            required
+                                        >
+                                        {% else %}
+                                        <input
+                                            type="number"
+                                            step="1"
+                                            min="1"
+                                            max="{{ item.producto.stock }}"
+                                            name="cantidad_{{ item.producto.pk }}"
+                                            value="{{ item.cantidad }}"
+                                            class="form-control dc-quantity-input"
+                                            required
+                                        >
+                                        {% endif %}
+
+                                        <span class="dc-stock-label">
+                                            <i class="fas fa-cubes"></i>
+                                            Stock:
+                                            {% if item.producto.unidadMedida|lower == "kilo" or item.producto.unidadMedida|lower == "kg" or item.producto.unidadMedida|lower == "metro" or item.producto.unidadMedida|lower == "m" %}
+                                                {{ item.producto.stock|floatformat:2 }}
+                                            {% else %}
+                                                {{ item.producto.stock }}
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <span class="dc-subtotal">
+                                        S/ {{ item.subtotal|floatformat:2 }}
+                                    </span>
+                                </td>
+
+                                <td class="text-center">
+                                    <button
+                                        type="button"
+                                        class="dc-delete-btn btn-eliminar"
+                                        data-url="{% url 'eliminar_carrito' item.producto.pk %}"
+                                        data-nombre="{{ item.producto.nombre }}"
+                                        title="Eliminar producto"
+                                        aria-label="Eliminar {{ item.producto.nombre }}"
+                                    >
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="dc-cart-actions">
+                    <a href="{% url 'lista_productos' %}" class="dc-continue-btn">
+                        <i class="fas fa-arrow-left"></i>
+                        Seguir comprando
+                    </a>
+
+                    <button type="submit" class="dc-update-btn">
+                        <i class="fas fa-sync-alt"></i>
+                        Actualizar cantidades
+                    </button>
+                </div>
+            </section>
+
+            <!-- Resumen -->
+            <aside class="dc-summary-card">
+                <div class="dc-summary-title">
+                    <i class="fas fa-receipt"></i>
+                    <h2>Resumen de compra</h2>
+                </div>
+
+                <div class="dc-summary-line">
+                    <span>Productos</span>
+                    <strong>{{ items|length }}</strong>
+                </div>
+
+                <div class="dc-summary-divider"></div>
+
+                <div class="dc-total-label">Total a pagar</div>
+                <div class="dc-total-amount">
+                    <span>S/</span> {{ total|floatformat:2 }}
+                </div>
+
+                <p class="dc-summary-note">
+                    <i class="fas fa-info-circle"></i>
+                    Verifica las cantidades antes de registrar la compra.
+                </p>
+
+                <a href="{% url 'registrar_compra' %}" class="dc-checkout-btn">
+                    <i class="fas fa-check-circle"></i>
+                    Registrar compra
+                    <i class="fas fa-arrow-right dc-checkout-arrow"></i>
+                </a>
+
+                <div class="dc-secure-note">
+                    <i class="fas fa-store"></i>
+                    <span>Bodega Doña Catita</span>
+                </div>
+            </aside>
+
+        </div>
     </form>
 
-    <div class="text-end">
-      <a href="{% url 'registrar_compra' %}" class="btn btn-primary btn-lg"><i class="fas fa-check-circle"></i> Registrar compra</a>
+    {% else %}
+    <div class="dc-empty-cart">
+        <div class="dc-empty-icon">
+            <i class="fas fa-shopping-basket"></i>
+        </div>
+        <h2>Tu carrito está vacío</h2>
+        <p>Aún no has agregado productos. Explora el catálogo y encuentra lo que necesitas.</p>
+        <a href="{% url 'lista_productos' %}" class="dc-empty-btn">
+            <i class="fas fa-store"></i>
+            Explorar productos
+        </a>
     </div>
-  {% else %}
-    <div class="alert alert-info">No hay productos en el carrito. Agrega alguno desde el catálogo o la página de producto.</div>
-    <a class="btn btn-primary" href="{% url 'lista_productos' %}"><i class="fas fa-list"></i> Ver productos</a>
-  {% endif %}
+    {% endif %}
 </div>
 
-<!-- Modal de confirmación para eliminar del carrito -->
-<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header bg-danger text-white">
-        <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar eliminación</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-      </div>
-      <div class="modal-body">
-        <p id="confirmDeleteText">¿Deseas eliminar este producto del carrito?</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        <form id="deleteForm" method="post" action="#" class="d-inline">
-          {% csrf_token %}
-          <button type="submit" class="btn btn-danger">Eliminar</button>
-        </form>
-      </div>
+<!-- Modal para confirmar eliminación -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1"
+     aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content dc-delete-modal">
+            <div class="modal-header">
+                <div class="dc-modal-icon">
+                    <i class="fas fa-trash-alt"></i>
+                </div>
+                <h5 class="modal-title" id="confirmDeleteModalLabel">
+                    Eliminar producto
+                </h5>
+                <button type="button" class="btn-close"
+                        data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <div class="modal-body">
+                <p id="confirmDeleteText">
+                    ¿Deseas eliminar este producto del carrito?
+                </p>
+                <small>Esta acción quitará el producto de tu carrito.</small>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="dc-cancel-btn"
+                        data-bs-dismiss="modal">Cancelar</button>
+                <form id="deleteForm" method="post" action="#">
+                    {% csrf_token %}
+                    <button type="submit" class="dc-confirm-delete-btn">
+                        <i class="fas fa-trash-alt"></i> Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+.dc-cart-page {
+    --dc-green: #78b82a;
+    --dc-green-dark: #4e8515;
+    --dc-ink: #202b25;
+    --dc-muted: #78837c;
+    --dc-border: #e7ece8;
+    color: var(--dc-ink);
+    padding: 12px 0 36px;
+}
+
+.dc-cart-page * { box-sizing: border-box; }
+
+.dc-cart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+}
+
+.dc-cart-heading {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.dc-cart-icon {
+    width: 58px;
+    height: 58px;
+    border-radius: 18px;
+    display: grid;
+    place-items: center;
+    background: #edf7e4;
+    color: var(--dc-green-dark);
+    font-size: 25px;
+}
+
+.dc-cart-heading h1 {
+    font-size: clamp(24px, 3vw, 31px);
+    font-weight: 800;
+    margin: 0 0 5px;
+    letter-spacing: -.7px;
+}
+
+.dc-cart-heading p {
+    margin: 0;
+    color: var(--dc-muted);
+    font-size: 14px;
+}
+
+.dc-cart-count, .dc-items-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: #f3f7f1;
+    color: #456b2c;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.dc-search-card, .dc-cart-products, .dc-summary-card, .dc-empty-cart {
+    background: #fff;
+    border: 1px solid var(--dc-border);
+    border-radius: 19px;
+    box-shadow: 0 7px 24px rgba(31, 53, 38, .045);
+}
+
+.dc-search-card {
+    padding: 21px;
+    margin-bottom: 24px;
+    position: relative;
+    z-index: 5;
+}
+
+.dc-search-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 750;
+    margin-bottom: 11px;
+}
+
+.dc-search-label i { color: var(--dc-green-dark); margin-right: 7px; }
+
+.dc-search-wrapper { position: relative; }
+
+.dc-search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #8a958d;
+    pointer-events: none;
+}
+
+.dc-search-input {
+    height: 50px;
+    padding: 10px 80px 10px 44px;
+    border: 1px solid #dfe7df;
+    border-radius: 12px;
+    background: #fbfdfb;
+    box-shadow: none !important;
+}
+
+.dc-search-input:focus {
+    border-color: #9bcf6b;
+    background: #fff;
+}
+
+.dc-search-hint {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 5px 9px;
+    border-radius: 7px;
+    background: #edf6e6;
+    color: #4e8515;
+    font-size: 11px;
+    font-weight: 750;
+    pointer-events: none;
+}
+
+.dc-search-help {
+    display: block;
+    margin-top: 9px;
+    color: var(--dc-muted);
+    font-size: 12px;
+}
+
+.dc-suggestions {
+    position: absolute;
+    top: calc(100% - 27px);
+    left: 21px;
+    right: 21px;
+    z-index: 1100;
+    border-radius: 0 0 12px 12px;
+    overflow: hidden;
+    box-shadow: 0 12px 25px rgba(0,0,0,.12);
+}
+
+.dc-suggestions:empty { display: none; }
+
+.dc-suggestions .list-group-item {
+    padding: 12px 15px;
+    border-color: #edf0ed;
+    font-size: 13px;
+}
+
+.dc-suggestions .list-group-item:hover {
+    background: #f2f8ed;
+    color: #315c19;
+}
+
+.dc-cart-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    align-items: start;
+    gap: 22px;
+}
+
+.dc-cart-products { min-width: 0; overflow: hidden; }
+
+.dc-section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 22px 22px 18px;
+}
+
+.dc-section-heading h2, .dc-summary-title h2 {
+    font-size: 17px;
+    font-weight: 800;
+    margin: 0;
+}
+
+.dc-section-heading p {
+    color: var(--dc-muted);
+    font-size: 12px;
+    margin: 5px 0 0;
+}
+
+.dc-table-responsive { border-top: 1px solid var(--dc-border); }
+
+.dc-cart-table {
+    min-width: 750px;
+    margin: 0;
+}
+
+.dc-cart-table thead th {
+    background: #f7f9f6;
+    color: #657168;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .55px;
+    text-transform: uppercase;
+    padding: 14px 13px;
+    border-bottom: 1px solid var(--dc-border);
+    white-space: nowrap;
+}
+
+.dc-cart-table tbody td {
+    padding: 16px 13px;
+    border-bottom: 1px solid #eef1ee;
+    font-size: 13px;
+}
+
+.dc-cart-table tbody tr:last-child td { border-bottom: 0; }
+.dc-cart-table tbody tr:hover { background: #fcfefb; }
+
+.dc-product-info { display: flex; align-items: center; gap: 11px; min-width: 175px; }
+
+.dc-product-avatar {
+    flex: 0 0 39px;
+    width: 39px;
+    height: 39px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: #f0f5ec;
+    color: #608b40;
+    font-size: 15px;
+}
+
+.dc-product-text { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+
+.dc-product-name { font-weight: 750; color: #27342b; line-height: 1.35; }
+
+.dc-product-unit { color: #879188; font-size: 11px; }
+
+.dc-offer-badge {
+    display: inline-block;
+    border-radius: 5px;
+    padding: 3px 6px;
+    background: #e8f7e4;
+    color: #34813a;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.dc-price { display: flex; flex-direction: column; gap: 3px; }
+.dc-old-price { color: #9aa39b; font-size: 11px; text-decoration: line-through; }
+.dc-current-price { color: #29372d; font-weight: 750; white-space: nowrap; }
+
+.dc-quantity-wrapper { display: flex; flex-direction: column; gap: 5px; }
+
+.dc-quantity-input {
+    width: 90px;
+    height: 37px;
+    border: 1px solid #dfe6df;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 700;
+    box-shadow: none !important;
+}
+
+.dc-quantity-input:focus { border-color: #91c85f; }
+
+.dc-stock-label { color: #879188; font-size: 10px; white-space: nowrap; }
+.dc-stock-label i { margin-right: 3px; }
+
+.dc-subtotal { font-weight: 850; color: #315b23; white-space: nowrap; }
+
+.dc-delete-btn {
+    width: 35px;
+    height: 35px;
+    border: 1px solid #f2d8d6;
+    border-radius: 10px;
+    background: #fff7f6;
+    color: #d44b43;
+    transition: .2s ease;
+}
+
+.dc-delete-btn:hover { background: #d94d45; color: #fff; border-color: #d94d45; }
+
+.dc-cart-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 17px 20px;
+    border-top: 1px solid var(--dc-border);
+}
+
+.dc-continue-btn, .dc-update-btn, .dc-checkout-btn, .dc-empty-btn {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 750;
+    transition: .2s ease;
+}
+
+.dc-continue-btn {
+    padding: 11px 13px;
+    border: 1px solid #dfe6df;
+    color: #536057;
+    background: #fff;
+}
+
+.dc-continue-btn:hover { background: #f5f8f3; color: #2e5123; }
+
+.dc-update-btn {
+    padding: 12px 15px;
+    border: 0;
+    background: #29372d;
+    color: #fff;
+}
+
+.dc-update-btn:hover { background: #17231a; color: #fff; transform: translateY(-1px); }
+
+.dc-summary-card { padding: 22px; position: sticky; top: 20px; }
+
+.dc-summary-title { display: flex; align-items: center; gap: 10px; margin-bottom: 23px; }
+.dc-summary-title > i { color: #5b8d35; font-size: 18px; }
+.dc-summary-title h2 { font-size: 16px; }
+
+.dc-summary-line { display: flex; justify-content: space-between; color: #778178; font-size: 13px; }
+.dc-summary-line strong { color: #29372d; }
+
+.dc-summary-divider { border-top: 1px dashed #dce4dc; margin: 18px 0; }
+
+.dc-total-label { color: #66736a; font-size: 12px; margin-bottom: 5px; }
+.dc-total-amount { font-size: 29px; font-weight: 850; letter-spacing: -.8px; color: #315b23; }
+.dc-total-amount span { font-size: 16px; }
+
+.dc-summary-note {
+    margin: 17px 0 20px;
+    padding: 11px;
+    border-radius: 9px;
+    background: #f5f8f2;
+    color: #687568;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+.dc-summary-note i { color: #649244; margin-right: 5px; }
+
+.dc-checkout-btn {
+    width: 100%;
+    padding: 14px 12px;
+    background: var(--dc-green);
+    color: #172311;
+    font-size: 13px;
+}
+
+.dc-checkout-btn:hover { background: #8acb42; color: #172311; transform: translateY(-1px); }
+.dc-checkout-arrow { margin-left: auto; }
+
+.dc-secure-note {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 7px;
+    color: #8a958b;
+    font-size: 11px;
+    margin-top: 17px;
+}
+
+.dc-secure-note i { color: #70994e; }
+
+.dc-empty-cart { text-align: center; padding: 55px 22px; }
+
+.dc-empty-icon {
+    width: 88px;
+    height: 88px;
+    display: grid;
+    place-items: center;
+    margin: 0 auto 20px;
+    border-radius: 28px;
+    background: #f0f7e9;
+    color: #78a952;
+    font-size: 35px;
+}
+
+.dc-empty-cart h2 { font-size: 23px; font-weight: 850; }
+.dc-empty-cart p { max-width: 420px; margin: 9px auto 22px; color: var(--dc-muted); font-size: 13px; line-height: 1.7; }
+
+.dc-empty-btn { background: #78b82a; color: #172311; padding: 13px 19px; }
+.dc-empty-btn:hover { background: #8acb42; color: #172311; }
+
+.dc-delete-modal { border: 0; border-radius: 18px; overflow: hidden; }
+.dc-delete-modal .modal-header { align-items: center; gap: 12px; border-bottom-color: #edf0ed; padding: 20px; }
+.dc-delete-modal .modal-title { font-size: 17px; font-weight: 800; }
+.dc-modal-icon { width: 39px; height: 39px; display: grid; place-items: center; border-radius: 12px; background: #fff0ee; color: #d94d45; }
+.dc-delete-modal .modal-body { padding: 22px; }
+.dc-delete-modal .modal-body p { margin-bottom: 8px; font-size: 14px; }
+.dc-delete-modal .modal-body small { color: #879188; }
+.dc-delete-modal .modal-footer { gap: 8px; padding: 15px 20px; background: #fafbfa; }
+
+.dc-cancel-btn, .dc-confirm-delete-btn { padding: 10px 15px; border-radius: 9px; font-size: 12px; font-weight: 750; }
+.dc-cancel-btn { border: 1px solid #dfe6df; background: #fff; color: #526057; }
+.dc-confirm-delete-btn { border: 0; background: #d94d45; color: #fff; }
+.dc-confirm-delete-btn:hover { background: #bd3832; }
+
+@media (max-width: 1100px) {
+    .dc-cart-layout { grid-template-columns: minmax(0, 1fr) 265px; gap: 15px; }
+    .dc-summary-card { padding: 18px; }
+}
+
+@media (max-width: 850px) {
+    .dc-cart-layout { grid-template-columns: 1fr; }
+    .dc-summary-card { position: static; }
+}
+
+@media (max-width: 576px) {
+    .dc-cart-page { padding-top: 4px; }
+    .dc-cart-icon { width: 47px; height: 47px; border-radius: 14px; font-size: 20px; }
+    .dc-cart-heading { gap: 11px; }
+    .dc-cart-heading h1 { font-size: 23px; }
+    .dc-cart-heading p { font-size: 12px; }
+    .dc-cart-count { padding: 8px 10px; }
+    .dc-search-card { padding: 15px; }
+    .dc-suggestions { left: 15px; right: 15px; }
+    .dc-section-heading { padding: 18px 15px; }
+    .dc-section-heading h2 { font-size: 15px; }
+    .dc-items-badge { padding: 8px; font-size: 11px; }
+    .dc-cart-actions { padding: 14px; }
+    .dc-continue-btn, .dc-update-btn { flex: 1 1 100%; }
+    .dc-empty-cart { padding: 40px 18px; }
+}
+</style>
+{% endblock %}
 
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-  var deleteButtons = document.querySelectorAll('.btn-eliminar');
-  var deleteForm = document.getElementById('deleteForm');
-  var confirmText = document.getElementById('confirmDeleteText');
+    // Confirmación de eliminación
+    const deleteButtons = document.querySelectorAll('.btn-eliminar');
+    const deleteForm = document.getElementById('deleteForm');
+    const confirmText = document.getElementById('confirmDeleteText');
+    const modalEl = document.getElementById('confirmDeleteModal');
 
-  deleteButtons.forEach(function(btn){
-    btn.addEventListener('click', function(){
-      var url = this.getAttribute('data-url');
-      var nombre = this.getAttribute('data-nombre') || '';
-      if (deleteForm) {
-        deleteForm.action = url;
-      }
-      if (confirmText) {
-        confirmText.textContent = '¿Deseas eliminar "' + nombre + '" del carrito?';
-      }
-      var modalEl = document.getElementById('confirmDeleteModal');
-      if (modalEl) {
-        var modal = new bootstrap.Modal(modalEl);
-        modal.show();
-      }
+    deleteButtons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            const url = this.getAttribute('data-url');
+            const nombre = this.getAttribute('data-nombre') || '';
+
+            if (deleteForm) deleteForm.action = url;
+
+            if (confirmText) {
+                confirmText.textContent =
+                    '¿Deseas eliminar "' + nombre + '" del carrito?';
+            }
+
+            if (modalEl && window.bootstrap) {
+                bootstrap.Modal.getOrCreateInstance(modalEl).show();
+            }
+        });
     });
-  });
+
+    // Búsqueda de productos
+    const buscarInput = document.getElementById('buscar_producto');
+    const sugerenciasBox = document.getElementById('sugerencias');
+    let debounceTimer = null;
+
+    if (!buscarInput || !sugerenciasBox) return;
+
+    function renderSugerencias(items) {
+        sugerenciasBox.innerHTML = '';
+
+        if (!Array.isArray(items) || !items.length) return;
+
+        items.forEach(function (p) {
+            const el = document.createElement('button');
+            el.type = 'button';
+            el.className = 'list-group-item list-group-item-action';
+
+            const precio = Number(p.precio || 0).toFixed(2);
+            el.textContent =
+                p.nombre + ' (Stock: ' + p.stock + ') - S/ ' + precio;
+
+            el.addEventListener('click', function () {
+                addItemFromSuggestion(p);
+            });
+
+            sugerenciasBox.appendChild(el);
+        });
+    }
+
+    async function fetchProductos(q) {
+        if (!q) {
+            renderSugerencias([]);
+            return;
+        }
+
+        try {
+            const response = await fetch(
+                "{% url 'buscar_producto' %}?q=" + encodeURIComponent(q),
+                { headers: { 'X-Requested-With': 'XMLHttpRequest' } }
+            );
+
+            if (!response.ok) throw new Error('No se pudo buscar productos');
+
+            const data = await response.json();
+            renderSugerencias(data);
+        } catch (error) {
+            console.error('Error al buscar productos:', error);
+            sugerenciasBox.innerHTML = '';
+        }
+    }
+
+    buscarInput.addEventListener('input', function (event) {
+        clearTimeout(debounceTimer);
+        const q = event.target.value.trim();
+
+        debounceTimer = setTimeout(function () {
+            fetchProductos(q);
+        }, 300);
+    });
+
+    async function addItemFromSuggestion(p) {
+        const formData = new FormData();
+        formData.append('cantidad', '1');
+
+        try {
+            const url = "{% url 'agregar_carrito' 0 %}".replace('/0/', '/' + p.id + '/');
+
+            const response = await fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                alert('No se pudo agregar el producto. Verifica el stock e inténtalo nuevamente.');
+            }
+        } catch (error) {
+            console.error('Error al agregar producto:', error);
+            alert('Ocurrió un error al agregar el producto.');
+        }
+    }
+
+    document.addEventListener('click', function (event) {
+        if (!sugerenciasBox.contains(event.target) && event.target !== buscarInput) {
+            sugerenciasBox.innerHTML = '';
+        }
+    });
 });
-
-//buscar productos
-const buscarInput = document.getElementById('buscar_producto');
-const sugerenciasBox = document.getElementById('sugerencias');
-let debounceTimer = null;
-
-function debounce(fn, delay) {
-  return (...args) => {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => fn(...args), delay);
-    };
-}
-
-buscarInput.addEventListener('input', debounce((e) => {
-    const q = e.target.value.trim();
-    fetchProductos(q, false);
-}, 300));
-
-async function fetchProductos(q, forBono=false) {
-    if (!q) {
-        renderSugerencias([]);
-        return;
-    }
-
-    const res = await fetch(`{% url 'buscar_producto' %}?q=${encodeURIComponent(q)}`);
-    const data = await res.json();
-
-    renderSugerencias(data);
-}
-
-function renderSugerencias(items) {
-    sugerenciasBox.innerHTML = '';
-
-    items.forEach(p => {
-        const el = document.createElement('button');
-
-        el.textContent = `${p.nombre} (Stock: ${p.stock}) - S/ ${p.precio}`;
-
-        el.addEventListener('click', () => addItemFromSuggestion(p));
-
-        sugerenciasBox.appendChild(el);
-    });
-}
-
-// funcion para addItemFromSuggestion
-window.addItemFromSuggestion = function(p) {
-    const formData = new FormData();
-    formData.append('cantidad', 1);
-
-    fetch(`{% url 'agregar_carrito' 0 %}`.replace('0', p.id), {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-CSRFToken': '{{ csrf_token }}'
-        }
-    })
-    .then(response => {
-        if (response.ok) {
-            window.location.reload();
-        } else {
-            alert('Error al agregar el producto al carrito.');
-        }
-    });
-};
-
-function renderSugerencias(items) {
-  sugerenciasBox.innerHTML = '';
-  if (!items.length) return;
-  items.forEach(p => {
-    const el = document.createElement('button');
-    el.type = 'button';
-    el.className = 'list-group-item list-group-item-action';
-    el.textContent = `${p.nombre} (Stock: ${p.stock}) - S/ ${p.precio}`;
-    el.dataset.id = p.id;
-    el.dataset.nombre = p.nombre;
-    el.dataset.stock = p.stock;
-    el.dataset.precio = p.precio;
-    el.addEventListener('click', () => addItemFromSuggestion(p));
-    sugerenciasBox.appendChild(el);
-    });
-  }
-  // cerrar sugerencias al hacer click fuera
-  document.addEventListener('click', (e) => {
-  if (!sugerenciasBox.contains(e.target) && e.target !== buscarInput) {
-    sugerenciasBox.innerHTML = '';
-    }
-  });
-
 </script>
-{% endblock %}
 {% endblock %}

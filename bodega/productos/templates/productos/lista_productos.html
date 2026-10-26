@@ -1,4 +1,5 @@
 {% extends 'base_admin.html' %}
+{% load static %}
 
 {% block title %}Productos | Doña Catita{% endblock %}
 
@@ -68,7 +69,7 @@
           <i class="fa-solid fa-magnifying-glass"></i>
 
           <input id="buscarProducto" type="text" name="q" class="form-control" value="{{ query }}"
-            placeholder="Nombre o descripción">
+            placeholder="Nombre, descripción o código de barras">
 
         </div>
 
@@ -174,7 +175,7 @@
           {% for producto in productos_seleccionados %}
           <input type="hidden" name="producto_ids" value="{{ producto.pk }}">
           {% endfor %}
-          <button type="submit" class="dc-btn dc-btn-primary">
+          <button type="button" id="btnImprimirEtiquetas" class="dc-btn dc-btn-primary">
             <i class="fa-solid fa-print"></i>
             Imprimir etiquetas
           </button>
@@ -217,7 +218,7 @@
           <tr>
 
             <td data-label="Seleccionar" class="text-center">
-              <input type="checkbox" name="producto_ids" value="{{ p.pk }}" class="check-producto-etiqueta" form="formEtiquetasMasivas" data-producto-id="{{ p.pk }}" {% if p.pk in productos_seleccionados_ids %}checked{% endif %}>
+              <input type="checkbox" name="producto_ids" value="{{ p.pk }}" class="check-producto-etiqueta" form="formEtiquetasMasivas" data-producto-id="{{ p.pk }}" data-nombre="{{ p.nombre }}" data-codigo-barras="{{ p.codigo_barras|default:'' }}" data-imagen="{% if p.codigo_barras_imagen %}{% static p.codigo_barras_imagen %}{% endif %}" {% if p.pk in productos_seleccionados_ids %}checked{% endif %}>
             </td>
 
             <td data-label="Producto">
@@ -471,12 +472,108 @@
 
 </div>
 
+<div class="modal fade" id="modalPrevisualizarEtiquetas" tabindex="-1" aria-labelledby="modalPrevisualizarEtiquetasLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalPrevisualizarEtiquetasLabel">
+          <i class="fa-solid fa-print"></i>
+          Vista previa de etiquetas
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="tipoImpresionEtiqueta" class="form-label fw-semibold">Tipo de impresión</label>
+          <select id="tipoImpresionEtiqueta" class="form-select">
+            <option value="con_nombre_con_codigo">Con nombre y código</option>
+            <option value="con_nombre_sin_codigo">Con nombre, sin código</option>
+            <option value="sin_nombre_con_codigo">Sin nombre, con código</option>
+            <option value="sin_nombre_sin_codigo">Sin nombre ni código</option>
+          </select>
+        </div>
+        <div id="vistaPreviaEtiquetas" class="row g-3"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="dc-btn dc-btn-secondary" data-bs-dismiss="modal">
+          Cancelar
+        </button>
+        <button type="button" id="confirmarImpresionEtiquetas" class="dc-btn dc-btn-primary">
+          <i class="fa-solid fa-print"></i>
+          Imprimir
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const selectAll = document.getElementById('seleccionarTodoProductos');
     const checkboxes = document.querySelectorAll('.check-producto-etiqueta');
     const detalleSeleccion = document.querySelector('.dc-btn.dc-btn-secondary');
     const botonLimpiar = document.querySelector('#formLimpiarSeleccion button[type="submit"]');
+    const btnImprimirEtiquetas = document.getElementById('btnImprimirEtiquetas');
+    const modalPrevisualizarEtiquetas = document.getElementById('modalPrevisualizarEtiquetas');
+    const vistaPreviaEtiquetas = document.getElementById('vistaPreviaEtiquetas');
+    const confirmarImpresionEtiquetas = document.getElementById('confirmarImpresionEtiquetas');
+    const formEtiquetasMasivas = document.getElementById('formEtiquetasMasivas');
+    const tipoImpresionEtiqueta = document.getElementById('tipoImpresionEtiqueta');
+
+    function renderVistaPrevia() {
+      const seleccionados = Array.from(checkboxes).filter(function (checkbox) {
+        return checkbox.checked;
+      });
+
+      if (!seleccionados.length) {
+        vistaPreviaEtiquetas.innerHTML = '<div class="col-12"><div class="alert alert-warning mb-0">No hay productos seleccionados para imprimir.</div></div>';
+        if (confirmarImpresionEtiquetas) {
+          confirmarImpresionEtiquetas.disabled = true;
+        }
+        return;
+      }
+
+      if (confirmarImpresionEtiquetas) {
+        confirmarImpresionEtiquetas.disabled = false;
+      }
+
+      vistaPreviaEtiquetas.innerHTML = seleccionados.map(function (checkbox) {
+        const nombre = checkbox.dataset.nombre || 'Producto';
+        const codigo = checkbox.dataset.codigoBarras || checkbox.dataset.codigo_barras || 'Sin código';
+        const imagen = checkbox.dataset.imagen || '';
+        const precio = checkbox.closest('tr')?.querySelector('.dc-money')?.textContent?.trim() || 'S/ 0.00';
+        const tipoImpresion = tipoImpresionEtiqueta ? tipoImpresionEtiqueta.value : 'con_nombre_con_codigo';
+        const conCodigo = tipoImpresion === 'con_nombre_con_codigo' || tipoImpresion === 'sin_nombre_con_codigo';
+        const conNombre = tipoImpresion === 'con_nombre_con_codigo' || tipoImpresion === 'con_nombre_sin_codigo';
+        const nombreHtml = conNombre
+          ? '<div class="text-center mb-2"><div class="fw-bold" style="font-size: 1.1rem; color: #111827; line-height: 1.2; min-height: 44px;">' + nombre + '</div></div>'
+          : '';
+        const precioExtraStyle = !conCodigo
+          ? 'font-size: 1.5rem; padding: 0; min-height: 108px; display: flex; align-items: center; justify-content: center; margin-top: auto;'
+          : 'font-size: 1.05rem;';
+        const precioHtml = '<div class="text-center' + (tipoImpresion === 'sin_nombre_sin_codigo' || tipoImpresion === 'con_nombre_sin_codigo' ? ' w-100' : '') + '" style="' + precioExtraStyle + ' color: #059669; font-weight: 700;">' + precio + '</div>';
+        const imagenHtml = conCodigo && imagen
+          ? '<img src="' + imagen + '" alt="Código de barras de ' + nombre + '" style="max-width: 100%; max-height: 64px; display: block; margin: 0 auto; background: white; border: 1px solid #d1d5db; border-radius: 6px; padding: 4px;">'
+          : '';
+        const codigoHtml = conCodigo
+          ? '<div class="text-center mt-2" style="font-size: 0.72rem; letter-spacing: 0.14em; color: #6b7280;">' + codigo + '</div>'
+          : '';
+        const compactClass = !conCodigo ? 'd-flex flex-column h-100' : '';
+        return `
+          <div class="col-md-6">
+            <div class="position-relative border rounded-3 p-3 h-100 shadow-sm ${compactClass}" style="background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%); min-height: 220px; border: 1.5px solid #e5e7eb;">
+              <div class="text-center mb-2">
+                <span class="fw-bold" style="font-size: 0.82rem; letter-spacing: 0.04em; color: #374151; text-transform: uppercase;">Etiqueta</span>
+              </div>
+              ${nombreHtml}
+              ${conCodigo ? '<div class="text-center mt-3">' + imagenHtml + '</div>' : ''}
+              ${conCodigo ? codigoHtml : ''}
+              ${precioHtml}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
 
     function actualizarSeleccion(productoId, accion) {
       const formData = new FormData();
@@ -507,6 +604,7 @@
         } else if (botonLimpiar) {
           botonLimpiar.disabled = false;
         }
+        renderVistaPrevia();
       })
       .catch(function () {
         if (productoId) {
@@ -516,6 +614,38 @@
           }
         }
       });
+    }
+
+    if (btnImprimirEtiquetas) {
+      btnImprimirEtiquetas.addEventListener('click', function () {
+        renderVistaPrevia();
+        if (modalPrevisualizarEtiquetas && typeof bootstrap !== 'undefined') {
+          const modal = new bootstrap.Modal(modalPrevisualizarEtiquetas);
+          modal.show();
+        }
+      });
+    }
+
+    if (confirmarImpresionEtiquetas && formEtiquetasMasivas && tipoImpresionEtiqueta) {
+      confirmarImpresionEtiquetas.addEventListener('click', function () {
+        const hiddenTipoImpresion = document.getElementById('tipoImpresionEtiquetaHidden');
+        const valor = tipoImpresionEtiqueta.value;
+        if (hiddenTipoImpresion) {
+          hiddenTipoImpresion.value = valor;
+        } else {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = 'tipo_etiqueta';
+          input.id = 'tipoImpresionEtiquetaHidden';
+          input.value = valor;
+          formEtiquetasMasivas.appendChild(input);
+        }
+        formEtiquetasMasivas.submit();
+      });
+    }
+
+    if (tipoImpresionEtiqueta) {
+      tipoImpresionEtiqueta.addEventListener('change', renderVistaPrevia);
     }
 
     if (selectAll) {
@@ -534,6 +664,8 @@
         actualizarSeleccion(checkbox.dataset.productoId, accion);
       });
     });
+
+    renderVistaPrevia();
   });
 </script>
 

@@ -5,6 +5,7 @@ from decimal import Decimal, InvalidOperation
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from io import BytesIO
@@ -314,7 +315,11 @@ def buscar_productos(request):
     if not q:
         return JsonResponse([], safe=False)
 
-    productos = Producto.objects.filter(nombre__icontains=q).order_by('nombre')[:12]
+    productos = Producto.objects.filter(
+        Q(nombre__icontains=q)
+        | Q(codigo_barras__icontains=q)
+        | Q(detalle__icontains=q)
+    ).order_by('nombre')[:12]
     results = []
     for p in productos:
         results.append({
